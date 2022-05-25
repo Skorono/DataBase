@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Compiler Value="C:\lazarus\fpc\3.2.2\bin\x86_64-win64\fpc.exe" Date="1420791944"/>
+  <Params Value=" -MObjFPC -Scghi -O1 -gw2 -gl -l -vewnhibq -FiC:\Users\Ольга\Desktop\projects\DB\lib\x86_64-win64 -FuC:\Users\Ольга\Desktop\projects\DB\ -FUC:\Users\Ольга\Desktop\projects\DB\lib\x86_64-win64\ -FEC:\Users\Ольга\Desktop\projects\DB\ -oC:\Users\Ольга\Desktop\projects\DB\Storage.exe Storage.lpr"/>
+</CONFIG>
