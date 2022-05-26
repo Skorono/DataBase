@@ -5,21 +5,25 @@ unit base_graphic;
 interface
 
 uses
-  Classes, SysUtils, Crt;
+  Classes, SysUtils, Crt, Windows;
 
 type
-  Menu = class sealed
-      x, y, background, width, height: integer;
-
+  TextButton = class
+    button_width, button_height: integer;
     public
-      procedure Create;
-      constructor Init(start_x, start_y, abs_background: integer);
+      constructor Init(width, height: integer);
+      function Create(x_cord, y_cord, abs_background: integer; abs_text: string): TextButton;
   end;
 
-  TextButton = class
+  Menu = class sealed
+      x, y, background: integer;
+      buttons: array[1..10] of TextButton;
+
+      countButtons: integer;
     public
-      procedure Create(x, y, x1, y1, abs_background: integer; abs_text: string);
-      constructor Init;
+      procedure Create;
+      procedure Main;
+      constructor Init(start_x, start_y, abs_background: integer);
   end;
 
 implementation
@@ -27,40 +31,74 @@ implementation
   begin
     x := start_x;
     y := start_y;
+    countButtons := 0;
     background := abs_background;
-    width := 800;
-    height := 600;
   end;
 
   procedure Menu.Create();
   const
     base_count = 3;
+
   var
     obj_button: TextButton;
-    button_width, button_height, i: integer;
+    i: integer;
+    cord_x, cord_y: integer;
+
   begin
-    obj_button.Init;
-    button_width := 30;
-    button_height := 15;
-    Window(x, y, button_width, button_height);
+    obj_button := TextButton.Init(40, 20);
+    Window(x, y, WindowWidth, WindowHeight);
+    cord_x := WindowWidth/2;
+    cord_y := WindowHeight/2;
 
     for i:= 1 to base_count do
       begin
-        obj_button.Create(x, y, button_width + x, button_height + y, background, '–ë–∞–∑–∞ –î–∞–Ω–Ω—ã—Ö ‚Ññ{i}!');
-        y := y + 10;
+        if WhereY = y then
+          background := 2;
+        buttons[i] := obj_button.Create(cord_x - button_width, cord_y, background, '¡‡Á‡ ƒ‡ÌÌ˚ı π' + inttostr(i));
+        cord_y := cord_y + 20;
       end;
   end;
 
-  constructor TextButton.Init;
+  procedure Menu.Main;
+  {var
+    run: boolean;}
   begin
+    {run := true;
+    while run do
+    begin
+      case readkey of
+      #80:
+        begin
+
+        end;
+      #72:
+        begin
+
+        end;
+      #13:
+        begin
+
+        end;
+      end;
+    end;}
   end;
 
-  procedure TextButton.Create(x, y, x1, y1, abs_background: integer; abs_text: string);
+  constructor TextButton.Init(width, height: integer);
   begin
-    Window(x, y, x1, y1);
+    button_width := width;
+    button_height := height;
+  end;
+
+  function TextButton.Create(x_cord, y_cord, abs_background: integer; abs_text: string): TextButton;
+  const
+    width = 256;
+    height = 256;
+  begin
+    Window(x_cord, y_cord, x_cord - button_width, y_cord + button_height);
     TextBackground(abs_background);
-    gotoxy(x, y);
-    writeln(abs_text);
+    gotoxy(x_cord, y_cord);
+    write(abs_text);
+    Create := Self;
   end;
 
   begin

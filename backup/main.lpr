@@ -3,12 +3,18 @@ program Main;
 {$mode objfpc}{$H+}
 
 uses
-  Classes, delete;
+  Classes, Windows, Crt;
 
-//var
-   //menu_obj: Menu;
+{var
+   menu_obj: Menu;}
 begin
-  //menu_obj.Init(0, 0, 1);
+  SetConsoleCP(1251);
+  SetConsoleOutputCP(1251);
+  ShowWindow(GetConsoleWindow(), SW_MAXIMIZE);
+  SetConsoleTitle('BD MENU');
+  writeln(GetConsoleWindow());
+  //menu_obj:=Menu.Init(1, 1, 0);
   //menu_obj.Create;
+  readkey();
 end.
 
