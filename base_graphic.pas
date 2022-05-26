@@ -5,57 +5,74 @@ unit base_graphic;
 interface
 
 uses
-  Classes, SysUtils, Crt, Windows;
+  Classes, SysUtils, Crt;
 
 type
-  TextButton = class
-    button_width, button_height: integer;
+  Border = class
     public
+      borderFreeSpace, x, high_y, end_y, text_size: integer;
+      symbol: char;
+
+    {Размер текста внутри, координаты начала откуда идёт текст, координаты конца по y, символ который будет в горизонтальной строке}
+    constructor Init(fsymbol: char; freeSpace, std_x, start_y, last_y, t_size: integer);
+    procedure Create;
+  end;
+
+  TextButton = class
+    public
+      button_width, button_height, x_pos, y_pos: integer;
+      background: integer;
+
       constructor Init(width, height: integer);
       function Create(x_cord, y_cord, abs_background: integer; abs_text: string): TextButton;
+      //function DeepCopy(obj: TextButton): TextButton;
   end;
 
   Menu = class sealed
-      x, y, background: integer;
+      x, y, x_border, y_border, background: integer;
       buttons: array[1..10] of TextButton;
 
       countButtons: integer;
     public
       procedure Create;
       procedure Main;
-      constructor Init(start_x, start_y, abs_background: integer);
+      constructor Init(abs_background: integer);
   end;
 
+
 implementation
-  constructor Menu.Init(start_x, start_y, abs_background: integer);
+  constructor Menu.Init(abs_background: integer);
   begin
-    x := start_x;
-    y := start_y;
-    countButtons := 0;
+    x := 1;
+    y := 1;
+    x_border := 80;
+    y_border := 25;
+    countButtons := 3;
     background := abs_background;
   end;
 
   procedure Menu.Create();
   const
     base_count = 3;
+    text_size = 14;
+    spaceBetweenButtons = 2;
 
   var
     obj_button: TextButton;
-    i: integer;
-    cord_x, cord_y: integer;
+    text: string[text_size];
+    cord_x, cord_y, i: integer;
 
   begin
-    obj_button := TextButton.Init(40, 20);
-    Window(x, y, WindowWidth, WindowHeight);
-    cord_x := WindowWidth/2;
-    cord_y := WindowHeight/2;
+    obj_button := TextButton.Init(text_size, spaceBetweenButtons);
+    Window(x, y, x_border, y_border);
+    cord_x := x_border div 2;
+    cord_y := y_border div 2;
 
     for i:= 1 to base_count do
       begin
-        if WhereY = y then
-          background := 2;
-        buttons[i] := obj_button.Create(cord_x - button_width, cord_y, background, 'База Данных №' + inttostr(i));
-        cord_y := cord_y + 20;
+        text := 'База Данных №' + inttostr(i);
+        buttons[i] := obj_button.Create(cord_x - (text_size div 2), cord_y, background, text);
+        cord_y := cord_y + spaceBetweenButtons;
       end;
   end;
 
@@ -89,16 +106,60 @@ implementation
     button_height := height;
   end;
 
+  //function TextButton.DeepCopy(obj: TextButton): TextButton;
+  //begin
+  //  obj := obj.Init(button_width, button_height);
+  //  obj.x_pos := x_pos;
+  //  obj.y_pos := y_pos;
+  //  obj.background := background;
+  //  DeepCopy := obj;
+  //end;
+  //
   function TextButton.Create(x_cord, y_cord, abs_background: integer; abs_text: string): TextButton;
-  const
-    width = 256;
-    height = 256;
+  var
+    DeepCopyObj: TextButton;
   begin
-    Window(x_cord, y_cord, x_cord - button_width, y_cord + button_height);
-    TextBackground(abs_background);
+    Window(x_cord, y_cord, x_cord + button_width, y_cord + button_height);
+    x_pos := x_cord;
+    y_pos := y_cord;
+    background := abs_background;
+    TextBackground(background);
     gotoxy(x_cord, y_cord);
     write(abs_text);
+
+    {Желательно что-то с этим сделать}
+    //Create := DeepCopy(DeepCopyObj);
     Create := Self;
+  end;
+
+  constructor Border.Init(fsymbol: char; freeSpace, std_x, start_y, last_y, t_size: integer);
+  begin
+    borderFreeSpace := freeSpace;
+    x := std_x;
+    high_y := start_y;
+    end_y := last_y;
+    text_size := t_size;
+    symbol := fsymbol;
+  end;
+
+  procedure Border.Create;
+  var
+    horizontal_text: string;
+    i: integer;
+  begin
+    horizontal_text := symbol * (text_size + (borderFreeSpace * 2));
+
+    gotoxy(x - borderFreeSpace, high_y - borderFreeSpace);
+    write(horizontal_text);
+    for i := (high_y - borderFreeSpace) - 1 to (end_y + borderFreeSpace) - 1 do
+      begin
+        gotoxy(x - borderFreeSpace, i);
+        write('|');
+        gotoxy(x + text_size + borderFreeSpace, i);
+        write('|');
+      end;
+    gotoxy(x, end_y + borderFreeSpace);
+    write(horizontal_text);
   end;
 
   begin

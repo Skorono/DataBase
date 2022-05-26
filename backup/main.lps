@@ -9,10 +9,8 @@
         <Filename Value="main.lpr"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Main"/>
-        <IsVisibleTab Value="True"/>
-        <TopLine Value="4"/>
-        <CursorPos X="30" Y="14"/>
-        <UsageCount Value="34"/>
+        <CursorPos X="23" Y="15"/>
+        <UsageCount Value="42"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -21,14 +19,15 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="22"/>
         <CursorPos X="19" Y="22"/>
-        <UsageCount Value="30"/>
+        <UsageCount Value="38"/>
       </Unit>
       <Unit>
         <Filename Value="base_graphic.pas"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="41"/>
-        <CursorPos X="18" Y="49"/>
-        <UsageCount Value="17"/>
+        <TopLine Value="92"/>
+        <CursorPos X="7" Y="142"/>
+        <UsageCount Value="21"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -38,44 +37,18 @@
       </Unit>
       <Unit>
         <Filename Value="storage.pas"/>
-        <EditorIndex Value="-1"/>
+        <EditorIndex Value="2"/>
         <CursorPos X="34" Y="9"/>
-        <UsageCount Value="15"/>
+        <UsageCount Value="16"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="C:\lazarus\fpc\3.2.2\source\rtl\win64\windows.pp"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="10"/>
       </Unit>
     </Units>
-    <JumpHistory HistoryIndex="9">
-      <Position>
-        <Filename Value="main.lpr"/>
-        <Caret Line="12" Column="3"/>
-      </Position>
-      <Position>
-        <Filename Value="main.lpr"/>
-        <Caret Line="14" Column="13"/>
-      </Position>
-      <Position>
-        <Filename Value="main.lpr"/>
-        <Caret Line="12" Column="20"/>
-      </Position>
-      <Position>
-        <Filename Value="main.lpr"/>
-        <Caret Line="10" Column="6"/>
-      </Position>
-      <Position>
-        <Filename Value="main.lpr"/>
-        <Caret Line="13" Column="47"/>
-      </Position>
-      <Position>
-        <Filename Value="main.lpr"/>
-        <Caret Line="14" Column="29"/>
-      </Position>
-      <Position>
-        <Filename Value="main.lpr"/>
-        <Caret Line="15" Column="5" TopLine="4"/>
-      </Position>
-      <Position>
-        <Filename Value="main.lpr"/>
-        <Caret Line="6" Column="19" TopLine="4"/>
-      </Position>
+    <JumpHistory HistoryIndex="29">
       <Position>
         <Filename Value="main.lpr"/>
         <Caret Line="9" Column="5"/>
@@ -83,6 +56,118 @@
       <Position>
         <Filename Value="main.lpr"/>
         <Caret Line="8" Column="2" TopLine="3"/>
+      </Position>
+      <Position>
+        <Filename Value="main.lpr"/>
+        <Caret Line="6" Column="19" TopLine="4"/>
+      </Position>
+      <Position>
+        <Filename Value="base_graphic.pas"/>
+        <Caret Line="14" Column="23" TopLine="11"/>
+      </Position>
+      <Position>
+        <Filename Value="main.lpr"/>
+        <Caret Line="15" Column="11"/>
+      </Position>
+      <Position>
+        <Filename Value="base_graphic.pas"/>
+        <Caret Line="8" Column="36"/>
+      </Position>
+      <Position>
+        <Filename Value="main.lpr"/>
+        <Caret Line="6" Column="32"/>
+      </Position>
+      <Position>
+        <Filename Value="base_graphic.pas"/>
+        <Caret Line="103" Column="20" TopLine="54"/>
+      </Position>
+      <Position>
+        <Filename Value="main.lpr"/>
+        <Caret Line="6" Column="38"/>
+      </Position>
+      <Position>
+        <Filename Value="base_graphic.pas"/>
+        <Caret Line="14" Column="31"/>
+      </Position>
+      <Position>
+        <Filename Value="base_graphic.pas"/>
+        <Caret Line="19" Column="32"/>
+      </Position>
+      <Position>
+        <Filename Value="base_graphic.pas"/>
+        <Caret Line="44" Column="29" TopLine="19"/>
+      </Position>
+      <Position>
+        <Filename Value="base_graphic.pas"/>
+        <Caret Line="48" Column="29" TopLine="22"/>
+      </Position>
+      <Position>
+        <Filename Value="main.lpr"/>
+        <Caret Line="8"/>
+      </Position>
+      <Position>
+        <Filename Value="base_graphic.pas"/>
+        <Caret Line="62" Column="11" TopLine="21"/>
+      </Position>
+      <Position>
+        <Filename Value="base_graphic.pas"/>
+        <Caret Line="63" Column="23" TopLine="36"/>
+      </Position>
+      <Position>
+        <Filename Value="base_graphic.pas"/>
+        <Caret Line="62" Column="11" TopLine="31"/>
+      </Position>
+      <Position>
+        <Filename Value="base_graphic.pas"/>
+        <Caret Line="112" Column="27" TopLine="61"/>
+      </Position>
+      <Position>
+        <Filename Value="base_graphic.pas"/>
+        <Caret Line="109" Column="32" TopLine="63"/>
+      </Position>
+      <Position>
+        <Filename Value="base_graphic.pas"/>
+        <Caret Line="113" Column="27" TopLine="64"/>
+      </Position>
+      <Position>
+        <Filename Value="base_graphic.pas"/>
+        <Caret Line="110" Column="27" TopLine="64"/>
+      </Position>
+      <Position>
+        <Filename Value="base_graphic.pas"/>
+        <Caret Line="111" Column="37" TopLine="65"/>
+      </Position>
+      <Position>
+        <Filename Value="base_graphic.pas"/>
+        <Caret Line="99" Column="8" TopLine="70"/>
+      </Position>
+      <Position>
+        <Filename Value="base_graphic.pas"/>
+        <Caret Line="18" Column="54"/>
+      </Position>
+      <Position>
+        <Filename Value="base_graphic.pas"/>
+        <Caret Line="100" Column="13" TopLine="71"/>
+      </Position>
+      <Position>
+        <Filename Value="base_graphic.pas"/>
+        <Caret Line="98" Column="23" TopLine="71"/>
+      </Position>
+      <Position>
+        <Filename Value="base_graphic.pas"/>
+        <Caret Line="26" TopLine="46"/>
+      </Position>
+      <Position>
+        <Filename Value="base_graphic.pas"/>
+        <Caret Column="210"/>
+      </Position>
+      <Position>
+        <Filename Value="base_graphic.pas"/>
+        <Caret Line="8" Column="25"/>
+      </Position>
+      <Position>
+        <Filename Value="base_graphic.pas"/>
+        <Caret Line="137" Column="29" TopLine="85"/>
       </Position>
     </JumpHistory>
     <RunParams>
