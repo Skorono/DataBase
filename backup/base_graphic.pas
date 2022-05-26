@@ -9,8 +9,8 @@ uses
 
 type
   Menu = class
-    private
-      x, y, width, height, background: integer;
+      x, y, background, width, height: integer;
+
     public
       procedure Create;
       constructor Init(start_x, start_y, abs_background: integer);
@@ -19,6 +19,7 @@ type
   TextButton = class
     public
       procedure Create(x, y, x1, y1, abs_background: integer; abs_text: string);
+      constructor Init;
   end;
 
 implementation
@@ -38,16 +39,20 @@ implementation
     obj_button: TextButton;
     button_width, button_height, i: integer;
   begin
-
-    button_width := 30 + x;
-    button_height := 15 + y;
+    obj_button.Init;
+    button_width := 30;
+    button_height := 15;
     Window(x, y, button_width, button_height);
 
     for i:= 1 to base_count do
       begin
-        obj_button.Create(x, y, button_width, button_height, background, 'База {i}!');
+        obj_button.Create(x, y, button_width + x, button_height + y, background, 'База Данных №{i}!');
         y := y + 10;
       end;
+  end;
+
+  constructor TextButton.Init;
+  begin
   end;
 
   procedure TextButton.Create(x, y, x1, y1, abs_background: integer; abs_text: string);
