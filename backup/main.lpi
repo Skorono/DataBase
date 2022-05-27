@@ -30,6 +30,10 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="Main"/>
       </Unit>
+      <Unit>
+        <Filename Value="delete.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

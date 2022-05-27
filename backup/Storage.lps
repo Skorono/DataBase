@@ -9,22 +9,22 @@
         <Filename Value="Storage.lpr"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
-        <CursorPos X="12" Y="9"/>
+        <CursorPos X="10" Y="9"/>
         <UsageCount Value="21"/>
       </Unit>
       <Unit>
         <Filename Value="storage.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="16"/>
+        <EditorIndex Value="1"/>
         <CursorPos X="8" Y="25"/>
         <UsageCount Value="21"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="base_graphic.pas"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="16"/>
-        <CursorPos X="37" Y="32"/>
+        <TopLine Value="54"/>
+        <CursorPos X="20" Y="103"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit>
@@ -47,16 +47,10 @@
       <FormatVersion Value="2"/>
       <Modes ActiveMode=""/>
     </RunParams>
+    <HistoryLists>
+      <List Name="LaunchingApplication" Type="File" Count="1">
+        <Item1 Value="C:\WINDOWS\system32\cmd.exe /C ${TargetCmdLine}"/>
+      </List>
+    </HistoryLists>
   </ProjectSession>
-  <Debugging>
-    <BreakPoints>
-      <Item>
-        <Kind Value="bpkSource"/>
-        <WatchScope Value="wpsLocal"/>
-        <WatchKind Value="wpkWrite"/>
-        <Source Value="base_graphic.pas"/>
-        <Line Value="32"/>
-      </Item>
-    </BreakPoints>
-  </Debugging>
 </CONFIG>

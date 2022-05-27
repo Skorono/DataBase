@@ -3,14 +3,18 @@ program Main;
 {$mode objfpc}{$H+}
 
 uses
-  {$IFDEF UNIX}
-  cthreads,
-  {$ENDIF}
-  Classes, base_graphic
-  { you can add units after this };
+  Classes, Windows, Crt, base_graphic;
+
 var
-   menu_obj: Menu(0, 0, 1);
+   menu_obj: Menu;
 begin
-  menu_obj.Create;
+  SetConsoleCP(1251);
+  SetConsoleOutputCP(1251);
+  ShowWindow(GetConsoleWindow(), SW_MAXIMIZE);
+  SetConsoleTitle('BD MENU');
+  TextBackground(4);
+  menu_obj:=Menu.Init(0);
+  menu_obj.main;
+  readkey();
 end.
 
