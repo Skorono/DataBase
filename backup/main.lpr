@@ -12,8 +12,9 @@ begin
   SetConsoleOutputCP(1251);
   ShowWindow(GetConsoleWindow(), SW_MAXIMIZE);
   SetConsoleTitle('BD MENU');
-  menu_obj:=Menu.Init(1, 1, 0);
-  menu_obj.Create;
+  TextBackground(4);
+  menu_obj:=Menu.Init(0);
+  menu_obj.main;
   readkey();
 end.
 

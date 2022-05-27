@@ -13,7 +13,7 @@ begin
   ShowWindow(GetConsoleWindow(), SW_MAXIMIZE);
   SetConsoleTitle('BD MENU');
   menu_obj:=Menu.Init(0);
-  menu_obj.Create;
+  menu_obj.main;
   readkey();
 end.
 
