@@ -22,6 +22,7 @@ type
     public
       button_width, button_height, x_pos, y_pos: integer;
       background: integer;
+      text_border: Border;
 
       constructor Init(width, height: integer);
       function Create(x_cord, y_cord, abs_background: integer; abs_text: string): TextButton;
@@ -31,6 +32,7 @@ type
   Menu = class sealed
       x, y, x_border, y_border, background: integer;
       buttons: array[1..10] of TextButton;
+      menu_border: Border;
 
       countButtons: integer;
     public
@@ -74,6 +76,8 @@ implementation
         buttons[i] := obj_button.Create(cord_x - (text_size div 2), cord_y, background, text);
         cord_y := cord_y + spaceBetweenButtons;
       end;
+    menu_border := border.Init('~', 1, cord_x - (text_size div 2), cord_y - (spaceBetweenButtons * base_count), cord_y, text_size);
+    menu_border.create;
   end;
 
   procedure Menu.Main;
@@ -132,23 +136,36 @@ implementation
     Create := Self;
   end;
 
-  constructor Border.Init(fsymbol: char; std_x, start_y, last_y, t_size: integer);
+  constructor Border.Init(fsymbol: char; freeSpace, std_x, start_y, last_y, t_size: integer);
   begin
-    borderFreeSpace := FreeSpace;
-    framedPos_x := framed_x;
-    framedPos_y := framed_y;
+    borderFreeSpace := freeSpace;
+    x := std_x;
+    high_y := start_y;
+    end_y := last_y;
+    text_size := t_size;
     symbol := fsymbol;
   end;
 
   procedure Border.Create;
   var
     horizontal_text: string;
+    i: integer;
   begin
-    horizontal_text := symbol * (framed_x + (borderFreeSpace * 2));
-    gotoxy(framedPos_x - borderFreeSpace, framedPos_y - borderFreeSpace);
-    write(horizontal_text);
+    {horizontal_text := '';
+    for i := 1 to text_size do
+      horizontal_text := horizontal_text + symbol;
 
-    gotoxy()
+    gotoxy(x - borderFreeSpace, high_y - borderFreeSpace);
+    write(horizontal_text);
+    for i := (high_y - borderFreeSpace) - 1 to (end_y + borderFreeSpace) - 1 do
+      begin
+        gotoxy(x - borderFreeSpace, i);
+        write('|');
+        gotoxy(x + text_size + borderFreeSpace, i);
+        write('|');
+      end;
+    gotoxy(x, end_y + borderFreeSpace);
+    write(horizontal_text); }
   end;
 
   begin

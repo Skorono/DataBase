@@ -22,6 +22,7 @@ type
     public
       button_width, button_height, x_pos, y_pos: integer;
       background: integer;
+      text_border: Border;
 
       constructor Init(width, height: integer);
       function Create(x_cord, y_cord, abs_background: integer; abs_text: string): TextButton;
@@ -31,6 +32,7 @@ type
   Menu = class sealed
       x, y, x_border, y_border, background: integer;
       buttons: array[1..10] of TextButton;
+      menu_border: Border;
 
       countButtons: integer;
     public
@@ -74,6 +76,8 @@ implementation
         buttons[i] := obj_button.Create(cord_x - (text_size div 2), cord_y, background, text);
         cord_y := cord_y + spaceBetweenButtons;
       end;
+    menu_border := border.Init('~', 1, cord_x - (text_size div 2), cord_y - (spaceBetweenButtons * base_count), cord_y, text_size);
+    menu_border.create;
   end;
 
   procedure Menu.Main;
@@ -147,7 +151,11 @@ implementation
     horizontal_text: string;
     i: integer;
   begin
-    horizontal_text := symbol * (text_size + (borderFreeSpace * 2));
+    window(x - borderFreeSpace, high_y - borderFreeSpace, x + text_size + (borderFreeSpace * 2), (end_y - high_y) ); {Дописать}
+
+    horizontal_text := '';
+    for i := 1 to text_size do
+      horizontal_text := horizontal_text + symbol;
 
     gotoxy(x - borderFreeSpace, high_y - borderFreeSpace);
     write(horizontal_text);
