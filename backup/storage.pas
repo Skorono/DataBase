@@ -12,7 +12,6 @@ type PNode = ^Line_Node;
        previous: PNode;
      end;
      // Todo: Создать класс листа для передачи в класс для работы с базой
-
      Cls_List = class
        Line: PNode;
        function add_line: PNode;

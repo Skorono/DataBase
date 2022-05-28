@@ -6,8 +6,12 @@ interface
 
 uses
   Classes, SysUtils, Crt;
-
 type
+  Base = class
+    {procedure add_line;}
+
+  end;
+
   Border = class
     public
       borderFreeSpace, start_x, top_y, bottom_y, text_size, dif_y, last_x: integer;
@@ -23,11 +27,15 @@ type
       button_width, button_height, x_pos, y_pos: integer;
       background: integer;
       text: string;
-      text_border: Border;
+      Border: Border;
 
-      constructor Init(width, height: integer);
-      function Create(x_cord, y_cord, abs_background: integer; abs_text: string): TextButton;
+      constructor Init(width, height, x_cord, y_cord, abs_background: integer; abs_text: string);
+      function Create: TextButton;
       destructor del;
+  end;
+
+  Cell = class(TextButton)
+
   end;
 
   Menu = class sealed
@@ -37,10 +45,13 @@ type
 
       countButtons: integer;
     public
-      procedure Create;
+      procedure Show_menu;
+      function Key_UP(on_button: integer): integer;
+      function Key_DOWN(on_button: integer): integer;
+      procedure press_enter;
       procedure Main;
-      procedure Destroy_screen;
       constructor Init(abs_background: integer);
+      destructor del;
   end;
 
 
@@ -55,32 +66,59 @@ implementation
     background := abs_background;
   end;
 
-  procedure Menu.Create();
+  procedure Menu.Show_menu();
   const
     base_count = 3;
     text_size = 14;
     spaceBetweenButtons = 2;
 
   var
-    obj_button: TextButton;
     text: string[text_size];
     cord_x, cord_y, i: integer;
 
   begin
-   // obj_button := TextButton.Init(text_size, spaceBetweenButtons);
     Window(x, y, x_border, y_border);
-    cord_x := x_border div 2;
+    cord_x := (x_border div 2) - (text_size div 2);
     cord_y := y_border div 2;
 
     for i:= 1 to base_count do
       begin
         text := 'База Данных №' + inttostr(i);
-        buttons[i] := TextButton.Init(text_size, spaceBetweenButtons);
-        buttons[i].Create(cord_x - (text_size div 2), cord_y, background, text);
+        buttons[i] := TextButton.Init(text_size, spaceBetweenButtons, cord_x, cord_y, background, text);
+        buttons[i].Create();
         cord_y := cord_y + spaceBetweenButtons;
       end;
-    menu_border := border.Init('~', 2, buttons[1].x_pos, buttons[1].y_pos, buttons[countButtons].y_pos, text_size);
-    menu_border.create;
+    //menu_border := border.Init('~', 2, buttons[1].x_pos, buttons[1].y_pos, buttons[countButtons].y_pos, text_size);
+    //menu_border.create;
+  end;
+
+  function Menu.Key_UP(on_button: integer): integer;
+  begin
+    buttons[on_button].background := 0;
+    buttons[on_button].Create();
+    if on_button = 1 then
+      on_button := countButtons
+    else
+      on_button := on_button - 1;
+    Key_UP := on_button;
+  end;
+
+  function Menu.Key_DOWN(on_button: integer): integer;
+  begin
+    buttons[on_button].background := 0;
+    buttons[on_button].Create();
+    if on_button = countButtons then
+      on_button := 1
+    else
+      on_button := on_button + 1;
+    Key_DOWN := on_button;
+  end;
+
+  procedure Menu.press_enter;
+  begin
+    Window(1, 1, x_border, y_border);
+    TextBackground(0);
+    ClrScr;
   end;
 
   procedure Menu.Main;
@@ -88,7 +126,7 @@ implementation
     run: boolean;
     on_button: integer;
   begin
-    create();
+    Show_menu();
 
     run := true;
     on_button := 1;
@@ -99,64 +137,57 @@ implementation
       case readkey of
       #72:
         begin
-          buttons[on_button].background := 0;
-          buttons[on_button].Create(buttons[on_button].x_pos, buttons[on_button].y_pos, buttons[on_button].background, buttons[on_button].text);
-          if on_button = 1 then
-              on_button := countButtons
-          else
-              on_button := on_button - 1;
+          on_button := Key_UP(on_button);
         end;
       #80:
         begin
-          buttons[on_button].background := 0;
-          buttons[on_button].Create(buttons[on_button].x_pos, buttons[on_button].y_pos, buttons[on_button].background, buttons[on_button].text);
-          if on_button = countButtons then
-            on_button := 1
-          else
-            on_button := on_button + 1;
+          on_button := Key_DOWN(on_button);
         end;
       #13:
         begin
-          Destroy_screen;
-          ClrScr;
-          TextBackground(0);
+          press_enter;
+          del;
+
+          run := false;
         end;
       end;
-      buttons[on_button].background := 2;
-      gotoxy(buttons[on_button].x_pos, buttons[on_button].y_pos);
-      ClrEol;
-      buttons[on_button].Create(buttons[on_button].x_pos, buttons[on_button].y_pos, buttons[on_button].background, buttons[on_button].text);
+      if run then
+      begin
+        buttons[on_button].background := 2;
+        gotoxy(buttons[on_button].x_pos, buttons[on_button].y_pos);
+        ClrEol;
+        buttons[on_button].Create();
+      end;
     end;
   end;
 
-  procedure Menu.Destroy_screen;
+  destructor Menu.Del;
   var
     i: integer;
   begin
     for i := 1 to countButtons do
-      {if buttons[i] then}
       buttons[i].del;
   end;
 
-  constructor TextButton.Init(width, height: integer);
+  constructor TextButton.Init(width, height, x_cord, y_cord, abs_background: integer; abs_text: string);
   begin
     button_width := width;
     button_height := height;
+    x_pos := x_cord;
+    y_pos := y_cord;
+    background := abs_background;
+    text := abs_text;
   end;
 
   destructor TextButton.Del;
   begin
   end;
 
-  function TextButton.Create(x_cord, y_cord, abs_background: integer; abs_text: string): TextButton;
+  function TextButton.Create(): TextButton;
   begin
-    Window(x_cord, y_cord, x_cord + button_width, y_cord + button_height);
-    x_pos := x_cord;
-    y_pos := y_cord;
-    text := abs_text;
-    background := abs_background;
+    Window(x_pos, y_pos, x_pos + button_width, y_pos + button_height);
     TextBackground(background);
-    gotoxy(x_cord, y_cord);
+    gotoxy(x_pos, y_pos);
     write(text);
 
     Create := Self;

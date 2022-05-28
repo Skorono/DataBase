@@ -5,6 +5,7 @@ program Main;
 uses
   Classes, Windows, Crt, base_graphic;
 
+
 var
    menu_obj: Menu;
 begin
@@ -12,7 +13,7 @@ begin
   SetConsoleOutputCP(1251);
   ShowWindow(GetConsoleWindow(), SW_MAXIMIZE);
   SetConsoleTitle('BD MENU');
-  TextBackground(4);
+
   menu_obj:=Menu.Init(0);
   menu_obj.main;
   readkey();
