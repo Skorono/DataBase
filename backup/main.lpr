@@ -3,8 +3,7 @@ program Main;
 {$mode objfpc}{$H+}
 
 uses
-  Classes, Windows, Crt, base_graphic;
-
+  Classes, Windows, Crt, base_graphic, menu;
 
 var
    menu_obj: Menu;
@@ -14,8 +13,9 @@ begin
   ShowWindow(GetConsoleWindow(), SW_MAXIMIZE);
   SetConsoleTitle('BD MENU');
 
+  {Сделать отдельную передачу заднего цвета для Меню и отдельно для кнопок!!! Но после создания таблицы}
   menu_obj:=Menu.Init(0);
-  menu_obj.main;
+  menu_obj.Main;
   readkey();
 end.
 
