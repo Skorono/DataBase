@@ -8,13 +8,14 @@ uses
 type PLine = ^Line_Node;
      Line_Node = record
        data: array[1..7] of Cell;
-       next: PLine;
-       previous: PLine;
+       next: nil;
+       previous: nil;
      end;
      // Todo: Создать класс листа для передачи в класс для работы с базой
 
      Cls_List = class
        Line: PLine;
+       constructor Init;
        function add_line(cells: array of Cell): PLine;
        procedure rewrite_cell;
        procedure save;
@@ -22,6 +23,11 @@ type PLine = ^Line_Node;
      end;
 
 implementation
+  constructor Cls_List.Init;
+  begin
+
+  end;
+
   procedure Cls_List.rewrite_cell;
   begin
   end;
@@ -30,7 +36,7 @@ implementation
   var
     new_Node: PLine;
   begin
-     new(Line^);
+     new(Line);
      Line^.data := cells;
      Line^.next := new_Node;
      Line^.next^.previous := Line;

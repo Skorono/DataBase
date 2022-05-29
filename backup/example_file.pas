@@ -38,6 +38,7 @@ begin
   x_border := border_x;
   y_border := border_y;
   background := abs_background;
+  List := Cls_List.
 end;
 
 function ViewTable.setHeadOfColumns(): SArray;
@@ -81,7 +82,7 @@ begin
   begin
     s_text := '';
     Cells[i] := Cell.Init(length(head_buttons[i].text), head_height, head_buttons[i].x_pos, head_buttons[i].y_pos + (borderFreeSpace * 2), background, s_text);
-    Cells[i].Border := Border.Init('-', borderFreeSpace-1, head_buttons[i].x_pos, head_buttons[i].y_pos + ((borderFreeSpace-1) * 2) , head_buttons[i].y_pos + (borderFreeSpace * 2), length(head_buttons[i].text));
+    Cells[i].Border := Border.Init('-', borderFreeSpace-1, head_buttons[i].x_pos, head_buttons[i].y_pos + ((borderFreeSpace * 2)-1) , head_buttons[i].y_pos + ((borderFreeSpace * 2)-1), length(head_buttons[i].text));
     Cells[i].Border.ChangeColor(1);
     Cells[i].Border.Create;
     Cells[i].Create;

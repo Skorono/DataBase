@@ -38,6 +38,7 @@ begin
   x_border := border_x;
   y_border := border_y;
   background := abs_background;
+  List := Cls_List.Init;
 end;
 
 function ViewTable.setHeadOfColumns(): SArray;

@@ -91,11 +91,13 @@ implementation
     TextColor(text_color);
 
     gotoxy(x_pos, y_pos);
-    if button_width < visibleTextSize then
+    if not (button_width >= length(text)) then
+      visible_text := text[button_width]
+    else if (button_width < visibleTextSize) then
       visible_text := text
     else if text <> '' then
       visible_text := text[visibleTextSize] + '...';
-    write(text);
+    write(visible_text);
   end;
 
   procedure Cell.write_info;

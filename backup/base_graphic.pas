@@ -91,7 +91,7 @@ implementation
     TextColor(text_color);
 
     gotoxy(x_pos, y_pos);
-    if width < visibleTextSize then
+    if button_width < visibleTextSize then
       visible_text := text
     else if text <> '' then
       visible_text := text[visibleTextSize] + '...';

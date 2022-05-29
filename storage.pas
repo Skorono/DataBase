@@ -15,6 +15,7 @@ type PLine = ^Line_Node;
 
      Cls_List = class
        Line: PLine;
+       constructor Init;
        function add_line(cells: array of Cell): PLine;
        procedure rewrite_cell;
        procedure save;
@@ -22,6 +23,11 @@ type PLine = ^Line_Node;
      end;
 
 implementation
+  constructor Cls_List.Init;
+  begin
+
+  end;
+
   procedure Cls_List.rewrite_cell;
   begin
   end;
