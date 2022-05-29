@@ -14,7 +14,7 @@ begin
   SetConsoleTitle('BD MENU');
 
   {Сделать отдельную передачу заднего цвета для Меню и отдельно для кнопок!!! Но после создания таблицы}
-  menu_obj:=Menu.Init(0);
+  menu_obj:=Menu.Init(1, 1, 80, 20, 0);
   menu_obj.Main;
   readkey();
 end.

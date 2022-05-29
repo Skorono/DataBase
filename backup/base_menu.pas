@@ -22,19 +22,18 @@ type
     public
       procedure Show_menu;
       procedure Main;
-      constructor Init(abs_background: integer);
+      constructor Init(start_x, start_y, border_x , border_y, abs_background: integer);
       {procedure paint_background;}
       destructor del;
   end;
 
 implementation
-
-constructor Menu.Init(abs_background: integer);
+constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: integer);
   begin
-    x := 1;
-    y := 1;
-    x_border := 80;
-    y_border := 25;
+    x := start_x;
+    y := start_y;
+    x_border := border_x;
+    y_border := border_y;
     countButtons := 3;
     background := abs_background;
   end;
@@ -51,6 +50,9 @@ constructor Menu.Init(abs_background: integer);
 
   begin
     Window(x, y, x_border, y_border);
+    {x и y определ€ютс€ относительно окна. “о есть если € ввожу x=10 и y=10 то это значени€ станов€тс€ начальными.   ограничению конца строки это правило вроде как не действует}
+    x := 1;
+    y := 1;
     {Paint_Background();}
     cord_x := (x_border div 2) - (text_size div 2);
     cord_y := y_border div 2;
@@ -62,8 +64,8 @@ constructor Menu.Init(abs_background: integer);
         buttons[i].Create();
         cord_y := cord_y + spaceBetweenButtons;
       end;
-    //menu_border := border.Init('~', 2, buttons[1].x_pos, buttons[1].y_pos, buttons[countButtons].y_pos, text_size);
-    //menu_border.create;
+    menu_border := border.Init('~', 9, buttons[1].x_pos, buttons[1].y_pos, buttons[countButtons].y_pos, text_size);
+    menu_border.create;
   end;
 
   function Menu.Key_UP(on_button: integer): integer;
@@ -89,26 +91,27 @@ constructor Menu.Init(abs_background: integer);
   end;
 
   procedure Menu.press_enter(on_button: integer);
+  const
+    x_size = 80;
+    y_size = 25;
   var
     base1: ViewTable;
-    i: integer;
   begin
-    Window(1, 1, x_border, y_border);
+    Window(x, y, x_size, y_size);
     TextBackground(0);
     del;
     ClrScr;
 
-    base1 := base1.Init();
-    for i := 1 to countButtons do
-      if whereY = buttons[i].y_pos then
-        case i of
-        1:
-          base1.show;
-        {2:
-          ;
-        3:
-          ;}
-        end;
+    { ѕридумать другой вариант задани€ размеров клетка в шапке таблицы }
+    base1 := ViewTable.Init(4, 8, x_border, y_border, 8, 1, 0);
+    case on_button of
+      1:
+       base1.show_head;
+      {2:
+        ;
+      3:
+       ;}
+    end;
   end;
 
   procedure Menu.Main;
@@ -122,6 +125,7 @@ constructor Menu.Init(abs_background: integer);
     on_button := 1;
     window(x, y, x_border, y_border);
     gotoxy(buttons[on_button].x_pos, buttons[on_button].y_pos);
+
     while run do
     begin
       case readkey of
@@ -143,7 +147,6 @@ constructor Menu.Init(abs_background: integer);
       begin
         buttons[on_button].background := 2;
         gotoxy(buttons[on_button].x_pos, buttons[on_button].y_pos);
-        ClrEol;
         buttons[on_button].Create();
       end;
     end;
