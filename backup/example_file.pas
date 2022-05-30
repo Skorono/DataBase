@@ -21,7 +21,13 @@ type
     constructor Init(start_x, start_y, border_x, border_y, width, height, abs_background: integer);
     procedure show_table1;
     procedure show_head;
-    procedure show_line();
+    procedure show_line;
+    procedure writeInCell;
+    procedure Key_UP;
+    procedure Key_DOWN;
+    procedure Key_RIGHT;
+    procedure Key_Left;
+    procedure main;
     function setHeadOfColumns(): SArray;
   end;
 
@@ -76,6 +82,8 @@ var
   i: integer;
   s_text: string;
 begin
+  //borderFreeSpace := 1;
+
   for i := 1 to countColumn do
   begin
     s_text := '';
@@ -87,7 +95,7 @@ begin
   end;
   List.add_line(Cells);
 
-  y := y + ((borderFreeSpace * 2));
+  y := y + ((borderFreeSpace * 2)-2);
 end;
 
 procedure ViewTable.show_table1();
@@ -97,7 +105,67 @@ begin
     show_line(); {Изменить}
 end;
 
+procedure ViewTable.writeInCell;
+var
+  center_x, center_y: integer;
+  input_field: TextButton;
+begin
+  center_x := (x_border - x) div 2;
+  center_y := (y_border - y) div 2;
+
+  input_field := TextButton.Init(10, 1, center_x - 10, center_y, background, '');
+  input_field.Border := Border.Init('-', borderFreeSpace, center_x - 10, center_y, center_y, 10);
+  input_field.Border.ChangeColor(1);
+
+  gotoxy(center_x - 10, center_y);
+  read(input_field.text);
+end;
+
+procedure ViewTable.main;
+var
+  run: boolean;
+begin
+  show_table1;
+  List.Line := List.Line.getNode(1);
+  gotoxy(List.Line^.data[1].x_pos, List.Line^.data[1].y_pos);
+
+  run := true;
+  while run do
+  begin
+    case readkey of
+      #72: begin
+
+      end;
+      #80: begin
+
+      end;
+      #13: begin
+        writeInCell;
+      end;
+    end;
+  end;
+end;
+
+procedure ViewTable.Key_UP;
 begin
 
+end;
+
+procedure ViewTable.Key_DOWN;
+begin
+
+end;
+
+procedure ViewTable.Key_RIGHT;
+begin
+
+end;
+
+procedure ViewTable.Key_Left;
+begin
+
+end;
+
+begin
 end.
 

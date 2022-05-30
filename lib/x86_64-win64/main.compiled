@@ -2,4 +2,5 @@
 <CONFIG>
   <Compiler Value="C:\lazarus\fpc\3.2.2\bin\x86_64-win64\fpc.exe" Date="1420791944"/>
   <Params Value=" -MObjFPC -Scaghi -CirotR -O1 -gw2 -gl -l -vewnhibq -FiC:\Users\Ольга\Desktop\projects\DataBase-main\lib\x86_64-win64 -FuC:\Users\Ольга\Desktop\projects\DataBase-main\ -FUC:\Users\Ольга\Desktop\projects\DataBase-main\lib\x86_64-win64\ -FEC:\Users\Ольга\Desktop\projects\DataBase-main\ -oC:\Users\Ольга\Desktop\projects\DataBase-main\main.exe main.lpr"/>
+  <Complete Value="False"/>
 </CONFIG>
