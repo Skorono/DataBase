@@ -106,7 +106,7 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
     base1 := ViewTable.Init(4, 4, x_border, y_border, 8, 1, 0);
     case on_button of
       1:
-       base1.show_head;
+       base1.show_table1;
       {2:
         ;
       3:

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
-  <Compiler Value="C:\lazarus\fpc\3.2.2\bin\x86_64-win64\fpc.exe" Date="1411537227"/>
-  <Params Value=" -MObjFPC -Scghi -O1 -gw2 -gl -l -vewnhibq -FiC:\Users\astat\Desktop\Projects\DataBase-bugged\lib\x86_64-win64 -FuC:\Users\astat\Desktop\Projects\DataBase-bugged\ -FUC:\Users\astat\Desktop\Projects\DataBase-bugged\lib\x86_64-win64\ -FEC:\Users\astat\Desktop\Projects\DataBase-bugged\ -oC:\Users\astat\Desktop\Projects\DataBase-bugged\Storage.exe Storage.lpr"/>
+  <Compiler Value="C:\lazarus\fpc\3.2.2\bin\x86_64-win64\fpc.exe" Date="1420791944"/>
+  <Params Value=" -MObjFPC -Scghi -O1 -gw2 -gl -l -vewnhibq -FiC:\Users\Ольга\Desktop\projects\DataBase-main\lib\x86_64-win64 -FuC:\Users\Ольга\Desktop\projects\DataBase-main\ -FUC:\Users\Ольга\Desktop\projects\DataBase-main\lib\x86_64-win64\ -FEC:\Users\Ольга\Desktop\projects\DataBase-main\ -oC:\Users\Ольга\Desktop\projects\DataBase-main\Storage.exe Storage.lpr"/>
 </CONFIG>

@@ -32,7 +32,7 @@ implementation
   begin
   end;
 
-  function Cls_List.add_line(cells: array of Cell): PLine ;
+  function Cls_List.add_line(cells: array of Cell): PLine;
   var
     new_Node: PLine;
   begin

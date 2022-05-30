@@ -8,8 +8,8 @@ uses
 type PLine = ^Line_Node;
      Line_Node = record
        data: array[1..7] of Cell;
-       next: nil;
-       previous: nil;
+       next: PLine;
+       previous: PLine;
      end;
      // Todo: Создать класс листа для передачи в класс для работы с базой
 
