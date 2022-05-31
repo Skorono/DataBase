@@ -12,10 +12,11 @@ type
 
   ViewTable = class
     background, countColumn, head_width, head_height, on_vertical_button, on_horizontal_button: integer;
-    x, y, x_border, y_border: integer;
+    x, y, x_border, y_border, y_line_pos: integer;
     Cells: array[1..7] of Cell;
     head_buttons: array[1..7] of TextButton;
     List: Cls_List;
+    line: PLine; {Не забыть переименовать}
     borderFreeSpace: integer;
 
     constructor Init(start_x, start_y, border_x, border_y, width, height, abs_background: integer);
@@ -37,6 +38,8 @@ constructor ViewTable.Init(start_x, start_y, border_x, border_y, width, height, 
 begin
   countColumn := 7;
   borderFreeSpace := 2;
+  on_horizontal_button := 1;
+  on_horizontal_button := 1;
   head_width := width;
   head_height := height;
   x := start_x;
@@ -81,18 +84,26 @@ end;
 
 procedure ViewTable.show_line();
 var
-  i, y_pos: integer;
+  i: integer;
   s_text: string;
 begin
   //borderFreeSpace := 1;
-  List.getNode(List.nodeCount);
-  y_pos := List.Line^.data[1].y_pos + ((borderFreeSpace * 2)-2);
-  //y_pos := ;
+  line := List.getNode(List.nodeCount);
+  if List.nodeCount > 0 then
+  begin
+    y_line_pos := line^.data[1].y_pos;
+    y_line_pos := y_line_pos + ((borderFreeSpace * 2) - 2);
+  end
+  else
+  begin
+    y_line_pos := head_buttons[1].y_pos;
+    y_line_pos := y_line_pos + ((borderFreeSpace * 2) - 1)
+  end;
   for i := 1 to countColumn do
   begin
     s_text := '';
-    Cells[i] := Cell.Init(length(head_buttons[i].text), head_height, head_buttons[i].x_pos, y_pos, background, s_text);
-    Cells[i].Border := Border.Init('-', borderFreeSpace-1, head_buttons[i].x_pos, y_pos, y_pos, length(head_buttons[i].text));
+    Cells[i] := Cell.Init(length(head_buttons[i].text), head_height, head_buttons[i].x_pos, y_line_pos, background, s_text);
+    Cells[i].Border := Border.Init('-', borderFreeSpace-1, head_buttons[i].x_pos, y_line_pos, y_line_pos, length(head_buttons[i].text));
     Cells[i].Border.ChangeColor(1);
     Cells[i].Border.Create;
     Cells[i].Create;
@@ -103,8 +114,8 @@ end;
 procedure ViewTable.show_table1();
 begin
   show_head();
-  while y < y_border do
-    show_line(); {Изменить}
+  while y_line_pos < y_border do
+    show_line();
 end;
 
 procedure ViewTable.writeInCell;
@@ -129,14 +140,14 @@ var
   key: char;
 begin
   show_table1;
-  List.getNode(1);
-  gotoxy(List.Line^.data[1].x_pos, List.Line^.data[1].y_pos);
+  line := List.getNode(1);
+  gotoxy(line^.data[1].x_pos, line^.data[1].y_pos);
 
   run := true;
   while run do
   begin
     key := readkey;
-    if not (key in ['A'..'Z']) then
+    if key = #0 then
     begin
       case readkey of
         #72: begin
@@ -151,11 +162,10 @@ begin
         #77: begin
           Key_RIGHT;
         end;
-        #13: begin
-          writeInCell;
-        end;
       end;
     end;
+    if key = #13 then
+      writeInCell;
   end;
 end;
 
@@ -165,8 +175,8 @@ begin
     on_vertical_button := List.nodeCount
   else
     on_vertical_button := on_vertical_button - 1;
-  List.getNode(on_vertical_button);
-  gotoxy(list.line^.data[on_horizontal_button].x_pos, list.line^.data[on_horizontal_button].y_pos);
+  line := List.getNode(on_vertical_button);
+  gotoxy(line^.data[on_horizontal_button].x_pos, line^.data[on_horizontal_button].y_pos);
 end;
 
 procedure ViewTable.Key_DOWN();
@@ -175,8 +185,8 @@ begin
     on_vertical_button := 1
   else
     on_vertical_button := on_vertical_button + 1;
-  List.getNode(on_vertical_button);
-  gotoxy(list.line^.data[on_horizontal_button].x_pos, list.line^.data[on_horizontal_button].y_pos);
+  line := List.getNode(on_vertical_button);
+  gotoxy(line^.data[on_horizontal_button].x_pos, line^.data[on_horizontal_button].y_pos);
 end;
 
 procedure ViewTable.Key_RIGHT();
@@ -185,8 +195,8 @@ begin
     on_horizontal_button := 1
   else
     on_horizontal_button := on_horizontal_button + 1;
-  List.getNode(on_vertical_button);
-  gotoxy(list.line^.data[on_horizontal_button].x_pos, list.line^.data[on_horizontal_button].y_pos);
+  line := List.getNode(on_vertical_button);
+  gotoxy(line^.data[on_horizontal_button].x_pos, line^.data[on_horizontal_button].y_pos);
 end;
 
 procedure ViewTable.Key_LEFT();
@@ -195,8 +205,8 @@ begin
     on_horizontal_button := countColumn
   else
     on_horizontal_button := on_horizontal_button - 1;
-  List.getNode(on_vertical_button);
-  gotoxy(list.line^.data[on_horizontal_button].x_pos, list.line^.data[on_horizontal_button].y_pos);
+  line := List.getNode(on_vertical_button);
+  gotoxy(line^.data[on_horizontal_button].x_pos, line^.data[on_horizontal_button].y_pos);
 end;
 
 begin

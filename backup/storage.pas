@@ -15,20 +15,25 @@ type PLine = ^Line_Node;
      // Todo: Создать класс листа для передачи в класс для работы с базой
 
      Cls_List = class
-       nodeCount: integer;
-       Line: PLine;
-       constructor Init;
-       procedure getNode(n: integer);
-       procedure add_line(cells: array of Cell);
-       procedure rewrite_cell;
-       procedure save;
-       {procedure rewrite_line;}
+     //  strict private
+       private
+         Line: PLine;
+
+       public
+         nodeCount: integer;
+         constructor Init;
+         function getNode(n: integer): PLine;
+         procedure add_line(cells: array of Cell);
+         procedure rewrite_cell;
+         procedure save;
+         {procedure rewrite_line;}
      end;
 
 implementation
   constructor Cls_List.Init;
   begin
-    nodeCount := 1;
+    nodeCount := 0;
+    new(Line);
   end;
 
   procedure Cls_List.rewrite_cell;
@@ -65,18 +70,20 @@ implementation
 
   end;
 
-  procedure Cls_List.getNode(n: integer);
+  function Cls_List.getNode(n: integer): PLine;
   var
-    list_copy: PLine;
+    line_copy: PLine;
   begin
-     list_copy := Line;
-     while (list_copy^.number <> n) and (list_copy^.previous <> nil) do
-       list_copy := list_copy^.previous;
-     list_copy := Line;
-     while (list_copy^.number <> n) and (list_copy <> nil) do
-       list_copy := list_copy^.next;
-
-     Line := list_copy;
+     if nodeCount > 0 then
+     begin
+       line_copy := Line;
+       if line_copy <> nil then
+       begin
+         while (line_copy^.number <> n) and (line_copy^.next <> nil) do
+           line_copy := line_copy^.next;
+         getNode := line_copy;
+       end;
+     end;
   end;
 
 end.
