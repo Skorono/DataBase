@@ -15,18 +15,17 @@
       <Unit>
         <Filename Value="storage.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="7"/>
         <CursorPos X="8" Y="25"/>
         <UsageCount Value="21"/>
-        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="base_graphic.pas"/>
-        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="54"/>
         <CursorPos X="20" Y="103"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="main.pas"/>
@@ -36,13 +35,26 @@
         <CursorPos X="28" Y="25"/>
         <UsageCount Value="10"/>
       </Unit>
+      <Unit>
+        <Filename Value="main.lpr"/>
+        <UnitName Value="Main"/>
+        <IsVisibleTab Value="True"/>
+        <CursorPos X="23" Y="6"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="example_file.pas"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="10"/>
+      </Unit>
+      <Unit>
+        <Filename Value="base_menu.pas"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="10"/>
+      </Unit>
     </Units>
-    <JumpHistory>
-      <Position>
-        <Filename Value="base_graphic.pas"/>
-        <Caret Line="32" Column="37" TopLine="16"/>
-      </Position>
-    </JumpHistory>
+    <JumpHistory HistoryIndex="-1"/>
     <RunParams>
       <FormatVersion Value="2"/>
       <Modes ActiveMode=""/>

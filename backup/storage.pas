@@ -29,7 +29,6 @@ implementation
   constructor Cls_List.Init;
   begin
     nodeCount := 1;
-    new(Line);
   end;
 
   procedure Cls_List.rewrite_cell;

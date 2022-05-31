@@ -6,160 +6,101 @@ interface
 
 uses
   Classes, SysUtils, Crt;
-
 type
+  Base = class
+    {procedure add_line;}
+
+  end;
+
   Border = class
     public
-      borderFreeSpace, start_x, top_y, bottom_y, text_size, dif_y, last_x: integer;
+      borderFreeSpace, start_x, top_y, bottom_y, text_size, last_x, border_color: integer;
       symbol: char;
 
-    {Размер текста внутри, координаты начала откуда идёт текст, координаты конца по y, символ который будет в горизонтальной строке}
     constructor Init(fsymbol: char; freeSpace, std_x, start_y, last_y, t_size: integer);
     procedure Create;
+    procedure ChangeColor(color: integer);
   end;
 
   TextButton = class
     public
-      button_width, button_height, x_pos, y_pos: integer;
+      button_width, button_height, x_pos, y_pos, text_color: integer;
       background: integer;
       text: string;
-      text_border: Border;
+      Border: Border;
 
-      constructor Init(width, height: integer);
-      function Create(x_cord, y_cord, abs_background: integer; abs_text: string): TextButton;
+      constructor Init(width, height, x_cord, y_cord, abs_background: integer; abs_text: string);
+      procedure Create;
+      procedure ChangeColor(color: integer);
       destructor del;
   end;
 
-  Menu = class sealed
-      x, y, x_border, y_border, background: integer;
-      buttons: array[1..10] of TextButton;
-      menu_border: Border;
-
-      countButtons: integer;
+  Cell = class(TextButton)
+    private
+      visibleTextSize: integer;
     public
-      procedure Create;
-      procedure Main;
-      procedure Destroy_screen;
-      constructor Init(abs_background: integer);
-  end;
+      constructor Init(width, height, x_cord, y_cord, abs_background: integer; abs_text: string);
+      procedure Create();
+      procedure write_info;
 
+  end;
 
 implementation
-  constructor Menu.Init(abs_background: integer);
-  begin
-    x := 1;
-    y := 1;
-    x_border := 80;
-    y_border := 25;
-    countButtons := 3;
-    background := abs_background;
-  end;
-
-  procedure Menu.Create();
-  const
-    base_count = 3;
-    text_size = 14;
-    spaceBetweenButtons = 2;
-
-  var
-    obj_button: TextButton;
-    text: string[text_size];
-    cord_x, cord_y, i: integer;
-
-  begin
-   // obj_button := TextButton.Init(text_size, spaceBetweenButtons);
-    Window(x, y, x_border, y_border);
-    cord_x := x_border div 2;
-    cord_y := y_border div 2;
-
-    for i:= 1 to base_count do
-      begin
-        text := 'База Данных №' + inttostr(i);
-        buttons[i] := TextButton.Init(text_size, spaceBetweenButtons);
-        buttons[i].Create(cord_x - (text_size div 2), cord_y, background, text);
-        cord_y := cord_y + spaceBetweenButtons;
-      end;
-    menu_border := border.Init('~', 2, buttons[1].x_pos, buttons[1].y_pos, buttons[countButtons].y_pos, text_size);
-    menu_border.create;
-  end;
-
-  procedure Menu.Main;
-  var
-    run: boolean;
-    on_button: integer;
-  begin
-    create();
-
-    run := true;
-    on_button := 1;
-    window(x, y, x_border, y_border);
-    gotoxy(buttons[on_button].x_pos, buttons[on_button].y_pos);
-    while run do
-    begin
-      case readkey of
-      #72:
-        begin
-          buttons[on_button].background := 0;
-          buttons[on_button].Create(buttons[on_button].x_pos, buttons[on_button].y_pos, buttons[on_button].background, buttons[on_button].text);
-          if on_button = 1 then
-              on_button := countButtons
-          else
-              on_button := on_button - 1;
-        end;
-      #80:
-        begin
-          buttons[on_button].background := 0;
-          buttons[on_button].Create(buttons[on_button].x_pos, buttons[on_button].y_pos, buttons[on_button].background, buttons[on_button].text);
-          if on_button = countButtons then
-            on_button := 1
-          else
-            on_button := on_button + 1;
-        end;
-      #13:
-        begin
-          Destroy_screen;
-          ClrScr;
-          TextBackground(0);
-        end;
-      end;
-      buttons[on_button].background := 2;
-      gotoxy(buttons[on_button].x_pos, buttons[on_button].y_pos);
-      ClrEol;
-      buttons[on_button].Create(buttons[on_button].x_pos, buttons[on_button].y_pos, buttons[on_button].background, buttons[on_button].text);
-    end;
-  end;
-
-  procedure Menu.Destroy_screen;
-  var
-    i: integer;
-  begin
-    for i := 1 to countButtons do
-      {if buttons[i] then}
-      buttons[i].del;
-  end;
-
-  constructor TextButton.Init(width, height: integer);
+  constructor TextButton.Init(width, height, x_cord, y_cord, abs_background: integer; abs_text: string);
   begin
     button_width := width;
     button_height := height;
+    x_pos := x_cord;
+    y_pos := y_cord;
+    background := abs_background;
+    text := abs_text;
+    text_color := 15;
   end;
 
   destructor TextButton.Del;
   begin
   end;
 
-  function TextButton.Create(x_cord, y_cord, abs_background: integer; abs_text: string): TextButton;
+  procedure TextButton.ChangeColor(color: integer);
   begin
-    Window(x_cord, y_cord, x_cord + button_width, y_cord + button_height);
-    x_pos := x_cord;
-    y_pos := y_cord;
-    text := abs_text;
-    background := abs_background;
-    TextBackground(background);
-    gotoxy(x_cord, y_cord);
-    write(text);
+    text_color := color;
+  end;
 
-    Create := Self;
+  procedure TextButton.Create();
+  begin
+    Window(x_pos, y_pos, x_pos + button_width, y_pos + button_height);
+    TextBackground(background);
+    TextColor(text_color);
+
+    gotoxy(x_pos, y_pos);
+    write(text);
+  end;
+
+  constructor Cell.Init(width, height, x_cord, y_cord, abs_background: integer; abs_text: string);
+  begin
+    inherited Init(width, height, x_cord, y_cord, abs_background, abs_text);
+    visibleTextSize := 6;
+  end;
+
+  procedure Cell.Create;
+  var
+    visible_text: string[6];
+  begin
+    Window(x_pos, y_pos, x_pos + button_width, y_pos + button_height);
+    TextBackground(background);
+    TextColor(text_color);
+
+    gotoxy(x_pos, y_pos);
+    if button_width < visibleTextSize then
+      visible_text := text
+    else if text <> '' then
+      visible_text := text[visibleTextSize] + '...';
+    write(text);
+  end;
+
+  procedure Cell.write_info;
+  begin
+
   end;
 
   constructor Border.Init(fsymbol: char; freeSpace, std_x, start_y, last_y, t_size: integer);
@@ -168,9 +109,15 @@ implementation
     start_x := std_x;
     last_x := start_x + t_size + borderFreeSpace;
     top_y := start_y;
-    dif_y := last_y;
-    text_size := t_size + (borderFreeSpace * 2);
+    bottom_y := last_y + borderFreeSpace;
+    text_size := (t_size + (borderFreespace * 2)) - 2;
     symbol := fsymbol;
+    border_color := 3;
+  end;
+
+  procedure Border.ChangeColor(color: integer);
+  begin
+    border_color := color;
   end;
 
   procedure Border.Create;
@@ -179,26 +126,28 @@ implementation
     i: integer;
   begin
     start_x := start_x - borderFreeSpace;
-    dif_y := dif_y - top_y;
     top_y := top_y - borderFreeSpace;
-    window(start_x, top_y, last_x, dif_y); {Дописать}
+    Window(start_x, top_y, last_x, bottom_y);
 
+    last_x := last_x - start_x;
     start_x := 1;
-    top_y := 1;
+    bottom_y := bottom_y - top_y;
+    top_y := 2;
+
+    TextColor(border_color);
     horizontal_text := '';
     for i := 1 to text_size do
       horizontal_text := horizontal_text + symbol;
-
-    gotoxy(start_x, top_y);
+    gotoxy(start_x+1, top_y-1);
     write(horizontal_text);
-    for i := top_y + 1 to dif_y - 1 do
-      begin
-        gotoxy(start_x, i);
-        write('|');
-        gotoxy(last_x, i);
-        write('|');
-      end;
-    gotoxy(start_x, dif_y);
+    for i := top_y to bottom_y do
+    begin
+      gotoxy(start_x, i);
+      write('|');
+      gotoxy(last_x, i);
+      write('|');
+    end;
+    gotoxy(start_x + 1, bottom_y + 1);
     write(horizontal_text);
   end;
 
