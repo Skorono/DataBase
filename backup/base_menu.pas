@@ -71,13 +71,13 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
         cord_y := cord_y + spaceBetweenButtons;
       end;
     menu_border := border.Init('~', 9, buttons[1].x_pos, buttons[1].y_pos, buttons[countButtons].y_pos, text_size);
-    menu_border.create;
+    menu_border.show;
   end;
 
   function Menu.Key_UP(on_button: integer): integer;
   begin
     buttons[on_button].background := 0;
-    buttons[on_button].Create();
+    buttons[on_button].show();
     if on_button = 1 then
       on_button := countButtons
     else
@@ -88,7 +88,7 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
   function Menu.Key_DOWN(on_button: integer): integer;
   begin
     buttons[on_button].background := 0;
-    buttons[on_button].Create();
+    buttons[on_button].show();
     if on_button = countButtons then
       on_button := 1
     else
@@ -103,13 +103,11 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
   var
     base1: ViewTable;
   begin
-    Window(x, y, x_border, y_border);
-    TextBackground(0);
+    menu_border.del;
     del;
-    ClrScr;
 
-    { Придумать другой вариант задания размеров клетка в шапке таблицы }
-    base1 := ViewTable.Init(3, 3, x_border, y_border, 8, 1, 0);
+    { Придумать другой вариант задания размеров клетки в шапке таблицы }
+    base1 := ViewTable.Init(1, 1, y_border, 8, 1, 0);
     case on_button of
       1:
        base1.main;
@@ -153,13 +151,13 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
         press_enter(on_button);
         run := false;
       end;
-    end;
-    if run then
-    begin
-      buttons[on_button].background := 2;
-      gotoxy(buttons[on_button].x_pos, buttons[on_button].y_pos);
-      buttons[on_button].Create();
-    end;
+      if run then
+      begin
+        buttons[on_button].background := 2;
+        gotoxy(buttons[on_button].x_pos, buttons[on_button].y_pos);
+        buttons[on_button].show();
+      end;
+    end
   end;
 
   {procedure Menu.paint_background();

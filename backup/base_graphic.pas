@@ -7,22 +7,18 @@ interface
 uses
   Classes, SysUtils, Crt;
 type
-  Base = class
-    {procedure add_line;}
-
-  end;
-
   Border = class
     public
       borderFreeSpace, start_x, top_y, bottom_y, text_size, last_x, border_color: integer;
       symbol: char;
 
     constructor Init(fsymbol: char; freeSpace, std_x, start_y, last_y, t_size: integer);
-    procedure Create;
+    destructor del;
+    procedure Show;
     procedure ChangeColor(color: integer);
   end;
 
-  TextButton = class
+  TextButton = class { Сделать так чтобы параметры для рамки передавались из параметров текста}
     public
       button_width, button_height, x_pos, y_pos, text_color: integer;
       background: integer;
@@ -30,7 +26,7 @@ type
       Border: Border;
 
       constructor Init(width, height, x_cord, y_cord, abs_background: integer; abs_text: string);
-      procedure Create;
+      procedure Show;
       procedure ChangeColor(color: integer);
       destructor del;
   end;
@@ -40,7 +36,7 @@ type
       visibleTextSize: integer;
     public
       constructor Init(width, height, x_cord, y_cord, abs_background: integer; abs_text: string);
-      procedure Create();
+      procedure Show;
       procedure write_info;
 
   end;
@@ -59,14 +55,18 @@ implementation
 
   destructor TextButton.Del;
   begin
+    window(x_pos, y_pos, x_pos + button_width, y_pos + button_height);
+    TextBackground(0);
+    ClrScr;
   end;
 
   procedure TextButton.ChangeColor(color: integer);
   begin
     text_color := color;
+    create;
   end;
 
-  procedure TextButton.Create();
+  procedure TextButton.Show();
   begin
     Window(x_pos, y_pos, x_pos + button_width, y_pos + button_height);
     TextBackground(background);
@@ -82,7 +82,7 @@ implementation
     visibleTextSize := 6;
   end;
 
-  procedure Cell.Create;
+  procedure Cell.Show;
   var
     visible_text: string[6];
   begin
@@ -90,12 +90,14 @@ implementation
     TextBackground(background);
     TextColor(text_color);
 
-    gotoxy(x_pos, y_pos);
-    if button_width < visibleTextSize then
+    gotoxy(1, 1);
+    if not (button_width >= length(text)) then
       visible_text := text
+    else if (button_width < visibleTextSize) then
+      visible_text := text[visibleTextSize - button_width] + '...';
     else if text <> '' then
       visible_text := text[visibleTextSize] + '...';
-    write(text);
+    write(visible_text);
   end;
 
   procedure Cell.write_info;
@@ -118,37 +120,47 @@ implementation
   procedure Border.ChangeColor(color: integer);
   begin
     border_color := color;
+    create;
   end;
 
-  procedure Border.Create;
+  procedure Border.Show;
   var
     horizontal_text: string;
-    i: integer;
+    _start_x, _top_y, _last_x, _bottom_y, i: integer;
   begin
-    start_x := start_x - borderFreeSpace;
-    top_y := top_y - borderFreeSpace;
-    Window(start_x, top_y, last_x, bottom_y);
+    _start_x := start_x - borderFreeSpace;
+    _top_y := top_y - borderFreeSpace;
+    Window(_start_x, _top_y, last_x, bottom_y);
 
-    last_x := last_x - start_x;
-    start_x := 1;
-    bottom_y := bottom_y - top_y;
-    top_y := 2;
+    _last_x := last_x - _start_x;
+    _start_x := 1;
+    _bottom_y := bottom_y - _top_y;
+    _top_y := 2;
 
     TextColor(border_color);
     horizontal_text := '';
     for i := 1 to text_size do
       horizontal_text := horizontal_text + symbol;
-    gotoxy(start_x+1, top_y-1);
+    gotoxy(_start_x+1, _top_y-1);
     write(horizontal_text);
-    for i := top_y to bottom_y do
+    for i := _top_y to _bottom_y do
     begin
-      gotoxy(start_x, i);
+      gotoxy(_start_x, i);
       write('|');
-      gotoxy(last_x, i);
+      gotoxy(_last_x, i);
       write('|');
     end;
-    gotoxy(start_x + 1, bottom_y + 1);
+    gotoxy(_start_x + 1, _bottom_y + 1);
     write(horizontal_text);
+  end;
+
+  destructor Border.del;
+  begin
+    start_x := start_x - borderFreeSpace;
+    top_y := top_y - borderFreeSpace;
+    window(start_x, top_y, last_x, bottom_y);
+    TextBackground(0);
+    ClrScr;
   end;
 
   begin

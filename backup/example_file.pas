@@ -19,7 +19,7 @@ type
     line: PLine; {Не забыть переименовать}
     borderFreeSpace: integer;
 
-    constructor Init(start_x, start_y, border_x, border_y, width, height, abs_background: integer);
+    constructor Init(start_x, start_y, border_y, width, height, abs_background: integer);
     procedure show_table1;
     procedure show_head;
     procedure show_line;
@@ -34,17 +34,16 @@ type
 
 implementation
 
-constructor ViewTable.Init(start_x, start_y, border_x, border_y, width, height, abs_background: integer);
+constructor ViewTable.Init(start_x, start_y, border_y, width, height, abs_background: integer);
 begin
   countColumn := 7;
   borderFreeSpace := 2;
   on_horizontal_button := 1;
-  on_horizontal_button := 1;
+  on_vertical_button := 1;
   head_width := width;
   head_height := height;
   x := start_x;
   y := start_y;
-  x_border := border_x;
   y_border := border_y;
   background := abs_background;
   List := Cls_List.Init;
@@ -65,21 +64,21 @@ procedure ViewTable.show_head;
 var
   i: integer;
   columnHeader: SArray;
-  x_pos: integer;
+  x_pos, y_pos: integer;
 begin
-  x_pos := x;
+  x_pos := x + borderFreeSpace;
+  y_pos := y + borderFreeSpace ;
   columnHeader := setHeadOfColumns;
   for i := 1 to countColumn do
   begin
     head_width := length(columnHeader[i]);
-    head_buttons[i] := TextButton.Init(head_width, head_height, x_pos, y, background, columnHeader[i]);
-    head_buttons[i].Border := border.Init('-', borderFreeSpace, x_pos, y, y, head_width);
+    head_buttons[i] := TextButton.Init(head_width, head_height, x_pos, y_pos, background, columnHeader[i]);
+    head_buttons[i].Border := border.Init('-', borderFreeSpace, x_pos, y_pos, y_pos, head_width);
     head_buttons[i].Border.ChangeColor(1);
-    head_buttons[i].Border.create;
     head_buttons[i].Create;
     x_pos := x_pos + length(columnHeader[i]) + borderFreeSpace;
   end;
-  y := y + ((borderFreeSpace * 2)-1);
+  x_border := head_buttons[countColumn].x_pos + head_buttons[countColumn].button_width + head_buttons[countColumn].border.borderFreeSpace;
 end;
 
 procedure ViewTable.show_line();
@@ -89,7 +88,7 @@ var
 begin
   //borderFreeSpace := 1;
   line := List.getNode(List.nodeCount);
-  if List.nodeCount > 0 then
+  if List.nodeCount > 1 then
   begin
     y_line_pos := line^.data[1].y_pos;
     y_line_pos := y_line_pos + ((borderFreeSpace * 2) - 2);
@@ -106,7 +105,7 @@ begin
     Cells[i].Border := Border.Init('-', borderFreeSpace-1, head_buttons[i].x_pos, y_line_pos, y_line_pos, length(head_buttons[i].text));
     Cells[i].Border.ChangeColor(1);
     Cells[i].Border.Create;
-    Cells[i].Create;
+    Cells[i].Show;
   end;
   List.add_line(Cells);
 end;
@@ -119,35 +118,44 @@ begin
 end;
 
 procedure ViewTable.writeInCell;
+const
+  height = 1;
 var
-  center_x, center_y: integer;
+  x_, y_, width: integer;
   input_field: TextButton;
 begin
-  center_x := (x_border - x) div 2;
-  center_y := (y_border - y) div 2;
+  x_ := line^.data[1].x_pos;
+  y_ := y_border + borderFreeSpace + 1;
+  width := line^.data[countColumn].x_pos + line^.data[countColumn].button_width - borderFreeSpace;
+  window(x_, y_, x_ + width, y_ + (borderFreeSpace * 2));
 
-  input_field := TextButton.Init(10, 1, center_x - 10, center_y, background, '');
-  input_field.Border := Border.Init('-', borderFreeSpace, center_x - 10, center_y, center_y, 10);
-  input_field.Border.ChangeColor(1);
+  input_field := TextButton.Init(width, height, x_, y_, 0, '');
+  input_field.Border := Border.Init('-', borderFreeSpace-1, x_, y_, y_, width);
+  input_field.create;
+  input_field.Border.ChangeColor(15);
 
-  gotoxy(center_x - 10, center_y);
-  read(input_field.text);
+  gotoxy(borderFreeSpace, borderFreeSpace);
+  read(line^.data[on_horizontal_button].text);
+
+  input_field.del;
+  input_field.border.del;
+
+  line^.data[on_horizontal_button].show;
 end;
 
 procedure ViewTable.main; { Временно main}
 var
   run: boolean;
-  key: char;
 begin
   show_table1;
+  window(x, y, x_border, y_border);
   line := List.getNode(1);
   gotoxy(line^.data[1].x_pos, line^.data[1].y_pos);
 
   run := true;
   while run do
   begin
-    key := readkey;
-    if key = #0 then
+    if readkey = #0 then
     begin
       case readkey of
         #72: begin
@@ -163,9 +171,11 @@ begin
           Key_RIGHT;
         end;
       end;
-    if key = #13 then
+      line := List.getNode(on_vertical_button);
+      gotoxy(line^.data[on_horizontal_button].x_pos, line^.data[on_horizontal_button].y_pos);
+    end
+    else if readkey = #13 then
       writeInCell;
-    end;
   end;
 end;
 
@@ -175,8 +185,6 @@ begin
     on_vertical_button := List.nodeCount
   else
     on_vertical_button := on_vertical_button - 1;
-  line := List.getNode(on_vertical_button);
-  gotoxy(line^.data[on_horizontal_button].x_pos, line^.data[on_horizontal_button].y_pos);
 end;
 
 procedure ViewTable.Key_DOWN();
@@ -185,8 +193,6 @@ begin
     on_vertical_button := 1
   else
     on_vertical_button := on_vertical_button + 1;
-  line := List.getNode(on_vertical_button);
-  gotoxy(line^.data[on_horizontal_button].x_pos, line^.data[on_horizontal_button].y_pos);
 end;
 
 procedure ViewTable.Key_RIGHT();
@@ -195,8 +201,6 @@ begin
     on_horizontal_button := 1
   else
     on_horizontal_button := on_horizontal_button + 1;
-  line := List.getNode(on_vertical_button);
-  gotoxy(line^.data[on_horizontal_button].x_pos, line^.data[on_horizontal_button].y_pos);
 end;
 
 procedure ViewTable.Key_LEFT();
@@ -205,8 +209,6 @@ begin
     on_horizontal_button := countColumn
   else
     on_horizontal_button := on_horizontal_button - 1;
-  line := List.getNode(on_vertical_button);
-  gotoxy(line^.data[on_horizontal_button].x_pos, line^.data[on_horizontal_button].y_pos);
 end;
 
 begin
