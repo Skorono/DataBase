@@ -32,7 +32,7 @@ type PLine = ^Line_Node;
 implementation
   constructor Cls_List.Init;
   begin
-    nodeCount := 0;
+    nodeCount := 1;
     new(Line);
     Line^.next:=NIL;
   end;

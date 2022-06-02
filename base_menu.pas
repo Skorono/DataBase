@@ -41,12 +41,11 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
   procedure Menu.Show_menu();
   const
     base_count = 3;
-    text_size = 14;
     spaceBetweenButtons = 2;
 
   var
-    text: string[text_size];
-    cord_x, cord_y, i: integer;
+    text: string;
+    cord_x, cord_y, text_size, i: integer;
     //allert: TextButton;
   begin
     Window(x, y, x_border, y_border);
@@ -65,7 +64,8 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
 
     for i:= 1 to base_count do
       begin
-        text := 'База Данных №' + inttostr(i);
+        text := 'Таблица №' + inttostr(i);
+        text_size := length(text);
         buttons[i] := TextButton.Init(text_size, spaceBetweenButtons, cord_x, cord_y, background, text);
         buttons[i].show();
         cord_y := cord_y + spaceBetweenButtons;

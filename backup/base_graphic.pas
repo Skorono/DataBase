@@ -63,7 +63,7 @@ implementation
   procedure TextButton.ChangeColor(color: integer);
   begin
     text_color := color;
-    create;
+    //create;
   end;
 
   procedure TextButton.Show();
@@ -84,19 +84,19 @@ implementation
 
   procedure Cell.Show;
   var
-    visible_text: string[6];
+    visible_text: string;
   begin
     Window(x_pos, y_pos, x_pos + button_width, y_pos + button_height);
     TextBackground(background);
     TextColor(text_color);
 
     gotoxy(1, 1);
-    if not (button_width >= length(text)) then
+    if length(text) > button_width then
+      visible_text := text[length(text) - button_width]
+    else if length(text) = button_width then
       visible_text := text
-    else if (button_width < visibleTextSize) then
-      visible_text := text[visibleTextSize - button_width] + '...';
     else if text <> '' then
-      visible_text := text[visibleTextSize] + '...';
+      visible_text := text;
     write(visible_text);
   end;
 
@@ -120,7 +120,7 @@ implementation
   procedure Border.ChangeColor(color: integer);
   begin
     border_color := color;
-    create;
+    //create;
   end;
 
   procedure Border.Show;
