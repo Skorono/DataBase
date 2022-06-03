@@ -63,7 +63,7 @@ implementation
   procedure TextButton.ChangeColor(color: integer);
   begin
     text_color := color;
-    //create;
+    show;
   end;
 
   procedure TextButton.Show();
@@ -120,7 +120,7 @@ implementation
   procedure Border.ChangeColor(color: integer);
   begin
     border_color := color;
-    //create;
+    show;
   end;
 
   procedure Border.Show;

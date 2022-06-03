@@ -9,13 +9,14 @@ uses
 type
   Border = class
     public
-      borderFreeSpace, start_x, top_y, bottom_y, text_size, last_x, border_color: integer;
+      borderFreeSpace, start_x, top_y, bottom_y, text_size, last_x, border_color, background: integer;
       symbol: char;
 
     constructor Init(fsymbol: char; freeSpace, std_x, start_y, last_y, t_size: integer);
     destructor del;
     procedure Show;
     procedure ChangeColor(color: integer);
+    procedure ChangeBackground(color: integer);
   end;
 
   TextButton = class { Сделать так чтобы параметры для рамки передавались из параметров текста}
@@ -28,6 +29,7 @@ type
       constructor Init(width, height, x_cord, y_cord, abs_background: integer; abs_text: string);
       procedure Show;
       procedure ChangeColor(color: integer);
+      procedure ChangeBackground(color: integer);
       destructor del;
   end;
 
@@ -63,6 +65,12 @@ implementation
   procedure TextButton.ChangeColor(color: integer);
   begin
     text_color := color;
+    show;
+  end;
+
+  procedure TextButton.ChangeBackground(color: integer);
+  begin
+    background := color;
     show;
   end;
 
@@ -115,11 +123,18 @@ implementation
     text_size := (t_size + (borderFreespace * 2)) - 2;
     symbol := fsymbol;
     border_color := 3;
+    background := 0;
   end;
 
   procedure Border.ChangeColor(color: integer);
   begin
     border_color := color;
+    show;
+  end;
+
+  procedure Border.Changebackground(color: integer);
+  begin
+    background := color;
     show;
   end;
 
@@ -138,6 +153,7 @@ implementation
     _top_y := 2;
 
     TextColor(border_color);
+    TextBackground(background);
     horizontal_text := '';
     for i := 1 to text_size do
       horizontal_text := horizontal_text + symbol;

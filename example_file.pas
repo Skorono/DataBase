@@ -12,9 +12,10 @@ type
 
   ViewTable = class
     background, countColumn, head_width, head_height, on_vertical_button, on_horizontal_button: integer;
-    x, y, x_border, y_border, y_line_pos: integer;
+    x, y, x_border, y_border, y_line_pos, on_page: integer;
     Cells: array[1..7] of Cell;
     head_buttons: array[1..7] of TextButton;
+    pages: array of Cls_List;
     List: Cls_List;
     line: PLine; {Не забыть переименовать}
     borderFreeSpace: integer;
@@ -23,8 +24,17 @@ type
     procedure show_table1;
     procedure show_head;
     procedure show_line;
+    {procedure createPage;}
+    procedure deleteText(count: integer);
+    procedure enterTextFormat;
     procedure writeInCell;
     procedure enterDateForm;
+    procedure onLineDeleteMode;
+    procedure onCellDeleteMode();
+    procedure deleteLine(lineNumber: integer);
+    procedure deleteCell(lineNumber, cellNumber: integer);
+    procedure deleteLineLighting(lineNumber, color: integer);
+    procedure deleteCellLigting(lineNumber, cellNumber, color: integer);
     {procedure enterSubmissionForm;
     procedure enterNumberForm;
     procedure enterAddressForm;}
@@ -32,13 +42,17 @@ type
     procedure Key_DOWN;
     procedure Key_RIGHT;
     procedure Key_Left;
+    procedure DelKey_UP;
+    procedure DelKey_DOWN;
+    procedure DelKey_RIGHT;
+    procedure DelKey_LEFT;
     procedure main;
-    function checkTextFormat(text: string): boolean;
-    function checkOrganizationName(text: string): boolean;
+    function enterOrganizationName: string;
+    function enterText(symbolsCount: integer): string;
     function checkDayFormat(day: string): boolean;
     function checkMonthFormat(month: string): boolean;
     function checkYearFormat(year: string): boolean;
-
+    function checkOrganizationName(text: string): boolean;
     function setHeadOfColumns(): SArray;
   end;
 
@@ -57,6 +71,7 @@ begin
   y_border := border_y;
   background := abs_background;
   List := Cls_List.Init;
+  on_page := 1;
 end;
 
 function ViewTable.setHeadOfColumns(): SArray;
@@ -126,111 +141,183 @@ begin
     show_line();
 end;
 
-function ViewTable.checkDayFormat(day: string[2]): boolean;
+function ViewTable.checkDayFormat(day: string): boolean;
 var
-  firstPart, secondPart: integer;
+  i, int_day: integer;
+  flag: boolean;
 begin
-  firstPart := strtoint(day[1]);
-  secondPart := strtoint(day[2]);
-  if (((firstPart = 3) and ((secondPart <= 1))) or ((firstPart < 3) and (secondPart < 10))) and ((firstPart > -1) and (secondPart > -1)) then
-    result := true
+  flag := true;
+  for i := 1 to length(day) do
+  begin
+    if not (day[i] in ['0'..'9']) then
+      flag := false;
+  end;
+  if flag then
+  begin
+    int_day := strtoint(day);
+    if ((int_day < 32) and (int_day > 0)) then
+      result := true
+    else
+      result := false;
+  end
   else
     result := false;
 end;
 
-function ViewTable.checkMonthFormat(month: string[2]): boolean;
+function ViewTable.checkMonthFormat(month: string): boolean;
 var
-  firstPart, secondPart: integer;
+  i, int_month: integer;
+  flag: boolean;
 begin
-  firstPart := strtoint(month[1]);
-  secondPart := strtoint(month[2]);
-  if (((firstPart = 0 ) and (seconPart < 10)) or ((firstPart = 1) and (secondPart < 3 )) and ((firstPart > -1) and (secondPart > -1)) then
-    result := true
+  flag := true;
+  for i := 1 to length(month) do
+  begin
+    if not (month[i] in ['0'..'9']) then
+      flag := false;
+  end;
+  if flag then
+  begin
+    int_month := strtoint(month);
+    if ((int_month < 13) and (int_month > 0)) then
+      result := true
+    else
+      result := false;
+  end
   else
     result := false;
 end;
 
-function ViewTable.checkYearFormat(year: string[4]): boolean;
+function ViewTable.checkYearFormat(year: string): boolean;
 var
-  firstPart, secondPart: integer;
+  i, int_year: integer;
+  flag: boolean;
 begin
+  flag := true;
+  for i := 1 to length(year) do
+  begin
+    if not (year[i] in ['0'..'9']) then
+      flag := false;
+  end;
+  if flag then
+  begin
+  int_year := strtoint(year);
+  if ((int_year > 1990) and (int_year < 2023)) then
+    result := true
+  else
+    result := false;
+  end
+  else
+    result := false;
+end;
 
+function ViewTable.checkOrganizationName(text: string): boolean;
+const
+  acceptSize = 100;
+begin
+  begin
+    if length(text) <= acceptSize then
+      result := true
+    else
+      result := false;
+  end;
 end;
 
 procedure ViewTable.enterDateForm;
 const
-  otherLen = 2;
+  otherLen = 2; { переименовать }
   yearLen = 4;
 var
   x_, y_: integer;
   text: string;
-  enterCount: integer;
-  datePath: integer;
-  run, checkCorrect: boolean;
-  key: char;
 begin
-  x_ := borderFreeSpace;
-  y_ := borderFreeSpace;
-  enterCount := 0;
-  datePath := 1;
+  x_ := 1;
+  y_ := 1;
 
   write('  .  .');
-  gotoxy(x_, y_);
-  run := true;
+  gotoxy(x_ + otherLen, y_);
+  repeat
+    deleteText(otherLen);
+    text := enterText(otherLen);
+    write(text);
+  until (checkDayFormat(text));
+
+  x_ := x_ + otherLen;
+  gotoxy(x_ + otherLen, y_);
+  repeat
+    deleteText(otherLen);
+    text := enterText(otherLen);
+    write(text);
+  until (checkMonthFormat(text));
+
+  x_ := x_ + otherLen;
+  gotoxy(x_ + yearLen, y_);
+  repeat
+    deleteText(yearLen);
+    text := enterText(yearLen);
+    write(text);
+  until (checkYearFormat(text));
+end;
+
+function ViewTable.enterOrganizationName: string;
+var
+  text: string;
+begin
   text := '';
-  while run do
+  while not checkOrganizationName(text) do
+    text := enterText(0);
+end;
+
+function ViewTable.enterText(symbolsCount: integer): string;
+var
+  count: integer;
+  key: char;
+begin
+  count := 0;
+  enterText := '';
+  key := ' ';
+  if symbolsCount > 0 then
+    begin
+    repeat
+      enterText := enterText + key;
+      count := count + 1;
+      key := readkey;
+    until (count = symbolsCount);
+    end
+  else if symbolsCount = 0 then
   begin
     repeat
+      enterText := enterText + key;
       key := readkey;
-    until not (key in ['0'..'9']);
-    text := text + key;
-    enterCount := enterCount + 1;
-    if (enterCount = otherLen) then
-    begin
-      case datePath of
-        1: checkCorrect := checkDayFormat(text);
-        2: checkCorrect := checkMonthFormat(text);
-      end;
-    end
-    else if (enterCount = yearLen) then
-      checkCorrect := checkYearFormat(text)
-    else
-      checkCorrect := false;
-
-    if checkCorrect then
-    begin
-      datePath := datePath + 1;
-      enterCount := 0;
-      text := '';
-      x_ := x_ + 2;
-      gotoxy(x_, y_);
-    end;
+    until (key = #32);
   end;
 end;
 
-function ViewTable.CheckOrganizationName(text: string): boolean;
-const
-  acceptSize = 100;
+procedure ViewTable.deleteText(count: integer);
+var
+  x_, y_, stepDel: integer;
 begin
-  if length(text) <= acceptSize then
-    result := true
-  else
-    result := false;
+  x_ := whereX;
+  y_ := whereY;
+  stepDel := 1;
+  repeat
+    x_ := x_ - stepDel;
+    gotoxy(x_, y_);
+    write(' ');
+    count := count - 1;
+  until count = 0;
 end;
 
-//function
-
-function ViewTable.checkTextFormat(text: string): boolean;
+procedure ViewTable.enterTextFormat;
 begin
   case on_horizontal_button of
     1:begin
-      checkTextFormat := CheckOrganizationName(text);
+      enterOrganizationName;
     end;
     2:begin
-      //checkTextFormat :=
+
     end;
     3: begin
-      //checkTextFormat :=
+
     end;
     4: begin
 
@@ -242,7 +329,7 @@ begin
 
     end;
     7: begin
-
+      enterDateForm;
     end;
   end;
 end;
@@ -266,7 +353,7 @@ begin
   window(x_, y_, x_ + width, y_ + (borderFreeSpace * 2));
   gotoxy(1, 1);
 
-  read(line^.data[on_horizontal_button].text);
+  enterTextFormat;
   input_field.del;
   input_field.border.del;
 
@@ -312,6 +399,102 @@ begin
   until key = #32;
 end;
 
+procedure ViewTable.deleteLineLighting(lineNumber, color: integer);
+var
+  i: integer;
+begin
+  line := List.getNode(lineNumber);
+  for i := 1 to countColumn do
+  begin
+    line^.data[i].ChangeBackground(color);
+    line^.data[i].border.ChangeBackground(color);
+  end;
+end;
+
+procedure ViewTable.deleteCellLigting(lineNumber, cellNumber, color: integer);
+begin
+  line := List.getNode(lineNumber);
+  line^.data[cellNumber].ChangeBackground(color);
+  line^.data[cellNumber].Border.ChangeBackground(color);
+end;
+
+procedure ViewTable.deleteLine(lineNumber: integer);
+var
+  i: integer;
+begin
+  line := List.getNode(lineNumber);
+  for i := 1 to countColumn do
+  begin
+    line^.data[i].text := '';
+  end;
+end;
+
+procedure ViewTable.deleteCell(lineNumber, cellNumber: integer);
+begin
+  line := List.getNode(lineNumber);
+  line^.data[cellNumber].text := '';
+end;
+
+procedure ViewTable.onLineDeleteMode;
+var
+  key: char;
+begin
+  key := ' ';
+  on_horizontal_button := 1;
+  on_vertical_button := 1;
+  deleteLineLighting(on_vertical_button, 7);
+  repeat
+  key := readkey;
+  if key = #0 then
+  begin
+  case readkey of
+    #72: begin
+      DelKey_UP;
+    end;
+    #80: begin
+      DelKey_DOWN;
+    end;
+  end;
+  end;
+  if key = #24 then
+    deleteLine(on_vertical_button)
+  else if key = #13 then
+    {onCellDeleteMode; }
+  until (key = #32);
+end;
+
+procedure ViewTable.onCellDeleteMode();
+begin
+
+end;
+
+procedure ViewTable.DelKey_UP;
+begin
+  deleteLineLighting(on_vertical_button, 0);
+  Key_UP;
+  deleteLineLighting(on_vertical_button, 7);
+end;
+
+procedure ViewTable.DelKey_DOWN;
+begin
+  deleteLineLighting(on_vertical_button, 0);
+  Key_DOWN;
+  deleteLineLighting(on_vertical_button, 7);
+end;
+
+procedure ViewTable.DelKey_RIGHT;
+begin
+  deleteCellLigting(on_vertical_button, on_horizontal_button, 0);
+  Key_RIGHT;
+  deleteCellLigting(on_vertical_button, on_horizontal_button, 7);
+end;
+
+procedure ViewTable.DelKey_LEFT;
+begin
+  deleteCellLigting(on_vertical_button, on_horizontal_button, 0);
+  Key_LEFT;
+  deleteCellLigting(on_vertical_button, on_horizontal_button, 7);
+end;
 
 procedure ViewTable.Key_UP();
 begin
