@@ -44,7 +44,7 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
     spaceBetweenButtons = 2;
 
   var
-    text: string[text_size];
+    text: string;
     cord_x, cord_y, text_size, i: integer;
     //allert: TextButton;
   begin

@@ -136,7 +136,6 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
       key := readkey;
       if key = #0 then
       begin
-
         case readkey of
         #72: begin
             on_button := Key_UP(on_button);

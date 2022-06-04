@@ -29,12 +29,13 @@ type
     procedure enterTextFormat;
     procedure writeInCell;
     procedure enterDateForm;
-    procedure onLineDeleteMode;
+    procedure DeleteMode;
     procedure onCellDeleteMode();
+    procedure WriteMode;
     procedure deleteLine(lineNumber: integer);
     procedure deleteCell(lineNumber, cellNumber: integer);
     procedure deleteLineLighting(lineNumber, color: integer);
-    procedure deleteCellLigting(lineNumber, cellNumber, color: integer);
+    procedure deleteCellLighting(lineNumber, cellNumber, color: integer);
     {procedure enterSubmissionForm;
     procedure enterNumberForm;
     procedure enterAddressForm;}
@@ -47,6 +48,7 @@ type
     procedure DelKey_RIGHT;
     procedure DelKey_LEFT;
     procedure main;
+    function isInteger(text: string): boolean;
     function enterOrganizationName: string;
     function enterText(symbolsCount: integer): string;
     function checkDayFormat(day: string): boolean;
@@ -141,18 +143,23 @@ begin
     show_line();
 end;
 
+function ViewTable.isInteger(text: string): boolean;
+var
+  i: integer;
+begin
+  result := true;
+  for i := 1 to length(text) do
+  begin
+    if not (text[i] in ['0'..'9']) then
+      result := false;
+  end;
+end;
+
 function ViewTable.checkDayFormat(day: string): boolean;
 var
-  i, int_day: integer;
-  flag: boolean;
+  int_day: integer;
 begin
-  flag := true;
-  for i := 1 to length(day) do
-  begin
-    if not (day[i] in ['0'..'9']) then
-      flag := false;
-  end;
-  if flag then
+  if isInteger(day) then
   begin
     int_day := strtoint(day);
     if ((int_day < 32) and (int_day > 0)) then
@@ -166,16 +173,9 @@ end;
 
 function ViewTable.checkMonthFormat(month: string): boolean;
 var
-  i, int_month: integer;
-  flag: boolean;
+  int_month: integer;
 begin
-  flag := true;
-  for i := 1 to length(month) do
-  begin
-    if not (month[i] in ['0'..'9']) then
-      flag := false;
-  end;
-  if flag then
+  if isInteger(month) then
   begin
     int_month := strtoint(month);
     if ((int_month < 13) and (int_month > 0)) then
@@ -189,22 +189,15 @@ end;
 
 function ViewTable.checkYearFormat(year: string): boolean;
 var
-  i, int_year: integer;
-  flag: boolean;
+  int_year: integer;
 begin
-  flag := true;
-  for i := 1 to length(year) do
+  if isinteger(year) then
   begin
-    if not (year[i] in ['0'..'9']) then
-      flag := false;
-  end;
-  if flag then
-  begin
-  int_year := strtoint(year);
-  if ((int_year > 1990) and (int_year < 2023)) then
-    result := true
-  else
-    result := false;
+    int_year := strtoint(year);
+    if ((int_year > 1990) and (int_year < 2023)) then
+      result := true
+    else
+      result := false;
   end
   else
     result := false;
@@ -265,6 +258,7 @@ begin
   text := '';
   while not checkOrganizationName(text) do
     text := enterText(0);
+  result := text;
 end;
 
 function ViewTable.enterText(symbolsCount: integer): string;
@@ -276,13 +270,13 @@ begin
   enterText := '';
   key := ' ';
   if symbolsCount > 0 then
-    begin
+  begin
     repeat
       enterText := enterText + key;
       count := count + 1;
       key := readkey;
     until (count = symbolsCount);
-    end
+  end
   else if symbolsCount = 0 then
   begin
     repeat
@@ -310,27 +304,13 @@ end;
 procedure ViewTable.enterTextFormat;
 begin
   case on_horizontal_button of
-    1:begin
-      enterOrganizationName;
-    end;
-    2:begin
-
-    end;
-    3: begin
-
-    end;
-    4: begin
-
-    end;
-    5: begin
-
-    end;
-    6: begin
-
-    end;
-    7: begin
-      enterDateForm;
-    end;
+    1: enterOrganizationName;
+    2: ;
+    3: ;
+    4: ;
+    5: ;
+    6: ;
+    7: enterDateForm;
   end;
 end;
 
@@ -353,7 +333,8 @@ begin
   window(x_, y_, x_ + width, y_ + (borderFreeSpace * 2));
   gotoxy(1, 1);
 
-  enterTextFormat;
+  //enterTextFormat;
+  read(line^.data[on_horizontal_button].text);
   input_field.del;
   input_field.border.del;
 
@@ -362,32 +343,37 @@ begin
   gotoxy(line^.data[on_horizontal_button].x_pos, line^.data[on_horizontal_button].y_pos);
 end;
 
-procedure ViewTable.main; { Временно main}
+procedure ViewTable.Main;
 var
   key: char;
 begin
   show_table1;
+  key := ' ';
   window(x, y, x_border, y_border);
   line := List.getNode(1);
   gotoxy(line^.data[1].x_pos, line^.data[1].y_pos);
+  repeat
+  key := readkey;
+  case key of
+    #1: WriteMode;
+    #4: DeleteMode;
+  end;
+  until (key = #32);
+end;
 
+procedure ViewTable.WriteMode; { Временно main}
+var
+  key: char;
+begin
   repeat
     key := readkey;
     if key = #0 then
     begin
       case readkey of
-        #72: begin
-          Key_UP;
-        end;
-        #80: begin
-          Key_DOWN;
-        end;
-        #75: begin
-          Key_LEFT;
-        end;
-        #77: begin
-          Key_RIGHT;
-        end;
+        #72: Key_UP;
+        #80: Key_DOWN;
+        #75: Key_LEFT;
+        #77: Key_RIGHT;
       end;
       line := List.getNode(on_vertical_button);
       gotoxy(line^.data[on_horizontal_button].x_pos, line^.data[on_horizontal_button].y_pos);
@@ -396,7 +382,7 @@ begin
     begin
       writeInCell;
     end;
-  until key = #32;
+  until key = #27;
 end;
 
 procedure ViewTable.deleteLineLighting(lineNumber, color: integer);
@@ -411,7 +397,7 @@ begin
   end;
 end;
 
-procedure ViewTable.deleteCellLigting(lineNumber, cellNumber, color: integer);
+procedure ViewTable.deleteCellLighting(lineNumber, cellNumber, color: integer);
 begin
   line := List.getNode(lineNumber);
   line^.data[cellNumber].ChangeBackground(color);
@@ -426,6 +412,7 @@ begin
   for i := 1 to countColumn do
   begin
     line^.data[i].text := '';
+    line^.data[i].show;
   end;
 end;
 
@@ -435,7 +422,7 @@ begin
   line^.data[cellNumber].text := '';
 end;
 
-procedure ViewTable.onLineDeleteMode;
+procedure ViewTable.DeleteMode;
 var
   key: char;
 begin
@@ -447,25 +434,42 @@ begin
   key := readkey;
   if key = #0 then
   begin
-  case readkey of
-    #72: begin
-      DelKey_UP;
+    case readkey of
+      #72: DelKey_UP;
+      #80: DelKey_DOWN;
     end;
-    #80: begin
-      DelKey_DOWN;
-    end;
+  end
+  else if key = #4 then
+  begin
+    deleteLine(on_vertical_button);
+  end
+  else if key = #3 then
+  begin
+    onCellDeleteMode;
   end;
-  end;
-  if key = #24 then
-    deleteLine(on_vertical_button)
-  else if key = #13 then
-    {onCellDeleteMode; }
-  until (key = #32);
+  until (key = #27);
 end;
 
 procedure ViewTable.onCellDeleteMode();
+var
+  key: char;
 begin
-
+  key := ' ';
+  on_horizontal_button := 1;
+  on_vertical_button := 1;
+  deleteCellLighting(on_vertical_button, on_horizontal_button, 7);
+  repeat
+  key := readkey;
+  if key = #0 then
+  begin
+    case readkey of
+    #75: DelKey_LEFT;
+    #77: DelKey_RIGHT;
+    end
+  end
+  else if (key = #4) then
+    deleteCell(on_horizontal_button, on_vertical_button);
+  until (key = #32) ;
 end;
 
 procedure ViewTable.DelKey_UP;
@@ -484,16 +488,16 @@ end;
 
 procedure ViewTable.DelKey_RIGHT;
 begin
-  deleteCellLigting(on_vertical_button, on_horizontal_button, 0);
+  deleteCellLighting(on_vertical_button, on_horizontal_button, 0);
   Key_RIGHT;
-  deleteCellLigting(on_vertical_button, on_horizontal_button, 7);
+  deleteCellLighting(on_vertical_button, on_horizontal_button, 7);
 end;
 
 procedure ViewTable.DelKey_LEFT;
 begin
-  deleteCellLigting(on_vertical_button, on_horizontal_button, 0);
+  deleteCellLighting(on_vertical_button, on_horizontal_button, 0);
   Key_LEFT;
-  deleteCellLigting(on_vertical_button, on_horizontal_button, 7);
+  deleteCellLighting(on_vertical_button, on_horizontal_button, 7);
 end;
 
 procedure ViewTable.Key_UP();
