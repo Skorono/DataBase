@@ -12,7 +12,6 @@ type PLine = ^Line_Node;
        next: PLine;
        previous: PLine;
      end;
-     // Todo: Создать класс листа для передачи в класс для работы с базой
 
      Cls_List = class
      //  strict private

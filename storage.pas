@@ -31,7 +31,7 @@ type PLine = ^Line_Node;
 implementation
   constructor Cls_List.Init;
   begin
-    nodeCount := 1;
+    nodeCount := 0;
     new(Line);
     Line^.next:=NIL;
   end;
@@ -47,6 +47,7 @@ implementation
      new(new_Node);
      new_Node^.data := cells;
      new_Node^.next := nil;
+     nodeCount := nodeCount + 1;
 
      if Line = nil then
      begin
@@ -62,7 +63,6 @@ implementation
        new_node^.previous := list_copy;
      end;
      new_Node^.number := nodeCount;
-     nodeCount := nodeCount + 1;
   end;
 
   procedure Cls_List.save;

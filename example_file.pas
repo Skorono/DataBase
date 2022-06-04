@@ -36,6 +36,7 @@ type
     procedure deleteCell(lineNumber, cellNumber: integer);
     procedure deleteLineLighting(lineNumber, color: integer);
     procedure deleteCellLighting(lineNumber, cellNumber, color: integer);
+    procedure showPosition;
     {procedure enterSubmissionForm;
     procedure enterNumberForm;
     procedure enterAddressForm;}
@@ -87,6 +88,23 @@ begin
   Result[7] := 'Дата окончания действия аккредитации';
 end;
 
+procedure ViewTable.showPosition;
+const
+  MAX_TEXT_SIZE = 21;
+var
+  inf_button: TextButton;
+  position: string;
+  x_pos, y_pos: integer;
+  last_line: PLine;
+begin
+  position := 'строка: ' + inttostr(on_vertical_button) + ' ячейка: ' + inttostr(on_horizontal_button);
+  last_line := List.getNode(List.nodeCount);
+  x_pos := (last_line^.data[countColumn].x_pos + last_line^.data[countColumn].button_width + borderFreeSpace) - MAX_TEXT_SIZE;
+  y_pos := last_line^.data[countColumn].y_pos + borderFreeSpace;
+  inf_button := TextButton.Init(MAX_TEXT_SIZE, 1, x_pos, y_pos, 0, position);
+  inf_button.Show;
+end;
+
 procedure ViewTable.show_head;
 var
   i: integer;
@@ -113,9 +131,8 @@ var
   i: integer;
   s_text: string;
 begin
-  //borderFreeSpace := 1;
   line := List.getNode(List.nodeCount);
-  if List.nodeCount > 1 then
+  if List.nodeCount > 0 then
   begin
     y_line_pos := line^.data[1].y_pos;
     y_line_pos := y_line_pos + ((borderFreeSpace * 2) - 2);
@@ -365,6 +382,10 @@ procedure ViewTable.WriteMode; { Временно main}
 var
   key: char;
 begin
+  showPosition;
+  window(x, y, x_border, y_border);
+  line := List.getNode(1);
+  gotoxy(line^.data[1].x_pos, line^.data[1].y_pos);
   repeat
     key := readkey;
     if key = #0 then
@@ -375,6 +396,8 @@ begin
         #75: Key_LEFT;
         #77: Key_RIGHT;
       end;
+      showPosition;
+      window(x, y, x_border, y_border);
       line := List.getNode(on_vertical_button);
       gotoxy(line^.data[on_horizontal_button].x_pos, line^.data[on_horizontal_button].y_pos);
     end
@@ -391,16 +414,12 @@ var
 begin
   line := List.getNode(lineNumber);
   for i := 1 to countColumn do
-  begin
-    line^.data[i].ChangeBackground(color);
     line^.data[i].border.ChangeBackground(color);
-  end;
 end;
 
 procedure ViewTable.deleteCellLighting(lineNumber, cellNumber, color: integer);
 begin
   line := List.getNode(lineNumber);
-  line^.data[cellNumber].ChangeBackground(color);
   line^.data[cellNumber].Border.ChangeBackground(color);
 end;
 

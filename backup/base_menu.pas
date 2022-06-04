@@ -54,13 +54,7 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
     y := 1;
     {Paint_Background();}
     cord_x := (x_border div 2) - (text_size div 2);
-    cord_y := y_border div 2;
-    { Удалить }
-    //allert := TextButton.Init(text_size, spaceBetweenButtons, cord_x, cord_y-10, background, 'Ведутся работы!!!');
-    //allert.border := Border.Init('-', 2, cord_x, cord_y - 1, cord_y - 1, text_size);
-    //allert.create;
-    //allert.border.create;
-    cord_y := cord_y + spaceBetweenButtons;
+    cord_y := (y_border div 2) + spaceBetweenButtons;
 
     for i:= 1 to base_count do
       begin
@@ -97,9 +91,8 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
   end;
 
   procedure Menu.press_enter(on_button: integer);
-  //const
-    //x_size = 80;
-    //y_size = 25;
+  const
+    STD_Y = 53;
   var
     base1: ViewTable;
   begin
@@ -107,7 +100,7 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
     del;
 
     { Придумать другой вариант задания размеров клетки в шапке таблицы }
-    base1 := ViewTable.Init(1, 1, y_border, 8, 1, 0);
+    base1 := ViewTable.Init(2, 1, STD_Y, 8, 1, 0);
     case on_button of
       1:
        base1.main;
@@ -136,7 +129,6 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
       key := readkey;
       if key = #0 then
       begin
-
         case readkey of
         #72: begin
             on_button := Key_UP(on_button);

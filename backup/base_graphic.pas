@@ -28,6 +28,7 @@ type
 
       constructor Init(width, height, x_cord, y_cord, abs_background: integer; abs_text: string);
       procedure Show;
+      procedure clearButton;
       procedure ChangeColor(color: integer);
       procedure ChangeBackground(color: integer);
       destructor del;
@@ -74,8 +75,19 @@ implementation
     show;
   end;
 
+  procedure TextButton.clearButton;
+  var
+    i: integer;
+  begin
+    Window(x_pos, y_pos, x_pos + button_width, y_pos + button_height);
+    gotoxy(1, 1);
+    for i := 1 to button_width do
+      write(' ')
+  end;
+
   procedure TextButton.Show();
   begin
+    clearButton;
     Window(x_pos, y_pos, x_pos + button_width, y_pos + button_height);
     TextBackground(background);
     TextColor(text_color);
@@ -91,13 +103,8 @@ implementation
   end;
 
   procedure Cell.clearCell;
-  var
-    i: integer;
   begin
-    Window(x_pos, y_pos, x_pos + button_width, y_pos + button_height);
-    gotoxy(1, 1);
-    for i := 1 to button_width do
-      write(' ')
+    inherited TextButton.clearButton;
   end;
 
   procedure Cell.Show;
@@ -168,7 +175,7 @@ implementation
     horizontal_text := '';
     for i := 1 to text_size do
       horizontal_text := horizontal_text + symbol;
-    gotoxy(_start_x+1, _top_y-1);
+    gotoxy(_start_x, _top_y-1);
     write(' ' + horizontal_text + ' ');
     for i := _top_y to _bottom_y do
     begin
