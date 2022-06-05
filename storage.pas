@@ -12,17 +12,20 @@ type PLine = ^Line_Node;
        next: PLine;
        previous: PLine;
      end;
-     // Todo: Создать класс листа для передачи в класс для работы с базой
 
      Cls_List = class
-       nodeCount: integer;
-       Line: PLine;
-       constructor Init;
-       function add_line(cells: array of Cell): PLine;
-       function getNode(n: integer): PLine;
-       procedure rewrite_cell;
-       procedure save;
-       {procedure rewrite_line;}
+     //  strict private
+       private
+         Line: PLine;
+
+       public
+         nodeCount: integer;
+         constructor Init;
+         function getNode(n: integer): PLine;
+         procedure add_line(cells: array of Cell);
+         procedure rewrite_cell;
+         procedure save;
+         {procedure rewrite_line;}
      end;
 
 implementation
@@ -30,26 +33,37 @@ implementation
   begin
     nodeCount := 0;
     new(Line);
-    Line^.previous := nil;
+    Line^.next:=NIL;
+    Line^.number := 0;
   end;
 
   procedure Cls_List.rewrite_cell;
   begin
   end;
 
-  function Cls_List.add_line(cells: array of Cell): PLine;
+  procedure Cls_List.add_line(cells: array of Cell);
   var
-    new_Node: PLine;
+    new_Node, list_copy: PLine;
   begin
-     new(Line);
-     Line^.data := cells;
-     Line^.next := new_Node;
-
-     Line^.next^.previous := Line;
-
-     add_line := new_node;
-     add_line^.next := nil;
+     new(new_Node);
+     new_Node^.data := cells;
+     new_Node^.next := nil;
      nodeCount := nodeCount + 1;
+
+     new_Node^.number := Line^.number + 1;
+     if Line = nil then
+     begin
+       new_node^.previous := nil;
+       Line := new_node;
+     end
+     else
+     begin
+       list_copy := Line;
+       while list_copy^.next <> nil do
+         list_copy := list_copy^.next;
+       list_copy^.next := new_node;
+       new_node^.previous := list_copy;
+     end;
   end;
 
   procedure Cls_List.save;
@@ -58,15 +72,19 @@ implementation
   end;
 
   function Cls_List.getNode(n: integer): PLine;
+  var
+    line_copy: PLine;
   begin
-     new(Line);
-     while Line^.previous <> nil do
-       Line := Line^.previous;
-
-     while (Line^.number <> n) and (Line <> nil) do
-       Line := Line^.previous;
-     getNode := Line;
+     if nodeCount > 0 then
+     begin
+       line_copy := Line;
+       if line_copy <> nil then
+       begin
+         while (line_copy^.number <> n) and (line_copy^.next <> nil) do
+           line_copy := line_copy^.next;
+         getNode := line_copy;
+       end;
+     end;
   end;
-
 end.
 

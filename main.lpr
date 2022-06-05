@@ -11,10 +11,10 @@ begin
   SetConsoleCP(1251);
   SetConsoleOutputCP(1251);
   ShowWindow(GetConsoleWindow(), SW_MAXIMIZE);
-  SetConsoleTitle('BD MENU');
+  SetConsoleTitle('DataBase');
 
-  {Сделать отдельную передачу заднего цвета для Меню и отдельно для кнопок!!! Но после создания таблицы}
-  menu_obj:=Menu.Init(1, 1, 80, 20, 0);
+  {��� ���� ���  �� � ��  �� � !!! � � �� ���}
+  menu_obj:=Menu.Init(1, 1, 80, 30, 0);
   menu_obj.Main;
   readkey();
 end.
