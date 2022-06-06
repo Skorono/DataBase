@@ -32,6 +32,7 @@ type
     procedure DeleteMode;
     procedure onCellDeleteMode();
     procedure WriteMode;
+    procedure switchPage(key: char);
     procedure deleteLine(lineNumber: integer);
     procedure deleteCell(lineNumber, cellNumber: integer);
     procedure deleteLineLighting(lineNumber, color: integer);
@@ -196,6 +197,7 @@ procedure ViewTable.showLine(lineNumber: integer);
 var
   i: integer;
 begin
+  window(x, y, x_border, y_boder);
   line := Pages[pageCount-1].getNode(lineNumber);
   for i := 1 to countColumn do
   begin
@@ -208,8 +210,8 @@ procedure ViewTable.showPage();
 var
   lineNumber: integer;
 begin
-  lineNumber := getFirstLineNumber;
-  while (LineNumber <= lineCount) and (Pages[pageCount-1].nodeCount < 100) do
+  lineNumber := 1;
+  while LineNumber <= lineCount do
   begin
     showLine(lineNumber);
     lineNumber := lineNumber + 1;
@@ -346,6 +348,14 @@ begin
   while not checkOrganizationName(text) do
     text := enterText(0);
   result := text;
+end;
+
+procedure ViewTable.switchPage(key: char);
+begin
+  if key = #116 then
+    nextPage()
+  else if key = #115 then
+    previousPage();
 end;
 
 function ViewTable.enterText(symbolsCount: integer): string;
