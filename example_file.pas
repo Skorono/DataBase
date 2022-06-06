@@ -11,32 +11,36 @@ type
   SArray = array[1..7] of string;
 
   ViewTable = class
-    background, countColumn, head_width, head_height, on_vertical_button, on_horizontal_button: integer;
-    x, y, x_border, y_border, y_line_pos, on_page: integer;
+    background, countColumn, head_width, head_height, on_vertical_button, on_horizontal_button, pageNumber, pageCount, elementsNumber: integer;
+    x, y, x_border, y_border, y_line_pos, lineCount,on_page: integer;
     Cells: array[1..7] of Cell;
     head_buttons: array[1..7] of TextButton;
-    pages: array of Cls_List;
-    List: Cls_List;
+    Pages: array of Cls_List;
     line: PLine; {Не забыть переименовать}
     borderFreeSpace: integer;
 
     constructor Init(start_x, start_y, border_y, width, height, abs_background: integer);
-    procedure show_table1;
+    procedure showPage;
     procedure show_head;
-    procedure show_line;
+    procedure createNewPage;
+    procedure setCellPosition(lineNum: integer);
     {procedure createPage;}
     procedure deleteText(count: integer);
-    procedure enterTextFormat;
     procedure writeInCell;
-    procedure enterDateForm;
     procedure DeleteMode;
-    procedure onCellDeleteMode();
     procedure WriteMode;
+    procedure switchPage(key: char);
     procedure deleteLine(lineNumber: integer);
-    procedure deleteCell(lineNumber, cellNumber: integer);
-    procedure deleteLineLighting(lineNumber, color: integer);
-    procedure deleteCellLighting(lineNumber, cellNumber, color: integer);
+    procedure LineLighting(lineNumber, color: integer);
+    procedure turnOffDeleteLight();
     procedure showPosition;
+    procedure showLine(lineNumber: integer);
+    procedure nextPage;
+    procedure previousPage;
+    procedure createInputField(width, height, x_, y_: integer);
+    procedure enterDateForm;
+    procedure positional_hint;
+    function enterOrganizationName: string;
     {procedure enterSubmissionForm;
     procedure enterNumberForm;
     procedure enterAddressForm;}
@@ -46,12 +50,14 @@ type
     procedure Key_Left;
     procedure DelKey_UP;
     procedure DelKey_DOWN;
-    procedure DelKey_RIGHT;
-    procedure DelKey_LEFT;
     procedure main;
-    function isInteger(text: string): boolean;
-    function enterOrganizationName: string;
+    function getFirstLineNumber: integer;
+    //function enterDateForm: string;
+    function calculationLineCount: integer;
+    function enterTextFormat: string;
     function enterText(symbolsCount: integer): string;
+    function isInteger(text: string): boolean;
+    function isString(text: string): boolean;
     function checkDayFormat(day: string): boolean;
     function checkMonthFormat(month: string): boolean;
     function checkYearFormat(year: string): boolean;
@@ -73,8 +79,48 @@ begin
   y := start_y;
   y_border := border_y;
   background := abs_background;
-  List := Cls_List.Init;
-  on_page := 1;
+  elementsNumber := 100;
+  pageNumber := 1;
+  pageCount := 0;
+  lineCount := calculationLineCount;
+  show_head;
+  createNewPage;
+  positional_hint;
+end;
+
+function ViewTable.calculationLineCount: integer;
+var
+  lineSize, headSize: integer;
+begin
+  headSize := head_height + (borderFreeSpace*2);
+  lineSize := head_height + borderFreeSpace;
+  result := (y_border - ((borderFreeSpace div 2) + headSize)) div lineSize;
+end;
+
+procedure ViewTable.positional_hint;
+var
+  text: string;
+  hint: TextButton;
+  pos_x, pos_y: integer;
+begin
+  text := 'ESC - выход из программы/выход из режима';
+  line := Pages[pageNumber-1].getNode(1);
+  pos_x := line^.data[countColumn].x_pos + line^.data[countColumn].button_width + (borderFreeSpace* 2);
+  pos_y := line^.data[countColumn].y_pos;
+  hint := TextButton.Init(length(text), 1, pos_x, pos_y, 0, text);
+  hint.show;
+  inc(pos_y);
+  text := 'Ctrl + A - EditMode';
+  hint := TextButton.Init(length(text), 1, pos_x, pos_y, 0, text);
+  hint.show;
+  inc(pos_y);
+  text := 'Ctrl + D - DeleteMode';
+  hint := TextButton.Init(length(text), 1, pos_x, pos_y, 0, text);
+  hint.show;
+  inc(pos_y);
+  text := 'Ctrl + <- / -> - Переключение между страницами';
+  hint := TextButton.Init(length(text), 1, pos_x, pos_y, 0, text);
+  hint.show;
 end;
 
 function ViewTable.setHeadOfColumns(): SArray;
@@ -90,15 +136,15 @@ end;
 
 procedure ViewTable.showPosition;
 const
-  MAX_TEXT_SIZE = 21;
+  MAX_TEXT_SIZE = 35;
 var
   inf_button: TextButton;
   position: string;
   x_pos, y_pos: integer;
   last_line: PLine;
 begin
-  position := 'строка: ' + inttostr(on_vertical_button) + ' ячейка: ' + inttostr(on_horizontal_button);
-  last_line := List.getNode(List.nodeCount);
+  position := 'страница: ' + inttostr(pageNumber) + ' строка: ' + inttostr(on_vertical_button) + ' ячейка: ' + inttostr(on_horizontal_button);
+  last_line := Pages[pageNumber-1].getNode(Pages[pageNumber-1].nodeCount);
   x_pos := (last_line^.data[countColumn].x_pos + last_line^.data[countColumn].button_width + borderFreeSpace) - MAX_TEXT_SIZE;
   y_pos := last_line^.data[countColumn].y_pos + borderFreeSpace;
   inf_button := TextButton.Init(MAX_TEXT_SIZE, 1, x_pos, y_pos, 0, position);
@@ -126,13 +172,10 @@ begin
   x_border := head_buttons[countColumn].x_pos + head_buttons[countColumn].button_width + head_buttons[countColumn].border.borderFreeSpace;
 end;
 
-procedure ViewTable.show_line();
-var
-  i: integer;
-  s_text: string;
+procedure ViewTable.setCellPosition(lineNum: integer);
 begin
-  line := List.getNode(List.nodeCount);
-  if List.nodeCount > 0 then
+  line := Pages[pageNumber-1].getNode(lineNum);
+  if lineNum > 1 then
   begin
     y_line_pos := line^.data[1].y_pos;
     y_line_pos := y_line_pos + ((borderFreeSpace * 2) - 2);
@@ -142,22 +185,82 @@ begin
     y_line_pos := head_buttons[1].y_pos;
     y_line_pos := y_line_pos + ((borderFreeSpace * 2) - 1)
   end;
-  for i := 1 to countColumn do
-  begin
-    s_text := '';
-    Cells[i] := Cell.Init(length(head_buttons[i].text), head_height, head_buttons[i].x_pos, y_line_pos, background, s_text);
-    Cells[i].Border := Border.Init('-', borderFreeSpace-1, head_buttons[i].x_pos, y_line_pos, y_line_pos, length(head_buttons[i].text));
-    Cells[i].Border.ChangeColor(1);
-    Cells[i].Show;
-  end;
-  List.add_line(Cells);
 end;
 
-procedure ViewTable.show_table1();
+function ViewTable.getFirstLineNumber: integer;
 begin
-  show_head();
-  while y_line_pos < y_border do
-    show_line();
+  if pageCount <> 1 then
+    result := Pages[pageCount-1].nodeCount
+  else
+    result := 1;
+end;
+
+procedure ViewTable.createNewPage();
+var
+  i, j: integer;
+  s_text: string;
+  lineNum: integer;
+begin
+  pageCount := pageCount + 1;
+  lineNum := 1;
+  setlength(Pages, pageCount);
+  Pages[pageCount-1] := Cls_List.Init;
+  Pages[pageCount-1].nodeCount := getFirstLineNumber;
+  for i := 1 to lineCount do
+  begin
+    setCellPosition(lineNum);
+    lineNum := lineNum + 1;
+    for j := 1 to countColumn do
+    begin
+      s_text := '';
+      Cells[j] := Cell.Init(length(head_buttons[j].text), head_height, head_buttons[j].x_pos, y_line_pos, background, s_text);
+      Cells[j].Border := Border.Init('-', borderFreeSpace-1, head_buttons[j].x_pos, y_line_pos, y_line_pos, length(head_buttons[j].text));
+    end;
+    Pages[pageCount-1].add_line(Cells);
+  end;
+end;
+
+procedure ViewTable.showLine(lineNumber: integer);
+var
+  i: integer;
+begin
+  window(x, y, x_border, y_border);
+  line := Pages[pageCount-1].getNode(lineNumber);
+  for i := 1 to countColumn do
+  begin
+      line^.data[i].show;
+      line^.data[i].Border.ChangeColor(1);
+  end;
+end;
+
+procedure ViewTable.showPage();
+var
+  lineNumber: integer;
+begin
+  lineNumber := 1;
+  while LineNumber <= lineCount do
+  begin
+    showLine(lineNumber);
+    lineNumber := lineNumber + 1;
+  end;
+end;
+
+procedure ViewTable.nextPage; { Написать удалеие предыдущей строки }
+begin
+  if pageNumber <> pageCount then
+    pageCount := pageCount + 1;
+  pageNumber := pageNumber + 1;
+  createNewPage;
+  showPage();
+end;
+
+procedure ViewTable.previousPage;
+begin
+  if pageNumber <> 1 then
+  begin
+    pageNumber := pageNumber - 1;
+    showPage();
+  end;
 end;
 
 function ViewTable.isInteger(text: string): boolean;
@@ -247,7 +350,7 @@ begin
   gotoxy(x_ + otherLen, y_);
   repeat
     deleteText(otherLen);
-    text := enterText(otherLen);
+    enterText(otherLen);
     write(text);
   until (checkDayFormat(text));
 
@@ -255,7 +358,7 @@ begin
   gotoxy(x_ + otherLen, y_);
   repeat
     deleteText(otherLen);
-    text := enterText(otherLen);
+    enterText(otherLen);
     write(text);
   until (checkMonthFormat(text));
 
@@ -263,44 +366,60 @@ begin
   gotoxy(x_ + yearLen, y_);
   repeat
     deleteText(yearLen);
-    text := enterText(yearLen);
-    write(text);
+    enterText(yearLen);
   until (checkYearFormat(text));
 end;
 
 function ViewTable.enterOrganizationName: string;
+const
+  MaxOrgNameSize = 100;
 var
   text: string;
 begin
   text := '';
-  while not checkOrganizationName(text) do
-    text := enterText(0);
-  result := text;
+  enterOrganizationName := enterText(MaxOrgNameSize);
+end;
+
+procedure ViewTable.switchPage(key: char);
+begin
+  if key = #116 then
+    nextPage()
+  else if key = #115 then
+    previousPage();
+  showPosition;
+end;
+
+function ViewTable.isString(text: string): boolean;
+var
+  i: integer;
+begin
+  result := false;
+  for i := 1 to length(text) do
+  begin
+    if (text[i] in ['A'..'Z']) or (text[i] in ['a'..'z']) or (text[i] in ['А'..'Я']) or (text[i] in ['а'..'я']) or (text[i] in ['0'..'9'])  then
+      result := true;
+  end;
 end;
 
 function ViewTable.enterText(symbolsCount: integer): string;
 var
-  count: integer;
   key: char;
+  text: string;
 begin
-  count := 0;
-  enterText := '';
   key := ' ';
-  if symbolsCount > 0 then
+  text := '';
+  while key <> #13 do
   begin
-    repeat
-      enterText := enterText + key;
-      count := count + 1;
-      key := readkey;
-    until (count = symbolsCount);
-  end
-  else if symbolsCount = 0 then
-  begin
-    repeat
-      enterText := enterText + key;
-      key := readkey;
-    until (key = #32);
+    key := readkey;
+    if isString(key) and (symbolsCount > length(text)) then
+    begin
+      text := text + key;
+      write(key);
+    end
+    else if key = #27 then
+      deleteText(1);
   end;
+  enterText := text;
 end;
 
 procedure ViewTable.deleteText(count: integer);
@@ -316,19 +435,35 @@ begin
     write(' ');
     count := count - 1;
   until count = 0;
+  gotoxy(x_, y_);
 end;
 
-procedure ViewTable.enterTextFormat;
+function ViewTable.enterTextFormat: string;
 begin
   case on_horizontal_button of
-    1: enterOrganizationName;
-    2: ;
+    1: enterTextFormat := enterOrganizationName;
+    {2: ;
     3: ;
     4: ;
     5: ;
     6: ;
-    7: enterDateForm;
+    7: text := enterDateForm;}
   end;
+end;
+
+procedure ViewTable.createInputField(width, height, x_, y_: integer);
+var
+  input_field: TextButton;
+begin
+  line := Pages[pageNumber-1].getNode(on_vertical_button);
+  input_field := TextButton.Init(width, height, x_, y_, 0, '');
+  input_field.Border := Border.Init('-', borderFreeSpace-1, x_, y_, y_, width);
+  input_field.show;
+  input_field.Border.ChangeColor(15);
+  gotoxy(1 + borderFreeSpace, 1 + (borderFreeSpace-1));
+  line^.data[on_horizontal_button].text := enterTextFormat;
+  input_field.del;
+  input_field.border.del;
 end;
 
 procedure ViewTable.writeInCell;
@@ -336,24 +471,12 @@ const
   height = 1;
 var
   x_, y_, width: integer;
-  input_field: TextButton;
 begin
+  line := Pages[pageNumber-1].getNode(lineCount);
   x_ := line^.data[1].x_pos;
-  y_ := y_border + (borderFreeSpace*2);
+  y_ := line^.data[countColumn].y_pos + (borderFreeSpace * 2);
   width := line^.data[countColumn].x_pos + line^.data[countColumn].button_width - borderFreeSpace;
-
-  input_field := TextButton.Init(width, height, x_, y_, 0, '');
-  input_field.Border := Border.Init('-', borderFreeSpace-1, x_, y_, y_, width);
-  input_field.show;
-  input_field.Border.ChangeColor(15);
-
-  window(x_, y_, x_ + width, y_ + (borderFreeSpace * 2));
-  gotoxy(1, 1);
-
-  //enterTextFormat;
-  read(line^.data[on_horizontal_button].text);
-  input_field.del;
-  input_field.border.del;
+  createInputField(width, height, x_, y_);
 
   line^.data[on_horizontal_button].show;
   window(x, y, x_border, y_border);
@@ -364,10 +487,11 @@ procedure ViewTable.Main;
 var
   key: char;
 begin
-  show_table1;
+  showPage;
+  showPosition;
   key := ' ';
   window(x, y, x_border, y_border);
-  line := List.getNode(1);
+  line := Pages[pageCount-1].getNode(getFirstLineNumber);
   gotoxy(line^.data[1].x_pos, line^.data[1].y_pos);
   repeat
   key := readkey;
@@ -375,7 +499,8 @@ begin
     #1: WriteMode;
     #4: DeleteMode;
   end;
-  until (key = #32);
+  switchPage(key);
+  until (key = #27);
 end;
 
 procedure ViewTable.WriteMode; { Временно main}
@@ -384,8 +509,8 @@ var
 begin
   showPosition;
   window(x, y, x_border, y_border);
-  line := List.getNode(1);
-  gotoxy(line^.data[1].x_pos, line^.data[1].y_pos);
+  line := Pages[pageCount-1].getNode(on_vertical_button);
+  gotoxy(line^.data[on_horizontal_button].x_pos, line^.data[on_horizontal_button].y_pos);
   repeat
     key := readkey;
     if key = #0 then
@@ -398,7 +523,7 @@ begin
       end;
       showPosition;
       window(x, y, x_border, y_border);
-      line := List.getNode(on_vertical_button);
+      line := Pages[pageCount-1].getNode(on_vertical_button);
       gotoxy(line^.data[on_horizontal_button].x_pos, line^.data[on_horizontal_button].y_pos);
     end
     else if key = #13 then
@@ -408,26 +533,28 @@ begin
   until key = #27;
 end;
 
-procedure ViewTable.deleteLineLighting(lineNumber, color: integer);
+procedure ViewTable.LineLighting(lineNumber, color: integer);
 var
   i: integer;
 begin
-  line := List.getNode(lineNumber);
+  line := Pages[pageCount-1].getNode(lineNumber);
   for i := 1 to countColumn do
     line^.data[i].border.ChangeBackground(color);
 end;
 
-procedure ViewTable.deleteCellLighting(lineNumber, cellNumber, color: integer);
+procedure ViewTable.turnOffDeleteLight();
 begin
-  line := List.getNode(lineNumber);
-  line^.data[cellNumber].Border.ChangeBackground(color);
+  line := Pages[pageNumber-1].getNode(on_vertical_button);
+  LineLighting(on_vertical_button, 0);
+  window(x, y, x_border, y_border);
+  gotoxy(line^.data[1].x_pos, line^.data[1].y_pos);
 end;
 
 procedure ViewTable.deleteLine(lineNumber: integer);
 var
   i: integer;
 begin
-  line := List.getNode(lineNumber);
+  line := Pages[pageCount].getNode(lineNumber);
   for i := 1 to countColumn do
   begin
     line^.data[i].text := '';
@@ -435,20 +562,15 @@ begin
   end;
 end;
 
-procedure ViewTable.deleteCell(lineNumber, cellNumber: integer);
-begin
-  line := List.getNode(lineNumber);
-  line^.data[cellNumber].text := '';
-end;
-
 procedure ViewTable.DeleteMode;
 var
   key: char;
 begin
+  showPosition;
   key := ' ';
   on_horizontal_button := 1;
   on_vertical_button := 1;
-  deleteLineLighting(on_vertical_button, 7);
+  LineLighting(on_vertical_button, 7);
   repeat
   key := readkey;
   if key = #0 then
@@ -457,79 +579,41 @@ begin
       #72: DelKey_UP;
       #80: DelKey_DOWN;
     end;
+    showPosition;
   end
   else if key = #4 then
   begin
     deleteLine(on_vertical_button);
-  end
-  else if key = #3 then
-  begin
-    onCellDeleteMode;
   end;
   until (key = #27);
-end;
-
-procedure ViewTable.onCellDeleteMode();
-var
-  key: char;
-begin
-  key := ' ';
-  on_horizontal_button := 1;
-  on_vertical_button := 1;
-  deleteCellLighting(on_vertical_button, on_horizontal_button, 7);
-  repeat
-  key := readkey;
-  if key = #0 then
-  begin
-    case readkey of
-    #75: DelKey_LEFT;
-    #77: DelKey_RIGHT;
-    end
-  end
-  else if (key = #4) then
-    deleteCell(on_horizontal_button, on_vertical_button);
-  until (key = #32) ;
+  turnOffDeleteLight()
 end;
 
 procedure ViewTable.DelKey_UP;
 begin
-  deleteLineLighting(on_vertical_button, 0);
+  LineLighting(on_vertical_button, 0);
   Key_UP;
-  deleteLineLighting(on_vertical_button, 7);
+  LineLighting(on_vertical_button, 7);
 end;
 
 procedure ViewTable.DelKey_DOWN;
 begin
-  deleteLineLighting(on_vertical_button, 0);
+  LineLighting(on_vertical_button, 0);
   Key_DOWN;
-  deleteLineLighting(on_vertical_button, 7);
-end;
-
-procedure ViewTable.DelKey_RIGHT;
-begin
-  deleteCellLighting(on_vertical_button, on_horizontal_button, 0);
-  Key_RIGHT;
-  deleteCellLighting(on_vertical_button, on_horizontal_button, 7);
-end;
-
-procedure ViewTable.DelKey_LEFT;
-begin
-  deleteCellLighting(on_vertical_button, on_horizontal_button, 0);
-  Key_LEFT;
-  deleteCellLighting(on_vertical_button, on_horizontal_button, 7);
+  LineLighting(on_vertical_button, 7);
 end;
 
 procedure ViewTable.Key_UP();
 begin
   if on_vertical_button = 1 then
-    on_vertical_button := List.nodeCount
+    on_vertical_button := Pages[pageNumber-1].nodeCount
   else
     on_vertical_button := on_vertical_button - 1;
 end;
 
 procedure ViewTable.Key_DOWN();
 begin
-  if on_vertical_button = List.nodeCount then
+  if on_vertical_button = Pages[pageNumber-1].nodeCount then
     on_vertical_button := 1
   else
     on_vertical_button := on_vertical_button + 1;

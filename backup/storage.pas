@@ -8,14 +8,14 @@ uses
 type PLine = ^Line_Node;
      Line_Node = record
        data: array[1..7] of Cell;
-       number: integer;
+       number: byte;
        next: PLine;
        previous: PLine;
      end;
 
      Cls_List = class
-     //  strict private
-       private
+       strict private
+       //private
          Line: PLine;
 
        public
@@ -31,7 +31,7 @@ type PLine = ^Line_Node;
 implementation
   constructor Cls_List.Init;
   begin
-    nodeCount := 1;
+    nodeCount := 0;
     new(Line);
     Line^.next:=NIL;
   end;
@@ -47,11 +47,13 @@ implementation
      new(new_Node);
      new_Node^.data := cells;
      new_Node^.next := nil;
+     nodeCount := nodeCount + 1;
 
      if Line = nil then
      begin
        new_node^.previous := nil;
        Line := new_node;
+       Line^.number := 1;
      end
      else
      begin
@@ -60,9 +62,8 @@ implementation
          list_copy := list_copy^.next;
        list_copy^.next := new_node;
        new_node^.previous := list_copy;
+       new_node^.number := list_copy^.number + 1;
      end;
-     new_Node^.number := nodeCount;
-     nodeCount := nodeCount + 1;
   end;
 
   procedure Cls_List.save;
@@ -85,6 +86,5 @@ implementation
        end;
      end;
   end;
-
 end.
 
