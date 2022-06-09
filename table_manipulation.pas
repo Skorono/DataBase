@@ -1,4 +1,4 @@
-unit example_file;
+unit table_manipulation;
 
 {$mode ObjFPC}{$H+}
 
@@ -9,7 +9,7 @@ uses
 
 type
   SArray = array[1..7] of string;
-  InheritedBaseCls = class
+  InheritedTableCls = class
     background, countColumn, head_width, head_height, on_vertical_button, on_horizontal_button, pageNumber, pageCount, elementsNumber: integer;
     x, y, x_border, y_border, y_line_pos, lineCount,on_page: integer;
     Cells: array[1..7] of Cell;
@@ -38,7 +38,6 @@ type
     procedure createInputField(width, height, x_, y_: integer);
     {procedure enterDateForm;}
     procedure positional_hint;
-    function enterOrganizationName: string;
     {procedure enterSubmissionForm;
     procedure enterNumberForm;
     procedure enterAddressForm;}
@@ -50,18 +49,14 @@ type
     procedure DelKey_DOWN;
     procedure main;
     function getFirstLineNumber: integer;
-    //function enterDateForm: string;
-    function deleteText(text: string; delCount: integer): string;
-    function calculationLineCount: integer;
-    function enterTextFormat: string;
-    function enterText(symbolsCount: integer): string;
     function isInteger(text: string): boolean;
     function isString(text: string): boolean;
-    function checkDayFormat(day: string): boolean;
-    function checkMonthFormat(month: string): boolean;
-    function checkYearFormat(year: string): boolean;
-    function checkOrganizationName(text: string): boolean;
+    function deleteText(text: string; delCount: integer): string;
+    function enterText(symbolsCount: integer): string;
+    function calculationLineCount: integer;
     function setHeadOfColumns(): SArray;
+    {======================================}
+    function enterTextFormat: string;
   end;
 
   ViewTable = class
@@ -70,7 +65,7 @@ type
 
 implementation
 
-constructor InheritedBaseCls.Init(start_x, start_y, border_y, width, height, abs_background: integer);
+constructor InheritedTableCls.Init(start_x, start_y, border_y, width, height, abs_background: integer);
 begin
   countColumn := 7;
   borderFreeSpace := 2;
@@ -91,7 +86,7 @@ begin
   positional_hint;
 end;
 
-function InheritedBaseCls.calculationLineCount: integer;
+function InheritedTableCls.calculationLineCount: integer;
 var
   lineSize, headSize: integer;
 begin
@@ -100,7 +95,7 @@ begin
   result := (y_border - ((borderFreeSpace div 2) + headSize)) div lineSize;
 end;
 
-procedure InheritedBaseCls.positional_hint;
+procedure InheritedTableCls.positional_hint;
 const
   height = 1;
 var
@@ -128,18 +123,11 @@ begin
   hint.show;
 end;
 
-function InheritedBaseCls.setHeadOfColumns(): SArray;
+function InheritedTableCls.setHeadOfColumns(): SArray;
 begin
-  Result[1] := 'Название';
-  Result[2] := 'Адрес';
-  Result[3] := 'Тип подчинения';
-  Result[4] := 'Год основания';
-  Result[5] := 'Номер лицензии';
-  Result[6] := 'Номер аккредитации';
-  Result[7] := 'Дата окончания действия аккредитации';
 end;
 
-procedure InheritedBaseCls.showPosition;
+procedure InheritedTableCls.showPosition;
 const
   MAX_TEXT_SIZE = 35;
 var
@@ -156,7 +144,7 @@ begin
   inf_button.Show;
 end;
 
-procedure InheritedBaseCls.show_head;
+procedure InheritedTableCls.show_head;
 var
   i: integer;
   columnHeader: SArray;
@@ -177,7 +165,7 @@ begin
   x_border := head_buttons[countColumn].x_pos + head_buttons[countColumn].button_width + head_buttons[countColumn].border.borderFreeSpace;
 end;
 
-procedure InheritedBaseCls.setCellPosition(lineNum: integer);
+procedure InheritedTableCls.setCellPosition(lineNum: integer);
 begin
   line := Pages[pageNumber-1].getNode(lineNum);
   if lineNum > 1 then
@@ -192,7 +180,7 @@ begin
   end;
 end;
 
-function InheritedBaseCls.getFirstLineNumber: integer;
+function InheritedTableCls.getFirstLineNumber: integer;
 begin
   if pageCount <> 1 then
     result := Pages[pageCount-1].nodeCount
@@ -200,7 +188,7 @@ begin
     result := 1;
 end;
 
-procedure InheritedBaseCls.createNewPage();
+procedure InheritedTableCls.createNewPage();
 var
   i, j: integer;
   s_text: string;
@@ -225,7 +213,7 @@ begin
   end;
 end;
 
-procedure InheritedBaseCls.showLine(lineNumber: integer);
+procedure InheritedTableCls.showLine(lineNumber: integer);
 var
   i: integer;
 begin
@@ -238,7 +226,7 @@ begin
   end;
 end;
 
-procedure InheritedBaseCls.showPage();
+procedure InheritedTableCls.showPage();
 var
   lineNumber: integer;
 begin
@@ -250,7 +238,7 @@ begin
   end;
 end;
 
-procedure InheritedBaseCls.nextPage; { Написать удалеие предыдущей строки }
+procedure InheritedTableCls.nextPage; { Написать удалеие предыдущей строки }
 begin
   if pageNumber <> pageCount then
     pageCount := pageCount + 1;
@@ -260,7 +248,7 @@ begin
   showPosition;
 end;
 
-procedure InheritedBaseCls.previousPage;
+procedure InheritedTableCls.previousPage;
 begin
   if pageNumber <> 1 then
   begin
@@ -270,7 +258,7 @@ begin
   end;
 end;
 
-function InheritedBaseCls.isInteger(text: string): boolean;
+function InheritedTableCls.isInteger(text: string): boolean;
 var
   i: integer;
 begin
@@ -282,108 +270,7 @@ begin
   end;
 end;
 
-function InheritedBaseCls.checkDayFormat(day: string): boolean;
-var
-  int_day: integer;
-begin
-  if isInteger(day) then
-  begin
-    int_day := strtoint(day);
-    if ((int_day < 32) and (int_day > 0)) then
-      result := true
-    else
-      result := false;
-  end
-  else
-    result := false;
-end;
-
-function InheritedBaseCls.checkMonthFormat(month: string): boolean;
-var
-  int_month: integer;
-begin
-  if isInteger(month) then
-  begin
-    int_month := strtoint(month);
-    if ((int_month < 13) and (int_month > 0)) then
-      result := true
-    else
-      result := false;
-  end
-  else
-    result := false;
-end;
-
-function InheritedBaseCls.checkYearFormat(year: string): boolean;
-var
-  int_year: integer;
-begin
-  if isinteger(year) then
-  begin
-    int_year := strtoint(year);
-    if ((int_year > 1990) and (int_year < 2023)) then
-      result := true
-    else
-      result := false;
-  end
-  else
-    result := false;
-end;
-
-function InheritedBaseCls.checkOrganizationName(text: string): boolean;
-const
-  acceptSize = 100;
-begin
-  begin
-    if length(text) <= acceptSize then
-      result := true
-    else
-      result := false;
-  end;
-end;
-
-{procedure InheritedBaseCls.enterDateForm;
-const
-  otherLen = 2; { переименовать }
-  yearLen = 4;
-var
-  x_, y_: integer;
-  text: string;
-begin
-  x_ := 1;
-  y_ := 1;
-
-  write('  .  .');
-  gotoxy(x_ + otherLen, y_);
-  repeat
-    deleteText(otherLen);
-    enterText(otherLen);
-  until (checkDayFormat(text));
-
-  x_ := x_ + otherLen;
-  gotoxy(x_ + otherLen, y_);
-  repeat
-    deleteText(otherLen);
-    enterText(otherLen);
-    write(text);
-  until (checkMonthFormat(text));
-
-  x_ := x_ + otherLen;
-  gotoxy(x_ + yearLen, y_);
-  repeat
-    deleteText(yearLen);
-    enterText(yearLen);
-  until (checkYearFormat(text));
-end;                    }
-
-function InheritedBaseCls.enterOrganizationName: string;
-const
-  MaxOrgNameSize = 100;
-begin
-  enterOrganizationName := enterText(MaxOrgNameSize);
-end;
-
-procedure InheritedBaseCls.switchPage(key: char);
+procedure InheritedTableCls.switchPage(key: char);
 begin
   if key = #116 then
     nextPage()
@@ -391,7 +278,7 @@ begin
     previousPage();
 end;
 
-function InheritedBaseCls.isString(text: string): boolean;
+function InheritedTableCls.isString(text: string): boolean;
 var
   i: integer;
 begin
@@ -403,7 +290,7 @@ begin
   end;
 end;
 
-function InheritedBaseCls.enterText(symbolsCount: integer): string;
+function InheritedTableCls.enterText(symbolsCount: integer): string;
 var
   key: char;
   text: string;
@@ -429,7 +316,7 @@ begin
   enterText := text;
 end;
 
-function InheritedBaseCls.deleteText(text: string; delCount: integer): string;
+function InheritedTableCls.deleteText(text: string; delCount: integer): string;
 var
   x_, y_, stepDel, count: integer;
 begin
@@ -447,20 +334,11 @@ begin
   deleteText := copy(text, 1, length(text) - delCount);
 end;
 
-function InheritedBaseCls.enterTextFormat: string;
+function InheritedTableCls.enterTextFormat: string;
 begin
-  case on_horizontal_button of
-    1: enterTextFormat := enterOrganizationName;
-    {2: ;
-    3: ;
-    4: ;
-    5: ;
-    6: ;
-    7: text := enterDateForm;}
-  end;
 end;
 
-procedure InheritedBaseCls.createInputField(width, height, x_, y_: integer);
+procedure InheritedTableCls.createInputField(width, height, x_, y_: integer);
 var
   input_field: TextButton;
 begin
@@ -475,7 +353,7 @@ begin
   input_field.border.del;
 end;
 
-procedure InheritedBaseCls.writeInCell;
+procedure InheritedTableCls.writeInCell;
 const
   height = 1;
 var
@@ -492,7 +370,7 @@ begin
   gotoxy(line^.data[on_horizontal_button].x_pos, line^.data[on_horizontal_button].y_pos);
 end;
 
-procedure InheritedBaseCls.Main;
+procedure InheritedTableCls.Main;
 var
   key: char;
 begin
@@ -512,7 +390,7 @@ begin
   until (key = #27);
 end;
 
-procedure InheritedBaseCls.WriteMode; { Временно main}
+procedure InheritedTableCls.WriteMode; { Временно main}
 var
   key: char;
 begin
@@ -542,7 +420,7 @@ begin
   until key = #27;
 end;
 
-procedure InheritedBaseCls.LineLighting(lineNumber, color: integer);
+procedure InheritedTableCls.LineLighting(lineNumber, color: integer);
 var
   i: integer;
 begin
@@ -551,7 +429,7 @@ begin
     line^.data[i].border.ChangeBackground(color);
 end;
 
-procedure InheritedBaseCls.turnOffDeleteLight();
+procedure InheritedTableCls.turnOffDeleteLight();
 begin
   line := Pages[pageNumber-1].getNode(on_vertical_button);
   LineLighting(on_vertical_button, 0);
@@ -559,7 +437,7 @@ begin
   gotoxy(line^.data[1].x_pos, line^.data[1].y_pos);
 end;
 
-procedure InheritedBaseCls.deleteLine(lineNumber: integer);
+procedure InheritedTableCls.deleteLine(lineNumber: integer);
 var
   i: integer;
 begin
@@ -571,7 +449,7 @@ begin
   end;
 end;
 
-procedure InheritedBaseCls.DeleteMode;
+procedure InheritedTableCls.DeleteMode;
 var
   key: char;
 begin
@@ -598,21 +476,21 @@ begin
   turnOffDeleteLight()
 end;
 
-procedure InheritedBaseCls.DelKey_UP;
+procedure InheritedTableCls.DelKey_UP;
 begin
   LineLighting(on_vertical_button, 0);
   Key_UP;
   LineLighting(on_vertical_button, 7);
 end;
 
-procedure InheritedBaseCls.DelKey_DOWN;
+procedure InheritedTableCls.DelKey_DOWN;
 begin
   LineLighting(on_vertical_button, 0);
   Key_DOWN;
   LineLighting(on_vertical_button, 7);
 end;
 
-procedure InheritedBaseCls.Key_UP();
+procedure InheritedTableCls.Key_UP();
 begin
   if on_vertical_button = 1 then
     on_vertical_button := Pages[pageNumber-1].nodeCount
@@ -620,7 +498,7 @@ begin
     on_vertical_button := on_vertical_button - 1;
 end;
 
-procedure InheritedBaseCls.Key_DOWN();
+procedure InheritedTableCls.Key_DOWN();
 begin
   if on_vertical_button = Pages[pageNumber-1].nodeCount then
     on_vertical_button := 1
@@ -628,7 +506,7 @@ begin
     on_vertical_button := on_vertical_button + 1;
 end;
 
-procedure InheritedBaseCls.Key_RIGHT();
+procedure InheritedTableCls.Key_RIGHT();
 begin
   if on_horizontal_button = countColumn then
     on_horizontal_button := 1
@@ -636,7 +514,7 @@ begin
     on_horizontal_button := on_horizontal_button + 1;
 end;
 
-procedure InheritedBaseCls.Key_LEFT();
+procedure InheritedTableCls.Key_LEFT();
 begin
   if on_horizontal_button = 1 then
     on_horizontal_button := countColumn

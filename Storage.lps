@@ -15,10 +15,11 @@
       <Unit>
         <Filename Value="storage.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="-1"/>
+        <IsVisibleTab Value="True"/>
         <TopLine Value="7"/>
         <CursorPos X="8" Y="25"/>
         <UsageCount Value="21"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="base_graphic.pas"/>
@@ -38,10 +39,9 @@
       <Unit>
         <Filename Value="main.lpr"/>
         <UnitName Value="Main"/>
-        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="-1"/>
         <CursorPos X="31" Y="11"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="example_file.pas"/>

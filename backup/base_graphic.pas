@@ -46,6 +46,8 @@ type
 
 implementation
   constructor TextButton.Init(width, height, x_cord, y_cord, abs_background: integer; abs_text: string);
+  var
+    i: integer;
   begin
     button_width := width;
     button_height := height;
@@ -54,6 +56,9 @@ implementation
     background := abs_background;
     text := abs_text;
     text_color := 15;
+    if length(text) < width then
+      for i := length(text) to width do
+        text := text + ' ';
   end;
 
   destructor TextButton.Del;
@@ -104,7 +109,7 @@ implementation
 
   procedure Cell.clearCell;
   begin
-    inherited TextButton.clearButton;
+    inherited clearButton;
   end;
 
   procedure Cell.Show;
@@ -118,10 +123,8 @@ implementation
 
     gotoxy(1, 1);
     if length(text) > button_width then
-      visible_text := text[length(text) - button_width]
-    else if length(text) = button_width then
-      visible_text := text
-    else if text <> '' then
+      visible_text := copy(text, 1, button_width-3) + '...'
+    else if length(text) <= button_width then
       visible_text := text;
     write(visible_text);
   end;

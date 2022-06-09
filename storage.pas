@@ -33,8 +33,6 @@ implementation
   begin
     nodeCount := 0;
     Line:=nil;
-//    new(Line);
-//    Line^.next:=NIL;
   end;
 
   procedure Cls_List.rewrite_cell;

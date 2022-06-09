@@ -5,7 +5,7 @@ unit base_menu;
 interface
 
 uses
-  Classes, SysUtils, Crt, base_graphic, example_file;
+  Classes, SysUtils, Crt, base_graphic, table_manipulation;
 
 type
     Menu = class sealed
@@ -94,13 +94,13 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
   const
     STD_Y = 54;
   var
-    base1: ViewTable;
+    base1: InheritedTableCls;
   begin
     menu_border.del;
     del;
 
     { Придумать другой вариант задания размеров клетки в шапке таблицы }
-    base1 := ViewTable.Init(2, 1, STD_Y, 8, 1, 0);
+    base1 := InheritedTableCls.Init(2, 1, STD_Y, 8, 1, 0);
     case on_button of
       1:
        base1.main;
