@@ -10,7 +10,8 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="Main"/>
         <EditorIndex Value="-1"/>
-        <CursorPos X="47" Y="16"/>
+        <WindowIndex Value="-1"/>
+        <CursorPos X="24" Y="17"/>
         <UsageCount Value="200"/>
       </Unit>
       <Unit>
@@ -22,12 +23,14 @@
         <UsageCount Value="201"/>
       </Unit>
       <Unit>
-        <Filename Value="table_manipulation.pas"/>
+        <Filename Value="example_file.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="464"/>
-        <CursorPos X="43" Y="413"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="10"/>
+        <CursorPos X="16" Y="4"/>
         <UsageCount Value="207"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="menu.pas"/>
@@ -37,82 +40,40 @@
         <UsageCount Value="200"/>
       </Unit>
       <Unit>
-        <Filename Value="tables.pas"/>
-        <IsPartOfProject Value="True"/>
-        <EditorIndex Value="-1"/>
-        <CursorPos X="103" Y="10"/>
-        <UsageCount Value="24"/>
-      </Unit>
-      <Unit>
         <Filename Value="base_graphic.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="153"/>
-        <CursorPos X="79" Y="173"/>
+        <TopLine Value="77"/>
+        <CursorPos Y="95"/>
         <UsageCount Value="100"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="storage.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="36"/>
-        <CursorPos Y="66"/>
+        <CursorPos X="13" Y="77"/>
         <UsageCount Value="100"/>
       </Unit>
       <Unit>
         <Filename Value="base_menu.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="123"/>
-        <CursorPos X="60" Y="100"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="19"/>
+        <CursorPos X="15" Y="95"/>
         <UsageCount Value="101"/>
-      </Unit>
-      <Unit>
-        <Filename Value="..\miserable Pascal\base\base.pas"/>
-        <EditorIndex Value="-1"/>
-        <UsageCount Value="1"/>
-      </Unit>
-      <Unit>
-        <Filename Value="..\miserable Pascal\пппп.pas"/>
-        <EditorIndex Value="-1"/>
-        <UsageCount Value="1"/>
-      </Unit>
-      <Unit>
-        <Filename Value="..\miserable Pascal\practic.pas"/>
-        <EditorIndex Value="-1"/>
-        <UsageCount Value="1"/>
-      </Unit>
-      <Unit>
-        <Filename Value="..\miserable Pascal\Object.pas"/>
-        <EditorIndex Value="-1"/>
-        <UsageCount Value="1"/>
-      </Unit>
-      <Unit>
-        <Filename Value="..\miserable Pascal\muxortova.pas"/>
-        <EditorIndex Value="-1"/>
-        <UsageCount Value="1"/>
-      </Unit>
-      <Unit>
-        <Filename Value="..\miserable Pascal\mine_zadacha.pas"/>
-        <EditorIndex Value="-1"/>
-        <UsageCount Value="1"/>
-      </Unit>
-      <Unit>
-        <Filename Value="..\miserable Pascal\base.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="14"/>
-        <UsageCount Value="1"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\model_of_storage.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="25"/>
         <CursorPos X="5" Y="28"/>
-        <UsageCount Value="2"/>
+        <UsageCount Value="1"/>
       </Unit>
       <Unit>
-        <Filename Value="..\miserable Pascal\shellsort.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="ShellSort"/>
-        <UsageCount Value="20"/>
-        <Loaded Value="True"/>
+        <Filename Value="backup\example_file.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="82"/>
+        <CursorPos X="13" Y="123"/>
+        <UsageCount Value="10"/>
       </Unit>
     </Units>
     <JumpHistory HistoryIndex="-1"/>
@@ -133,6 +94,9 @@
       </Item>
       <Item>
         <Expression Value="gotoxy"/>
+      </Item>
+      <Item>
+        <Expression Value="nodeCount"/>
       </Item>
     </Watches>
   </Debugging>

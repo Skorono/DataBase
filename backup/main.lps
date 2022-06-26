@@ -9,7 +9,7 @@
         <Filename Value="main.lpr"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Main"/>
-        <CursorPos X="66" Y="20"/>
+        <CursorPos X="47" Y="16"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit>
@@ -24,9 +24,10 @@
       <Unit>
         <Filename Value="table_manipulation.pas"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="4"/>
-        <TopLine Value="147"/>
-        <CursorPos X="41" Y="159"/>
+        <TopLine Value="463"/>
+        <CursorPos X="26" Y="474"/>
         <UsageCount Value="207"/>
         <Loaded Value="True"/>
       </Unit>
@@ -41,23 +42,23 @@
         <Filename Value="tables.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="5"/>
-        <TopLine Value="151"/>
-        <CursorPos X="6" Y="16"/>
-        <UsageCount Value="21"/>
+        <TopLine Value="132"/>
+        <CursorPos X="103" Y="10"/>
+        <UsageCount Value="24"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="base_graphic.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="42"/>
-        <CursorPos X="10" Y="60"/>
+        <TopLine Value="153"/>
+        <CursorPos X="79" Y="173"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="storage.pas"/>
         <EditorIndex Value="3"/>
+        <TopLine Value="36"/>
         <CursorPos Y="66"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
@@ -65,8 +66,8 @@
       <Unit>
         <Filename Value="base_menu.pas"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="7"/>
-        <CursorPos X="35" Y="8"/>
+        <TopLine Value="123"/>
+        <CursorPos X="60" Y="100"/>
         <UsageCount Value="101"/>
         <Loaded Value="True"/>
       </Unit>
@@ -115,14 +116,6 @@
       </Unit>
     </Units>
     <JumpHistory HistoryIndex="29">
-      <Position>
-        <Filename Value="base_graphic.pas"/>
-        <Caret Line="121" Column="51" TopLine="100"/>
-      </Position>
-      <Position>
-        <Filename Value="base_menu.pas"/>
-        <Caret Line="95" Column="15" TopLine="44"/>
-      </Position>
       <Position>
         <Filename Value="base_menu.pas"/>
         <Caret Line="106" Column="19" TopLine="81"/>
@@ -209,14 +202,6 @@
       </Position>
       <Position>
         <Filename Value="table_manipulation.pas"/>
-        <Caret Line="40" Column="31" TopLine="115"/>
-      </Position>
-      <Position>
-        <Filename Value="tables.pas"/>
-        <Caret Line="16" Column="6" TopLine="110"/>
-      </Position>
-      <Position>
-        <Filename Value="table_manipulation.pas"/>
         <Caret Line="493" Column="31" TopLine="116"/>
       </Position>
       <Position>
@@ -235,6 +220,22 @@
         <Filename Value="base_graphic.pas"/>
         <Caret Line="61" TopLine="42"/>
       </Position>
+      <Position>
+        <Filename Value="base_graphic.pas"/>
+        <Caret Line="60" Column="10" TopLine="42"/>
+      </Position>
+      <Position>
+        <Filename Value="base_graphic.pas"/>
+        <Caret Line="59" TopLine="55"/>
+      </Position>
+      <Position>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="50" Column="19" TopLine="7"/>
+      </Position>
+      <Position>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="84" Column="25" TopLine="58"/>
+      </Position>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
@@ -247,22 +248,6 @@
     </HistoryLists>
   </ProjectSession>
   <Debugging>
-    <BreakPoints>
-      <Item>
-        <Kind Value="bpkSource"/>
-        <WatchScope Value="wpsLocal"/>
-        <WatchKind Value="wpkWrite"/>
-        <Source Value="base_graphic.pas"/>
-        <Line Value="59"/>
-      </Item>
-      <Item>
-        <Kind Value="bpkSource"/>
-        <WatchScope Value="wpsLocal"/>
-        <WatchKind Value="wpkWrite"/>
-        <Source Value="base_graphic.pas"/>
-        <Line Value="62"/>
-      </Item>
-    </BreakPoints>
     <Watches>
       <Item>
         <Expression Value="line^.next^"/>
