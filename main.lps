@@ -9,9 +9,9 @@
         <Filename Value="main.lpr"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Main"/>
-        <EditorIndex Value="-1"/>
-        <CursorPos X="47" Y="16"/>
+        <CursorPos X="5"/>
         <UsageCount Value="200"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="delete.pas"/>
@@ -24,10 +24,12 @@
       <Unit>
         <Filename Value="table_manipulation.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="464"/>
-        <CursorPos X="43" Y="413"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="429"/>
+        <CursorPos Y="455"/>
         <UsageCount Value="207"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="menu.pas"/>
@@ -39,83 +41,200 @@
       <Unit>
         <Filename Value="tables.pas"/>
         <IsPartOfProject Value="True"/>
+        <WindowIndex Value="1"/>
+        <CursorPos X="46" Y="15"/>
+        <UsageCount Value="65"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="..\miserable Pascal\shellsort.pas"/>
+        <UnitName Value="ShellSort"/>
         <EditorIndex Value="-1"/>
-        <CursorPos X="103" Y="10"/>
-        <UsageCount Value="24"/>
+        <WindowIndex Value="1"/>
+        <UsageCount Value="22"/>
       </Unit>
       <Unit>
         <Filename Value="base_graphic.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="153"/>
-        <CursorPos X="79" Y="173"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="120"/>
+        <CursorPos X="96" Y="172"/>
         <UsageCount Value="100"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="storage.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="36"/>
-        <CursorPos Y="66"/>
+        <EditorIndex Value="1"/>
+        <CursorPos X="70" Y="41"/>
         <UsageCount Value="100"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="base_menu.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="123"/>
-        <CursorPos X="60" Y="100"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="112"/>
+        <CursorPos X="68" Y="140"/>
         <UsageCount Value="101"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\miserable Pascal\base\base.pas"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="1"/>
+        <UsageCount Value="7"/>
       </Unit>
       <Unit>
         <Filename Value="..\miserable Pascal\пппп.pas"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="1"/>
+        <UsageCount Value="7"/>
       </Unit>
       <Unit>
         <Filename Value="..\miserable Pascal\practic.pas"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="1"/>
+        <UsageCount Value="7"/>
       </Unit>
       <Unit>
         <Filename Value="..\miserable Pascal\Object.pas"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="1"/>
+        <UsageCount Value="7"/>
       </Unit>
       <Unit>
         <Filename Value="..\miserable Pascal\muxortova.pas"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="1"/>
+        <UsageCount Value="7"/>
       </Unit>
       <Unit>
         <Filename Value="..\miserable Pascal\mine_zadacha.pas"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="1"/>
+        <UsageCount Value="7"/>
       </Unit>
       <Unit>
         <Filename Value="..\miserable Pascal\base.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="14"/>
-        <UsageCount Value="1"/>
-      </Unit>
-      <Unit>
-        <Filename Value="..\model_of_storage.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="25"/>
-        <CursorPos X="5" Y="28"/>
-        <UsageCount Value="2"/>
-      </Unit>
-      <Unit>
-        <Filename Value="..\miserable Pascal\shellsort.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="ShellSort"/>
-        <UsageCount Value="20"/>
-        <Loaded Value="True"/>
+        <UsageCount Value="7"/>
       </Unit>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory HistoryIndex="29">
+      <Position>
+        <Filename Value="tables.pas"/>
+        <Caret Line="163" Column="17" TopLine="120"/>
+      </Position>
+      <Position>
+        <Filename Value="base_menu.pas"/>
+        <Caret Line="120" Column="12" TopLine="76"/>
+      </Position>
+      <Position>
+        <Filename Value="base_menu.pas"/>
+        <Caret Line="32" Column="45"/>
+      </Position>
+      <Position>
+        <Filename Value="base_menu.pas"/>
+        <Caret Line="101" Column="5" TopLine="103"/>
+      </Position>
+      <Position>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="454" TopLine="408"/>
+      </Position>
+      <Position>
+        <Filename Value="main.lpr"/>
+        <Caret Line="16" Column="72"/>
+      </Position>
+      <Position>
+        <Filename Value="tables.pas"/>
+        <Caret Line="31" Column="90" TopLine="2"/>
+      </Position>
+      <Position>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="87" Column="12" TopLine="58"/>
+      </Position>
+      <Position>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="21" Column="17" TopLine="45"/>
+      </Position>
+      <Position>
+        <Filename Value="base_menu.pas"/>
+        <Caret Line="112" Column="21" TopLine="91"/>
+      </Position>
+      <Position>
+        <Filename Value="tables.pas"/>
+        <Caret Line="42" Column="19" TopLine="8"/>
+      </Position>
+      <Position>
+        <Filename Value="base_menu.pas"/>
+        <Caret Line="110" TopLine="91"/>
+      </Position>
+      <Position>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="454" TopLine="422"/>
+      </Position>
+      <Position>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="453" TopLine="422"/>
+      </Position>
+      <Position>
+        <Filename Value="base_menu.pas"/>
+        <Caret Line="100" Column="5" TopLine="74"/>
+      </Position>
+      <Position>
+        <Filename Value="base_menu.pas"/>
+        <Caret Line="101" Column="5" TopLine="75"/>
+      </Position>
+      <Position>
+        <Filename Value="tables.pas"/>
+        <Caret Line="187" Column="17" TopLine="139"/>
+      </Position>
+      <Position>
+        <Filename Value="tables.pas"/>
+        <Caret Line="177" Column="17" TopLine="139"/>
+      </Position>
+      <Position>
+        <Filename Value="tables.pas"/>
+        <Caret Line="133" Column="17" TopLine="107"/>
+      </Position>
+      <Position>
+        <Filename Value="base_menu.pas"/>
+        <Caret Line="100" Column="5" TopLine="74"/>
+      </Position>
+      <Position>
+        <Filename Value="base_menu.pas"/>
+        <Caret Line="89" Column="13" TopLine="78"/>
+      </Position>
+      <Position>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="453" Column="8" TopLine="431"/>
+      </Position>
+      <Position>
+        <Filename Value="tables.pas"/>
+        <Caret Line="56" Column="19" TopLine="10"/>
+      </Position>
+      <Position>
+        <Filename Value="tables.pas"/>
+        <Caret Line="39" Column="3" TopLine="16"/>
+      </Position>
+      <Position>
+        <Filename Value="tables.pas"/>
+        <Caret Line="187" Column="17" TopLine="139"/>
+      </Position>
+      <Position>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="26" Column="24" TopLine="40"/>
+      </Position>
+      <Position>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="24" Column="27"/>
+      </Position>
+      <Position>
+        <Filename Value="base_menu.pas"/>
+        <Caret Line="137" Column="55" TopLine="107"/>
+      </Position>
+      <Position>
+        <Filename Value="base_menu.pas"/>
+        <Caret Line="140" Column="68" TopLine="112"/>
+      </Position>
+      <Position>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="456" Column="22" TopLine="429"/>
+      </Position>
+    </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
       <Modes ActiveMode=""/>
@@ -127,13 +246,14 @@
     </HistoryLists>
   </ProjectSession>
   <Debugging>
-    <Watches>
+    <BreakPoints>
       <Item>
-        <Expression Value="line^.next^"/>
+        <Kind Value="bpkSource"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+        <Source Value="table_manipulation.pas"/>
+        <Line Value="455"/>
       </Item>
-      <Item>
-        <Expression Value="gotoxy"/>
-      </Item>
-    </Watches>
+    </BreakPoints>
   </Debugging>
 </CONFIG>

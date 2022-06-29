@@ -5,13 +5,14 @@ unit tables;
 interface
 
 uses
-  Classes, SysUtils, table_manipulation, base_graphic;
+  Classes, SysUtils, table_manipulation;
 
 type
   SArray = array[1..7] of string;
 
-  Table1 =  class sealed (InheritedTableCls)
+  Table1 = class sealed (InheritedTableCls)
     constructor Init(start_x, start_y, border_y, width, height, abs_background: integer);
+    procedure showPage;
     function enterTextFormat: string;
     {function enterDateForm: string;}
     function checkDayFormat(day: string): boolean;
@@ -20,22 +21,30 @@ type
     function checkOrganizationName(text: string): boolean;
     function enterOrganizationName: string;
     function setHeadOfColumns(): SArray;
+    {procedure enterSubmissionForm;
+    procedure enterNumberForm;
+    procedure enterAddressForm;}
   end;
 
-  Table2 =  class sealed (InheritedTableCls)
+  Table2 = class sealed (InheritedTableCls)
     constructor Init(start_x, start_y, border_y, width, height, abs_background: integer);
     function enterTextFormat: string;
   end;
 
-  Table3 =  class sealed (InheritedTableCls)
+  Table3 = class sealed (InheritedTableCls)
     constructor Init(start_x, start_y, border_y, width, height, abs_background: integer);
     function enterTextFormat: string;
   end;
+
 implementation
-
 constructor Table1.Init(start_x, start_y, border_y, width, height, abs_background: integer);
 begin
   inherited Init(start_x, start_y, border_y, width, height, abs_background);
+end;
+
+procedure Table1.showPage;
+begin
+  inherited showPage;
 end;
 
 function Table1.enterTextFormat: string;

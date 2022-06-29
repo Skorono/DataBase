@@ -5,7 +5,7 @@ unit base_menu;
 interface
 
 uses
-  Classes, SysUtils, Crt, base_graphic, table_manipulation;
+  Classes, SysUtils, Crt, base_graphic, table_manipulation, tables;
 
 type
     Menu = class sealed
@@ -14,18 +14,21 @@ type
       menu_border: Border;
 
       countButtons: integer;
-    private
+    strict private
+      procedure press_enter(on_button: integer);
+      procedure Show_menu;
       function Key_UP(on_button: integer): integer;
       function Key_DOWN(on_button: integer): integer;
-      procedure press_enter(on_button: integer);
-
     public
-      procedure Show_menu;
       procedure Main;
       constructor Init(start_x, start_y, border_x , border_y, abs_background: integer);
       {procedure paint_background;}
       destructor del;
   end;
+
+  _table1 = specialize ViewTable<Table1>;
+  _table2 = specialize ViewTable<Table2>;
+  _table3 = specialize ViewTable<Table3>;
 
 implementation
 constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: integer);
@@ -42,10 +45,10 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
   const
     base_count = 3;
     spaceBetweenButtons = 2;
-
+    text_size = 10;
   var
     text: string;
-    cord_x, cord_y, text_size, i: integer;
+    cord_x, cord_y, i: integer;
     //allert: TextButton;
   begin
     Window(x, y, x_border, y_border);
@@ -59,7 +62,6 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
     for i:= 1 to base_count do
       begin
         text := 'Таблица №' + inttostr(i);
-        text_size := length(text);
         buttons[i] := TextButton.Init(text_size, spaceBetweenButtons, cord_x, cord_y, background, text);
         buttons[i].show();
         cord_y := cord_y + spaceBetweenButtons;
@@ -94,20 +96,27 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
   const
     STD_Y = 54;
   var
-    base1: InheritedTableCls;
+    table1: _table1;
+    table2: _table2;
+    table3: _table3;
   begin
     menu_border.del;
     del;
 
     { Придумать другой вариант задания размеров клетки в шапке таблицы }
-    base1 := InheritedTableCls.Init(2, 1, STD_Y, 8, 1, 0);
     case on_button of
-      1:
-       base1.main;
-      {2:
-        ;
-      3:
-       ;}
+      1: begin
+        table1 := table1.Init(2, 2, STD_Y, 8, 1, 0);
+        table1.main;
+      end;
+      {2: begin
+        table2 := table2.Init(2, 2, STD_Y, 8, 1, 0);
+        table2.main;
+      end;
+      3: begin
+        table3 := table3.Init(2, 2, STD_Y, 8, 1, 0);
+        table3.main;
+      end;}
     end;
   end;
 
@@ -117,13 +126,12 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
     on_button: integer;
     key: char;
   begin
-    Show_menu();
-
+    Show_menu;
+    window(x, y, x_border, y_border);
     run := true;
     on_button := 1;
-    window(x, y, x_border, y_border);
-    gotoxy(buttons[on_button].x_pos, buttons[on_button].y_pos);
-
+    buttons[on_button].background := 5;
+    buttons[on_button].show;
     while run do
     begin
       key := readkey;
@@ -145,7 +153,7 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
       end;
       if run then
       begin
-        buttons[on_button].background := 2;
+        buttons[on_button].background := 5;
         gotoxy(buttons[on_button].x_pos, buttons[on_button].y_pos);
         buttons[on_button].show();
       end;

@@ -3,7 +3,7 @@ program Main;
 {$mode objfpc}{$H+}
 
 uses
-  Classes, Windows, Crt, base_graphic, base_menu;
+  Classes, Windows, Crt, base_graphic, base_menu, tables;
 
 var
    menu_obj: Menu;

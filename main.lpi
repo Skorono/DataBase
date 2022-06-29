@@ -46,11 +46,6 @@
         <Filename Value="tables.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit>
-      <Unit>
-        <Filename Value="..\miserable Pascal\shellsort.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="ShellSort"/>
-      </Unit>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -61,7 +56,6 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
-      <OtherUnitFiles Value="..\miserable Pascal"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Parsing>

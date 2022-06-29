@@ -23,6 +23,13 @@
     </PublishOptions>
     <RunParams>
       <FormatVersion Value="2"/>
+      <Modes>
+        <Mode Name="default">
+          <local>
+            <LaunchingApplication PathPlusParams="C:\WINDOWS\system32\cmd.exe /C ${TargetCmdLine}"/>
+          </local>
+        </Mode>
+      </Modes>
     </RunParams>
     <Units>
       <Unit>

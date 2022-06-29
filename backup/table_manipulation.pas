@@ -25,8 +25,6 @@ type
     procedure setCellPosition(lineNum: integer);
     {procedure createPage;}
     procedure writeInCell;
-    procedure DeleteMode;
-    procedure WriteMode;
     procedure switchPage(key: char);
     procedure deleteLine(lineNumber: integer);
     procedure LineLighting(lineNumber, color: integer);
@@ -47,7 +45,6 @@ type
     procedure Key_Left;
     procedure DelKey_UP;
     procedure DelKey_DOWN;
-    procedure main;
     function getFirstLineNumber: integer;
     function isInteger(text: string): boolean;
     function isString(text: string): boolean;
@@ -59,8 +56,14 @@ type
     function enterTextFormat: string;
   end;
 
-  ViewTable = class
-
+  generic ViewTable<_T> = class
+    strict private
+      table: _T;
+    public
+      constructor Init(start_x, start_y, border_y, width, height, abs_background: integer);
+      procedure main;
+      procedure DeleteMode;
+      procedure WriteMode;
   end;
 
 implementation
@@ -370,56 +373,6 @@ begin
   gotoxy(line^.data[on_horizontal_button].x_pos, line^.data[on_horizontal_button].y_pos);
 end;
 
-procedure InheritedTableCls.Main;
-var
-  key: char;
-begin
-  showPage;
-  showPosition;
-  key := ' ';
-  window(x, y, x_border, y_border);
-  line := Pages[pageCount-1].getNode(getFirstLineNumber);
-  gotoxy(line^.data[1].x_pos, line^.data[1].y_pos);
-  repeat
-  key := readkey;
-  case key of
-    #1: WriteMode;
-    #4: DeleteMode;
-  end;
-  switchPage(key);
-  until (key = #27);
-end;
-
-procedure InheritedTableCls.WriteMode; { Временно main}
-var
-  key: char;
-begin
-  showPosition;
-  window(x, y, x_border, y_border);
-  line := Pages[pageCount-1].getNode(on_vertical_button);
-  gotoxy(line^.data[on_horizontal_button].x_pos, line^.data[on_horizontal_button].y_pos);
-  repeat
-    key := readkey;
-    if key = #0 then
-    begin
-      case readkey of
-        #72: Key_UP;
-        #80: Key_DOWN;
-        #75: Key_LEFT;
-        #77: Key_RIGHT;
-      end;
-      showPosition;
-      window(x, y, x_border, y_border);
-      line := Pages[pageCount-1].getNode(on_vertical_button);
-      gotoxy(line^.data[on_horizontal_button].x_pos, line^.data[on_horizontal_button].y_pos);
-    end
-    else if key = #13 then
-    begin
-      writeInCell;
-    end;
-  until key = #27;
-end;
-
 procedure InheritedTableCls.LineLighting(lineNumber, color: integer);
 var
   i: integer;
@@ -447,33 +400,6 @@ begin
     line^.data[i].text := '';
     line^.data[i].show;
   end;
-end;
-
-procedure InheritedTableCls.DeleteMode;
-var
-  key: char;
-begin
-  showPosition;
-  key := ' ';
-  on_horizontal_button := 1;
-  on_vertical_button := 1;
-  LineLighting(on_vertical_button, 7);
-  repeat
-  key := readkey;
-  if key = #0 then
-  begin
-    case readkey of
-      #72: DelKey_UP;
-      #80: DelKey_DOWN;
-    end;
-    showPosition;
-  end
-  else if key = #4 then
-  begin
-    deleteLine(on_vertical_button);
-  end;
-  until (key = #27);
-  turnOffDeleteLight()
 end;
 
 procedure InheritedTableCls.DelKey_UP;
@@ -520,6 +446,88 @@ begin
     on_horizontal_button := countColumn
   else
     on_horizontal_button := on_horizontal_button - 1;
+end;
+
+constructor ViewTable.Init(start_x, start_y, border_y, width, height, abs_background: integer);
+begin
+  table := table.Init(start_x, start_y, border_y, width, height, abs_background);
+end;
+
+procedure ViewTable.Main;
+var
+  key: char;
+begin
+  table.showPage;
+  table.showPosition;
+  key := ' ';
+  window(table.x, table.y, table.x_border, table.y_border);
+  table.line := table.Pages[table.pageCount-1].getNode(table.getFirstLineNumber);
+  gotoxy(table.line^.data[1].x_pos, table.line^.data[1].y_pos);
+  repeat
+  key := readkey;
+  case key of
+    #1: WriteMode;
+    #4: DeleteMode;
+  end;
+  table.switchPage(key);
+  until (key = #27);
+end;
+
+procedure ViewTable.WriteMode; { Временно main}
+var
+  key: char;
+begin
+  table.showPosition;
+  window(table.x, table.y, table.x_border, table.y_border);
+  table.line := table.Pages[table.pageCount-1].getNode(table.on_vertical_button);
+  gotoxy(table.line^.data[table.on_horizontal_button].x_pos, table.line^.data[table.on_horizontal_button].y_pos);
+  repeat
+    key := readkey;
+    if key = #0 then
+    begin
+      case readkey of
+        #72: table.Key_UP;
+        #80: table.Key_DOWN;
+        #75: table.Key_LEFT;
+        #77: table.Key_RIGHT;
+      end;
+      table.showPosition;
+      window(table.x, table.y, table.x_border, table.y_border);
+      table.line := table.Pages[table.pageCount-1].getNode(table.on_vertical_button);
+      gotoxy(table.line^.data[table.on_horizontal_button].x_pos, table.line^.data[table.on_horizontal_button].y_pos);
+    end
+    else if key = #13 then
+    begin
+      table.writeInCell;
+    end;
+  until key = #27;
+end;
+
+procedure ViewTable.DeleteMode;
+var
+  key: char;
+begin
+  table.showPosition;
+  key := ' ';
+  table.on_horizontal_button := 1;
+  table.on_vertical_button := 1;
+  table.LineLighting(table.on_vertical_button, 7);
+  repeat
+  key := readkey;
+  if key = #0 then
+  begin
+    case readkey of
+      #72: table.DelKey_UP;
+      #80: table.DelKey_DOWN;
+    end;
+    table.showPosition;
+  end
+  else if key = #4 then
+  begin
+    table.deleteLine(table.on_vertical_button);
+  end;
+  until (key = #27);
+  table.turnOffDeleteLight;
 end;
 
 begin
