@@ -3,7 +3,7 @@ program Main;
 {$mode objfpc}{$H+}
 
 uses
-  Classes, Windows, Crt, base_graphic, base_menu;
+  Classes, Windows, Crt, base_graphic, base_menu, tables;
 
 var
    menu_obj: Menu;
@@ -14,7 +14,7 @@ begin
   SetConsoleTitle('DataBase');
 
   {áÂÌ ÂÌÃÎ ÀÇÃ  ÆÂ Ï ÜÎ  ÂÌ Ï !!! İ Á ÁÏ ÂÆË}
-  menu_obj:=Menu.Init(1, 1, 80, 30, 0);
+  menu_obj:=Menu.Init(1, 1, 50, 30, 0);
   menu_obj.Main;
   readkey();
 end.
