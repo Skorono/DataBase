@@ -106,17 +106,17 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
     { Придумать другой вариант задания размеров клетки в шапке таблицы }
     case on_button of
       1: begin
-        table1 := table1.Init(2, 2, STD_Y, 8, 1, 0);
+        table1 := _table1.Create;
         table1.main;
       end;
-      {2: begin
-        table2 := table2.Init(2, 2, STD_Y, 8, 1, 0);
+      2: begin
+        table2 := _table2.Create;
         table2.main;
       end;
       3: begin
-        table3 := table3.Init(2, 2, STD_Y, 8, 1, 0);
+        table3 := _table3.Create;
         table3.main;
-      end;}
+      end;
     end;
   end;
 

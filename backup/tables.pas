@@ -5,31 +5,38 @@ unit tables;
 interface
 
 uses
-  Classes, SysUtils, table_manipulation;
+  Classes, SysUtils, table_manipulation, base_graphic;
 
 type
   SArray = array[1..7] of string;
 
-  Table1 =  class sealed (InheritedTableCls)
+  Table1 = class sealed (InheritedTableCls)
     constructor Init(start_x, start_y, border_y, width, height, abs_background: integer);
     procedure showPage;
-    function enterTextFormat: string;
+    procedure showLine(lineNumber: integer);
+    procedure showHead;
+    function enterTextFormat: string; override;
+    function setHeadOfColumns(): SArray; override;
     {function enterDateForm: string;}
     function checkDayFormat(day: string): boolean;
     function checkMonthFormat(month: string): boolean;
     function checkYearFormat(year: string): boolean;
     function checkOrganizationName(text: string): boolean;
     function enterOrganizationName: string;
-    function setHeadOfColumns(): SArray;
+    {procedure enterSubmissionForm;
+    procedure enterNumberForm;
+    procedure enterAddressForm;}
   end;
 
-  Table2 =  class sealed (InheritedTableCls)
+  Table2 = class sealed (InheritedTableCls)
     constructor Init(start_x, start_y, border_y, width, height, abs_background: integer);
+    function setHeadOfColumns(): SArray; override;
     function enterTextFormat: string;
   end;
 
-  Table3 =  class sealed (InheritedTableCls)
+  Table3 = class sealed (InheritedTableCls)
     constructor Init(start_x, start_y, border_y, width, height, abs_background: integer);
+    function setHeadOfColumns(): SArray; override;
     function enterTextFormat: string;
   end;
 
@@ -37,11 +44,22 @@ implementation
 constructor Table1.Init(start_x, start_y, border_y, width, height, abs_background: integer);
 begin
   inherited Init(start_x, start_y, border_y, width, height, abs_background);
+  countColumn := 7;
 end;
 
 procedure Table1.showPage;
 begin
   inherited showPage;
+end;
+
+procedure Table1.showLine(lineNumber: integer);
+begin
+  inherited showLine(lineNumber);
+end;
+
+procedure Table1.showHead;
+begin
+  inherited showHead;
 end;
 
 function Table1.enterTextFormat: string;
@@ -59,13 +77,13 @@ end;
 
 function Table1.setHeadOfColumns(): SArray;
 begin
-  Result[1] := 'РќР°Р·РІР°РЅРёРµ';
-  Result[2] := 'РђРґСЂРµСЃ';
-  Result[3] := 'РўРёРї РїРѕРґС‡РёРЅРµРЅРёСЏ';
-  Result[4] := 'Р“РѕРґ РѕСЃРЅРѕРІР°РЅРёСЏ';
-  Result[5] := 'РќРѕРјРµСЂ Р»РёС†РµРЅР·РёРё';
-  Result[6] := 'РќРѕРјРµСЂ Р°РєРєСЂРµРґРёС‚Р°С†РёРё';
-  Result[7] := 'Р”Р°С‚Р° РѕРєРѕРЅС‡Р°РЅРёСЏ РґРµР№СЃС‚РІРёСЏ Р°РєРєСЂРµРґРёС‚Р°С†РёРё';
+  Result[1] := 'Название';
+  Result[2] := 'Адрес';
+  Result[3] := 'Тип подчинения';
+  Result[4] := 'Год основания';
+  Result[5] := 'Номер лицензии';
+  Result[6] := 'Номwер аккредитации';
+  Result[7] := 'Дата окончания действия аккредитации';
 end;
 
 function Table1.checkDayFormat(day: string): boolean;
@@ -130,7 +148,7 @@ end;
 
 {procedure Table1.enterDateForm;
 const
-  otherLen = 2; { РїРµСЂРµРёРјРµРЅРѕРІР°С‚СЊ }
+  otherLen = 2; { переименовать }
   yearLen = 4;
 var
   x_, y_: integer;
@@ -172,6 +190,15 @@ end;
 constructor Table2.Init(start_x, start_y, border_y, width, height, abs_background: integer);
 begin
   inherited Init(start_x, start_y, border_y, width, height, abs_background);
+  countColumn := 4;
+end;
+
+function Table2.setHeadOfColumns(): SArray;
+begin
+  Result[1] := 'Учреждение';
+  Result[2] := 'Специальность';
+  Result[3] := 'Количество бюджетных мест';
+  Result[4] := 'Количество коммерческих мест';
 end;
 
 function Table2.enterTextFormat: string;
@@ -182,6 +209,14 @@ end;
 constructor Table3.Init(start_x, start_y, border_y, width, height, abs_background: integer);
 begin
   inherited Init(start_x, start_y, border_y, width, height, abs_background);
+  countColumn := 3;
+end;
+
+function Table3.setHeadOfColumns(): SArray;
+begin
+  Result[1] := 'Номер';
+  Result[2] := 'Название';
+  Result[3] := 'Длительсность обучения';
 end;
 
 function Table3.enterTextFormat: string;

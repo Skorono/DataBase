@@ -20,7 +20,9 @@ type
 
     constructor Init(start_x, start_y, border_y, width, height, abs_background: integer);
     procedure showPage;
-    procedure show_head;
+    procedure showPosition;
+    procedure showLine(lineNumber: integer);
+    procedure showHead;
     procedure createNewPage;
     procedure setCellPosition(lineNum: integer);
     {procedure createPage;}
@@ -29,8 +31,6 @@ type
     procedure deleteLine(lineNumber: integer);
     procedure LineLighting(lineNumber, color: integer);
     procedure turnOffDeleteLight();
-    procedure showPosition;
-    procedure showLine(lineNumber: integer);
     procedure nextPage;
     procedure previousPage;
     procedure createInputField(width, height, x_, y_: integer);
@@ -47,16 +47,14 @@ type
     function deleteText(text: string; delCount: integer): string;
     function enterText(symbolsCount: integer): string;
     function calculationLineCount: integer;
-    function setHeadOfColumns(): SArray;
-    function enterTextFormat: string;
+    function setHeadOfColumns(): SArray; virtual;
+    function enterTextFormat: string; virtual;
   end;
 
-  generic ViewTable<_T> = class
-    strict private
-      table: _T;
+  generic ViewTable<T> = class
+      table: T;
     public
-      constructor Init(start_x, start_y, border_y, width, height, abs_background: integer);
-      procedure main;
+      procedure Main;
       procedure DeleteMode;
       procedure WriteMode;
   end;
@@ -65,7 +63,7 @@ implementation
 
 constructor InheritedTableCls.Init(start_x, start_y, border_y, width, height, abs_background: integer);
 begin
-  countColumn := 7;
+  countColumn := 0;
   borderFreeSpace := 2;
   on_horizontal_button := 1;
   on_vertical_button := 1;
@@ -79,7 +77,7 @@ begin
   pageNumber := 1;
   pageCount := 0;
   lineCount := calculationLineCount;
-  show_head;
+  showHead;
   createNewPage;
   positional_hint;
 end;
@@ -121,10 +119,6 @@ begin
   hint.show;
 end;
 
-function InheritedTableCls.setHeadOfColumns(): SArray;
-begin
-end;
-
 procedure InheritedTableCls.showPosition;
 const
   MAX_TEXT_SIZE = 35;
@@ -142,7 +136,7 @@ begin
   inf_button.Show;
 end;
 
-procedure InheritedTableCls.show_head;
+procedure InheritedTableCls.showHead;
 var
   i: integer;
   columnHeader: SArray;
@@ -211,6 +205,10 @@ begin
   end;
 end;
 
+function InheritedTableCls.setHeadOfColumns: SArray;
+begin
+end;
+
 procedure InheritedTableCls.showLine(lineNumber: integer);
 var
   i: integer;
@@ -229,7 +227,7 @@ var
   lineNumber: integer;
 begin
   lineNumber := 0;
-  while LineNumber <= lineCount do
+  while lineNumber <= lineCount do
   begin
     lineNumber := lineNumber + 1;
     showLine(lineNumber);
@@ -288,6 +286,10 @@ begin
   end;
 end;
 
+function InheritedTableCls.enterTextFormat: string;
+begin
+end;
+
 function InheritedTableCls.enterText(symbolsCount: integer): string;
 var
   key: char;
@@ -330,10 +332,6 @@ begin
   until count = 0;
   gotoxy(x_, y_);
   deleteText := copy(text, 1, length(text) - delCount);
-end;
-
-function InheritedTableCls.enterTextFormat: string;
-begin
 end;
 
 procedure InheritedTableCls.createInputField(width, height, x_, y_: integer);
@@ -443,15 +441,11 @@ begin
     on_horizontal_button := on_horizontal_button - 1;
 end;
 
-constructor ViewTable.Init(start_x, start_y, border_y, width, height, abs_background: integer);
-begin
-  table := table.Init(start_x, start_y, border_y, width, height, abs_background);
-end;
-
 procedure ViewTable.Main;
 var
   key: char;
 begin
+  table := T.Init(2, 2, 53, 8, 1, 0);
   table.showPage;
   table.showPosition;
   key := ' ';
