@@ -8,32 +8,30 @@ uses
   Classes, SysUtils, Storage, Crt, base_graphic;
 
 type
-  SArray = array[1..7] of string;
+  Header = array of string;
   InheritedTableCls = class
-    background, countColumn, head_width, head_height, on_vertical_button, on_horizontal_button, pageNumber, pageCount, elementsNumber: integer;
-    x, y, x_border, y_border, y_line_pos, lineCount,on_page: integer;
-    Cells: array[1..7] of Cell;
-    head_buttons: array[1..7] of TextButton;
-    Pages: array of Cls_List;
+    background, countColumn, head_width, head_height, on_vertical_button, on_horizontal_button, elementsNumber: integer;
+    x, y, x_border, y_border, lineCount: integer;
+    pageNumber, pageCount: word;
+    head_buttons: array of TextButton;
+    lineList: Cls_List;
     line: PLine; {Не забыть переименовать}
     borderFreeSpace: integer;
 
-    constructor Init(start_x, start_y, border_y, width, height, abs_background: integer);
+    constructor Init(start_x, start_y, border_y, width, height, columnCount: integer);
     procedure showPage;
     procedure showPosition;
     procedure showLine(lineNumber: integer);
     procedure showHead;
     procedure createNewPage;
-    procedure setCellPosition(lineNum: integer);
     {procedure createPage;}
     procedure writeInCell;
     procedure switchPage(key: char);
     procedure deleteLine(lineNumber: integer);
     procedure LineLighting(lineNumber, color: integer);
-    procedure turnOffDeleteLight();
+    procedure turnOffDeleteLight;
     procedure nextPage;
     procedure previousPage;
-    procedure createInputField(width, height, x_, y_: integer);
     procedure positional_hint;
     procedure Key_UP;
     procedure Key_DOWN;
@@ -41,14 +39,17 @@ type
     procedure Key_Left;
     procedure DelKey_UP;
     procedure DelKey_DOWN;
-    function getFirstLineNumber: integer;
+    procedure SetBackground(abs_background: integer);
+    function createInputField(): TextButton;
+    function getFirstLineNumber(page: word): word;
     function isInteger(text: string): boolean;
     function isString(text: string): boolean;
     function deleteText(text: string; delCount: integer): string;
     function enterText(symbolsCount: integer): string;
     function calculationLineCount: integer;
-    function setHeadOfColumns(): SArray; virtual;
+    function setHeadOfColumns(): Header; virtual;
     function enterTextFormat: string; virtual;
+    function getLineYPosition(lineNum: integer): integer;
   end;
 
   generic ViewTable<T> = class
@@ -61,9 +62,9 @@ type
 
 implementation
 
-constructor InheritedTableCls.Init(start_x, start_y, border_y, width, height, abs_background: integer);
+constructor InheritedTableCls.Init(start_x, start_y, border_y, width, height, columnCount: integer);
 begin
-  countColumn := 0;
+  countColumn := columnCount;
   borderFreeSpace := 2;
   on_horizontal_button := 1;
   on_vertical_button := 1;
@@ -72,14 +73,20 @@ begin
   x := start_x;
   y := start_y;
   y_border := border_y;
-  background := abs_background;
   elementsNumber := 100;
   pageNumber := 1;
   pageCount := 0;
   lineCount := calculationLineCount;
+  lineList := Cls_List.Init;
+  setlength(head_buttons, countColumn);
   showHead;
   createNewPage;
   positional_hint;
+end;
+
+procedure InheritedTableCls.SetBackground(abs_background: integer);
+begin
+  background := abs_background;
 end;
 
 function InheritedTableCls.calculationLineCount: integer;
@@ -100,7 +107,7 @@ var
   pos_x, pos_y: integer;
 begin
   text := 'ESC - выход из программы/выход из режима';
-  line := Pages[pageNumber-1].getNode(1);
+  line := lineList.getNode(1);
   pos_x := line^.data[countColumn].x_pos + line^.data[countColumn].button_width + (borderFreeSpace * 2);
   pos_y := line^.data[countColumn].y_pos;
   hint := TextButton.Init(length(text), height, pos_x, pos_y, 0, text);
@@ -129,7 +136,7 @@ var
   last_line: PLine;
 begin
   position := 'страница: ' + inttostr(pageNumber) + ' строка: ' + inttostr(on_vertical_button) + ' ячейка: ' + inttostr(on_horizontal_button);
-  last_line := Pages[pageNumber-1].getNode(Pages[pageNumber-1].nodeCount);
+  last_line := lineList.getNode(lineCount);
   x_pos := (last_line^.data[countColumn].x_pos + last_line^.data[countColumn].button_width + borderFreeSpace) - MAX_TEXT_SIZE;
   y_pos := last_line^.data[countColumn].y_pos + borderFreeSpace;
   inf_button := TextButton.Init(MAX_TEXT_SIZE, 1, x_pos, y_pos, 0, position);
@@ -139,13 +146,14 @@ end;
 procedure InheritedTableCls.showHead;
 var
   i: integer;
-  columnHeader: SArray;
+  columnHeader: Header;
   x_pos, y_pos: integer;
 begin
   x_pos := x + borderFreeSpace;
   y_pos := y + borderFreeSpace ;
+  setlength(columnHeader, countColumn);
   columnHeader := setHeadOfColumns;
-  for i := 1 to countColumn do
+  for i := 0 to countColumn-1 do
   begin
     head_width := length(columnHeader[i]);
     head_buttons[i] := TextButton.Init(head_width, head_height, x_pos, y_pos, background, columnHeader[i]);
@@ -154,67 +162,46 @@ begin
     head_buttons[i].Show;
     x_pos := x_pos + length(columnHeader[i]) + borderFreeSpace;
   end;
-  x_border := head_buttons[countColumn].x_pos + head_buttons[countColumn].button_width + head_buttons[countColumn].border.borderFreeSpace;
+  x_border := head_buttons[countColumn-1].x_pos + head_buttons[countColumn-1].button_width + head_buttons[countColumn-1].border.borderFreeSpace;
 end;
 
-procedure InheritedTableCls.setCellPosition(lineNum: integer);
+function InheritedTableCls.getLineYPosition(lineNum: integer): integer;
 begin
-  line := Pages[pageNumber-1].getNode(lineNum);
-  if lineNum > 1 then
-  begin
-    y_line_pos := line^.data[1].y_pos;
-    y_line_pos := y_line_pos + ((borderFreeSpace * 2) - 2);
-  end
-  else
-  begin
-    y_line_pos := head_buttons[1].y_pos;
-    y_line_pos := y_line_pos + ((borderFreeSpace * 2) - 1)
-  end;
+  result := (head_buttons[1].y_pos + (borderFreeSpace+1)) + ((lineNum-1) mod lineCount) * borderFreeSpace;
 end;
 
-function InheritedTableCls.getFirstLineNumber: integer;
+function InheritedTableCls.getFirstLineNumber(page: word): word;
 begin
-  if pageCount <> 1 then
-    result := Pages[pageCount-1].nodeCount
-  else
-    result := 1;
+    result := (lineCount * (page-1)) + 1;
 end;
 
 procedure InheritedTableCls.createNewPage();
 var
   i, j: integer;
-  s_text: string;
-  lineNum: integer;
+  lineNum, y_line_pos: integer;
+  Cells: array of Cell;
 begin
-  pageCount := pageCount + 1;
   lineNum := 1;
-  setlength(Pages, pageCount);
-  Pages[pageCount-1] := Cls_List.Init;
-  Pages[pageCount-1].nodeCount := getFirstLineNumber;
+  pageCount := pageCount + 1;
+  setlength(Cells, countColumn);
   for i := 1 to lineCount do
   begin
-    setCellPosition(lineNum);
+    y_line_pos := getLineYPosition(lineNum);
     lineNum := lineNum + 1;
-    for j := 1 to countColumn do
+    for j := 0 to countColumn-1 do
     begin
-      s_text := '';
-      Cells[j] := Cell.Init(length(head_buttons[j].text), head_height, head_buttons[j].x_pos, y_line_pos, background, s_text);
+      Cells[j] := Cell.Init(length(head_buttons[j].text), head_height, head_buttons[j].x_pos, y_line_pos, background, '');
       Cells[j].Border := Border.Init('-', borderFreeSpace-1, head_buttons[j].x_pos, y_line_pos, y_line_pos, length(head_buttons[j].text));
     end;
-    Pages[pageCount-1].add_line(Cells);
+    lineList.add_line(Cells);
   end;
-end;
-
-function InheritedTableCls.setHeadOfColumns: SArray;
-begin
 end;
 
 procedure InheritedTableCls.showLine(lineNumber: integer);
 var
   i: integer;
 begin
-  window(x, y, x_border, y_border);
-  line := Pages[pageCount-1].getNode(lineNumber);
+  line := lineList.getNode(getFirstLineNumber(pageNumber) + (lineNumber-1));
   for i := 1 to countColumn do
   begin
       line^.data[i].show;
@@ -222,24 +209,30 @@ begin
   end;
 end;
 
+
+function InheritedTableCls.setHeadOfColumns: Header;
+begin
+end;
+
 procedure InheritedTableCls.showPage();
 var
   lineNumber: integer;
 begin
-  lineNumber := 0;
+  cursoroff;
+  lineNumber := 1;
   while lineNumber <= lineCount do
   begin
-    lineNumber := lineNumber + 1;
     showLine(lineNumber);
+    lineNumber := lineNumber + 1;
   end;
+  cursoron;
 end;
 
 procedure InheritedTableCls.nextPage; { Написать удалеие предыдущей строки }
 begin
-  if pageNumber <> pageCount then
-    pageCount := pageCount + 1;
   pageNumber := pageNumber + 1;
-  createNewPage;
+  if pageNumber > pageCount then
+    createNewPage;
   showPage();
   showPosition;
 end;
@@ -334,34 +327,34 @@ begin
   deleteText := copy(text, 1, length(text) - delCount);
 end;
 
-procedure InheritedTableCls.createInputField(width, height, x_, y_: integer);
-var
-  input_field: TextButton;
-begin
-  line := Pages[pageNumber-1].getNode(on_vertical_button);
-  input_field := TextButton.Init(width, height, x_, y_, 0, '');
-  input_field.Border := Border.Init('-', borderFreeSpace-1, x_, y_, y_, width);
-  input_field.show;
-  input_field.Border.ChangeColor(15);
-  gotoxy(1 + borderFreeSpace, 1 + (borderFreeSpace-1));
-  line^.data[on_horizontal_button].text := enterTextFormat;
-  input_field.del;
-  input_field.border.del;
-end;
-
-procedure InheritedTableCls.writeInCell;
+function InheritedTableCls.createInputField(): TextButton;
 const
   height = 1;
 var
   x_, y_, width: integer;
 begin
-  line := Pages[pageNumber-1].getNode(lineCount);
+  line := lineList.getNode(lineCount);
   x_ := line^.data[1].x_pos;
   y_ := line^.data[countColumn].y_pos + (borderFreeSpace * 2);
   width := line^.data[countColumn].x_pos + line^.data[countColumn].button_width - borderFreeSpace;
-  createInputField(width, height, x_, y_);
+  createInputField := TextButton.Init(width, height, x_, y_, 0, '');
+  createInputField.Border := Border.Init('-', borderFreeSpace-1, x_, y_, y_, width);
+  createInputField.show;
+  createInputField.Border.ChangeColor(15);
+end;
 
+procedure InheritedTableCls.writeInCell;
+var
+  input_field: TextButton;
+begin
+  input_field := createInputField;
+  gotoxy(1 + borderFreeSpace, 1 + (borderFreeSpace-1));
+  line := lineList.getNode(getFirstLineNumber(pageNumber) + (on_vertical_button-1));
+  line^.data[on_horizontal_button].text := enterTextFormat;
   line^.data[on_horizontal_button].show;
+  input_field.del;
+  input_field.border.del;
+
   window(x, y, x_border, y_border);
   gotoxy(line^.data[on_horizontal_button].x_pos, line^.data[on_horizontal_button].y_pos);
 end;
@@ -370,15 +363,15 @@ procedure InheritedTableCls.LineLighting(lineNumber, color: integer);
 var
   i: integer;
 begin
-  line := Pages[pageCount-1].getNode(lineNumber);
+  line := lineList.getNode(lineNumber);
   for i := 1 to countColumn do
     line^.data[i].border.ChangeBackground(color);
 end;
 
 procedure InheritedTableCls.turnOffDeleteLight();
 begin
-  line := Pages[pageNumber-1].getNode(on_vertical_button);
-  LineLighting(on_vertical_button, 0);
+  line := lineList.getNode(getFirstLineNumber(pageNumber) + (on_vertical_button-1));
+  LineLighting(getFirstLineNumber(pageNumber) + (on_vertical_button-1), 0);
   window(x, y, x_border, y_border);
   gotoxy(line^.data[1].x_pos, line^.data[1].y_pos);
 end;
@@ -387,7 +380,7 @@ procedure InheritedTableCls.deleteLine(lineNumber: integer);
 var
   i: integer;
 begin
-  line := Pages[pageCount].getNode(lineNumber);
+  line := lineList.getNode(lineNumber);
   for i := 1 to countColumn do
   begin
     line^.data[i].text := '';
@@ -397,30 +390,30 @@ end;
 
 procedure InheritedTableCls.DelKey_UP;
 begin
-  LineLighting(on_vertical_button, 0);
+  LineLighting(getFirstLineNumber(pageNumber) + (on_vertical_button-1), 0);
   Key_UP;
-  LineLighting(on_vertical_button, 7);
+  LineLighting(getFirstLineNumber(pageNumber) + (on_vertical_button-1), 7);
 end;
 
 procedure InheritedTableCls.DelKey_DOWN;
 begin
-  LineLighting(on_vertical_button, 0);
+  LineLighting(getFirstLineNumber(pageNumber) + (on_vertical_button-1), 0);
   Key_DOWN;
-  LineLighting(on_vertical_button, 7);
+  LineLighting(getFirstLineNumber(pageNumber) + (on_vertical_button-1), 7);
 end;
 
 procedure InheritedTableCls.Key_UP();
 begin
-  if on_vertical_button = 1 then
-    on_vertical_button := Pages[pageNumber-1].nodeCount
+  if on_vertical_button = getFirstLineNumber(pageNumber) then
+    on_vertical_button := getFirstLineNumber(pageNumber) + lineCount
   else
     on_vertical_button := on_vertical_button - 1;
 end;
 
 procedure InheritedTableCls.Key_DOWN();
 begin
-  if on_vertical_button = Pages[pageNumber-1].nodeCount then
-    on_vertical_button := 1
+  if on_vertical_button = getFirstLineNumber(pageNumber) + lineCount then
+    on_vertical_button := getFirstLineNumber(pageNumber)
   else
     on_vertical_button := on_vertical_button + 1;
 end;
@@ -445,12 +438,12 @@ procedure ViewTable.Main;
 var
   key: char;
 begin
-  table := T.Init(2, 2, 53, 8, 1, 0);
+  table := T.Init(2, 2, 56, 8, 1, 0);
   table.showPage;
   table.showPosition;
   key := ' ';
   window(table.x, table.y, table.x_border, table.y_border);
-  table.line := table.Pages[table.pageCount-1].getNode(table.getFirstLineNumber);
+  table.line := table.lineList.getNode(table.getFirstLineNumber(table.pageNumber) + (table.on_vertical_button-1));
   gotoxy(table.line^.data[1].x_pos, table.line^.data[1].y_pos);
   repeat
   key := readkey;
@@ -468,7 +461,7 @@ var
 begin
   table.showPosition;
   window(table.x, table.y, table.x_border, table.y_border);
-  table.line := table.Pages[table.pageCount-1].getNode(table.on_vertical_button);
+  table.line := table.lineList.getNode(table.getFirstLineNumber(table.pageNumber) + (table.on_vertical_button-1));
   gotoxy(table.line^.data[table.on_horizontal_button].x_pos, table.line^.data[table.on_horizontal_button].y_pos);
   repeat
     key := readkey;
@@ -482,7 +475,7 @@ begin
       end;
       table.showPosition;
       window(table.x, table.y, table.x_border, table.y_border);
-      table.line := table.Pages[table.pageCount-1].getNode(table.on_vertical_button);
+      table.line := table.lineList.getNode(table.getFirstLineNumber(table.pageNumber) + (table.on_vertical_button-1));
       gotoxy(table.line^.data[table.on_horizontal_button].x_pos, table.line^.data[table.on_horizontal_button].y_pos);
     end
     else if key = #13 then
@@ -500,7 +493,7 @@ begin
   key := ' ';
   table.on_horizontal_button := 1;
   table.on_vertical_button := 1;
-  table.LineLighting(table.on_vertical_button, 7);
+  table.LineLighting(table.getFirstLineNumber(table.pageNumber) + (table.on_vertical_button-1), 7);
   repeat
   key := readkey;
   if key = #0 then
@@ -513,7 +506,7 @@ begin
   end
   else if key = #4 then
   begin
-    table.deleteLine(table.on_vertical_button);
+    table.deleteLine(table.getFirstLineNumber(table.pageNumber) + (table.on_vertical_button-1));
   end;
   until (key = #27);
   table.turnOffDeleteLight;

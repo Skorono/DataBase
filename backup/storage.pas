@@ -15,9 +15,7 @@ type PLine = ^Line_Node;
 
      Cls_List = class
        strict private
-       //private
          Line: PLine;
-
        public
          nodeCount: integer;
          constructor Init;
@@ -32,8 +30,7 @@ implementation
   constructor Cls_List.Init;
   begin
     nodeCount := 0;
-    new(Line);
-    Line^.next:=NIL;
+    Line:=nil;
   end;
 
   procedure Cls_List.rewrite_cell;

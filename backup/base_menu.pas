@@ -27,8 +27,8 @@ type
   end;
 
   _table1 = specialize ViewTable<Table1>;
-  //_table2 = specialize ViewTable<Table2>;
-  //_table3 = specialize ViewTable<Table3>;
+  _table2 = specialize ViewTable<Table2>;
+  _table3 = specialize ViewTable<Table3>;
 
 implementation
 constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: integer);
@@ -93,8 +93,6 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
   end;
 
   procedure Menu.press_enter(on_button: integer);
-  const
-    STD_Y = 54;
   var
     table1: _table1;
     table2: _table2;

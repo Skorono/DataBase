@@ -8,16 +8,14 @@ uses
 type PLine = ^Line_Node;
      Line_Node = record
        data: array[1..7] of Cell;
-       number: byte;
+       number: word;
        next: PLine;
        previous: PLine;
      end;
 
      Cls_List = class
        strict private
-       //private
          Line: PLine;
-
        public
          nodeCount: integer;
          constructor Init;

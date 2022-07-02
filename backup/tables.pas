@@ -5,18 +5,18 @@ unit tables;
 interface
 
 uses
-  Classes, SysUtils, table_manipulation, base_graphic;
+  Classes, SysUtils, table_manipulation;
 
 type
-  SArray = array[1..7] of string;
+  Header = array of string;
 
   Table1 = class sealed (InheritedTableCls)
-    constructor Init(start_x, start_y, border_y, width, height, abs_background: integer);
+    constructor Init(start_x, start_y, border_y, width, height, columnCount: integer);
     procedure showPage;
     procedure showLine(lineNumber: integer);
     procedure showHead;
     function enterTextFormat: string; override;
-    function setHeadOfColumns(): SArray; override;
+    function setHeadOfColumns(): Header; override;
     {function enterDateForm: string;}
     function checkDayFormat(day: string): boolean;
     function checkMonthFormat(month: string): boolean;
@@ -29,22 +29,22 @@ type
   end;
 
   Table2 = class sealed (InheritedTableCls)
-    constructor Init(start_x, start_y, border_y, width, height, abs_background: integer);
-    function setHeadOfColumns(): SArray; override;
-    function enterTextFormat: string;
+    constructor Init(start_x, start_y, border_y, width, height, columnCount: integer);
+    function setHeadOfColumns(): Header; override;
+    function enterTextFormat: string; override;
   end;
 
   Table3 = class sealed (InheritedTableCls)
-    constructor Init(start_x, start_y, border_y, width, height, abs_background: integer);
-    function setHeadOfColumns(): SArray; override;
-    function enterTextFormat: string;
+    constructor Init(start_x, start_y, border_y, width, height, columnCount: integer);
+    function setHeadOfColumns(): Header; override;
+    function enterTextFormat: string; override;
   end;
 
 implementation
-constructor Table1.Init(start_x, start_y, border_y, width, height, abs_background: integer);
+constructor Table1.Init(start_x, start_y, border_y, width, height, columnCount: integer);
 begin
-  inherited Init(start_x, start_y, border_y, width, height, abs_background);
   countColumn := 7;
+  inherited Init(start_x, start_y, border_y, width, height, countColumn);
 end;
 
 procedure Table1.showPage;
@@ -75,15 +75,16 @@ begin
   end;
 end;
 
-function Table1.setHeadOfColumns(): SArray;
+function Table1.setHeadOfColumns(): Header;
 begin
-  Result[1] := 'Название';
-  Result[2] := 'Адрес';
-  Result[3] := 'Тип подчинения';
-  Result[4] := 'Год основания';
-  Result[5] := 'Номер лицензии';
-  Result[6] := 'Номwер аккредитации';
-  Result[7] := 'Дата окончания действия аккредитации';
+  setlength(result, countColumn);
+  Result[0] := 'Название';
+  Result[1] := 'Адрес';
+  Result[2] := 'Тип подчинения';
+  Result[3] := 'Год основания';
+  Result[4] := 'Номер лицензии';
+  Result[5] := 'Номер аккредитации';
+  Result[6] := 'Дата окончания действия аккредитации';
 end;
 
 function Table1.checkDayFormat(day: string): boolean;
@@ -187,18 +188,20 @@ begin
   enterOrganizationName := enterText(MaxOrgNameSize);
 end;
 
-constructor Table2.Init(start_x, start_y, border_y, width, height, abs_background: integer);
+constructor Table2.Init(start_x, start_y, border_y, width, height, columnCount: integer);
 begin
-  inherited Init(start_x, start_y, border_y, width, height, abs_background);
   countColumn := 4;
+  setBackground(5);
+  inherited Init(start_x, start_y, border_y, width, height, countColumn);
 end;
 
-function Table2.setHeadOfColumns(): SArray;
+function Table2.setHeadOfColumns(): Header;
 begin
-  Result[1] := 'Учреждение';
-  Result[2] := 'Специальность';
-  Result[3] := 'Количество бюджетных мест';
-  Result[4] := 'Количество коммерческих мест';
+  setlength(result, countColumn);
+  Result[0] := 'Учреждение';
+  Result[1] := 'Специальность';
+  Result[2] := 'Количество бюджетных мест';
+  Result[3] := 'Количество коммерческих мест';
 end;
 
 function Table2.enterTextFormat: string;
@@ -206,17 +209,18 @@ begin
 
 end;
 
-constructor Table3.Init(start_x, start_y, border_y, width, height, abs_background: integer);
+constructor Table3.Init(start_x, start_y, border_y, width, height, columnCount: integer);
 begin
-  inherited Init(start_x, start_y, border_y, width, height, abs_background);
   countColumn := 3;
+  inherited Init(start_x, start_y, border_y, width, height, countColumn);
 end;
 
-function Table3.setHeadOfColumns(): SArray;
+function Table3.setHeadOfColumns(): Header;
 begin
-  Result[1] := 'Номер';
-  Result[2] := 'Название';
-  Result[3] := 'Длительсность обучения';
+  setlength(result, countColumn);
+  Result[0] := 'Номер';
+  Result[1] := 'Название';
+  Result[2] := 'Длительсность обучения';
 end;
 
 function Table3.enterTextFormat: string;

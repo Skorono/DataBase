@@ -12,8 +12,7 @@ type
       x, y, x_border, y_border, background: integer;
       buttons: array[1..10] of TextButton;
       menu_border: Border;
-
-      countButtons: integer;
+      countButtons: byte;
     strict private
       procedure press_enter(on_button: integer);
       procedure Show_menu;
@@ -93,8 +92,6 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
   end;
 
   procedure Menu.press_enter(on_button: integer);
-  const
-    STD_Y = 54;
   var
     table1: _table1;
     table2: _table2;

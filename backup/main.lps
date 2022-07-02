@@ -9,7 +9,7 @@
         <Filename Value="main.lpr"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Main"/>
-        <CursorPos X="42" Y="17"/>
+        <CursorPos X="45" Y="20"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit>
@@ -26,8 +26,8 @@
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="142"/>
-        <CursorPos X="63" Y="153"/>
+        <TopLine Value="244"/>
+        <CursorPos X="79" Y="278"/>
         <UsageCount Value="207"/>
         <Loaded Value="True"/>
       </Unit>
@@ -41,10 +41,10 @@
       <Unit>
         <Filename Value="tables.pas"/>
         <IsPartOfProject Value="True"/>
-        <WindowIndex Value="1"/>
-        <TopLine Value="51"/>
-        <CursorPos X="13" Y="68"/>
-        <UsageCount Value="93"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="101"/>
+        <CursorPos X="25" Y="91"/>
+        <UsageCount Value="108"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -52,187 +52,188 @@
         <UnitName Value="ShellSort"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
-        <UsageCount Value="19"/>
+        <UsageCount Value="17"/>
       </Unit>
       <Unit>
         <Filename Value="base_graphic.pas"/>
-        <EditorIndex Value="4"/>
-        <TopLine Value="8"/>
-        <CursorPos X="71" Y="89"/>
+        <EditorIndex Value="5"/>
+        <CursorPos X="32" Y="57"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="storage.pas"/>
         <EditorIndex Value="1"/>
-        <CursorPos X="70" Y="41"/>
+        <TopLine Value="34"/>
+        <CursorPos X="32" Y="42"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="base_menu.pas"/>
-        <EditorIndex Value="3"/>
-        <CursorPos X="41" Y="173"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="128"/>
+        <CursorPos X="25" Y="15"/>
         <UsageCount Value="101"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\miserable Pascal\base\base.pas"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="4"/>
+        <UsageCount Value="2"/>
       </Unit>
       <Unit>
         <Filename Value="..\miserable Pascal\пппп.pas"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="4"/>
+        <UsageCount Value="2"/>
       </Unit>
       <Unit>
         <Filename Value="..\miserable Pascal\practic.pas"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="4"/>
+        <UsageCount Value="2"/>
       </Unit>
       <Unit>
         <Filename Value="..\miserable Pascal\Object.pas"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="4"/>
+        <UsageCount Value="2"/>
       </Unit>
       <Unit>
         <Filename Value="..\miserable Pascal\muxortova.pas"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="4"/>
+        <UsageCount Value="2"/>
       </Unit>
       <Unit>
         <Filename Value="..\miserable Pascal\mine_zadacha.pas"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="4"/>
+        <UsageCount Value="2"/>
       </Unit>
       <Unit>
         <Filename Value="..\miserable Pascal\base.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="14"/>
-        <UsageCount Value="4"/>
+        <UsageCount Value="2"/>
       </Unit>
     </Units>
     <JumpHistory HistoryIndex="29">
       <Position>
-        <Filename Value="table_manipulation.pas"/>
-        <Caret Line="152" TopLine="133"/>
-      </Position>
-      <Position>
-        <Filename Value="table_manipulation.pas"/>
-        <Caret Line="25" Column="23" TopLine="2"/>
+        <Filename Value="tables.pas"/>
+        <Caret Line="39" Column="40" TopLine="7"/>
       </Position>
       <Position>
         <Filename Value="tables.pas"/>
-        <Caret Line="76" Column="5" TopLine="34"/>
+        <Caret Line="78" Column="43" TopLine="52"/>
       </Position>
       <Position>
         <Filename Value="tables.pas"/>
-        <Caret Line="8" Column="54"/>
+        <Caret Line="196" Column="43" TopLine="170"/>
       </Position>
       <Position>
         <Filename Value="tables.pas"/>
-        <Caret Line="65" TopLine="34"/>
-      </Position>
-      <Position>
-        <Filename Value="table_manipulation.pas"/>
-        <Caret Line="80" Column="9" TopLine="62"/>
-      </Position>
-      <Position>
-        <Filename Value="table_manipulation.pas"/>
-        <Caret Line="25" Column="17"/>
+        <Caret Line="215" Column="43" TopLine="174"/>
       </Position>
       <Position>
         <Filename Value="tables.pas"/>
-        <Caret Line="92" Column="6" TopLine="44"/>
+        <Caret Line="86" TopLine="66"/>
+      </Position>
+      <Position>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="151" Column="31" TopLine="126"/>
+      </Position>
+      <Position>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="154" Column="23" TopLine="126"/>
+      </Position>
+      <Position>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="68" Column="40" TopLine="36"/>
+      </Position>
+      <Position>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="155" TopLine="129"/>
       </Position>
       <Position>
         <Filename Value="tables.pas"/>
-        <Caret Line="8" Column="54"/>
+        <Caret Line="80" Column="32" TopLine="54"/>
+      </Position>
+      <Position>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="161" Column="145" TopLine="135"/>
+      </Position>
+      <Position>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="162" TopLine="135"/>
+      </Position>
+      <Position>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="186" Column="32" TopLine="163"/>
+      </Position>
+      <Position>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="188" Column="16" TopLine="163"/>
+      </Position>
+      <Position>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="177" Column="32" TopLine="161"/>
+      </Position>
+      <Position>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="181" Column="31" TopLine="155"/>
+      </Position>
+      <Position>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="188" Column="14" TopLine="155"/>
+      </Position>
+      <Position>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="35" Column="39" TopLine="46"/>
+      </Position>
+      <Position>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="447" Column="11" TopLine="418"/>
+      </Position>
+      <Position>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="29" Column="17" TopLine="29"/>
+      </Position>
+      <Position>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="33" Column="18"/>
+      </Position>
+      <Position>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="22" Column="21" TopLine="4"/>
+      </Position>
+      <Position>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="65" Column="99" TopLine="28"/>
+      </Position>
+      <Position>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="21" Column="76" TopLine="11"/>
       </Position>
       <Position>
         <Filename Value="tables.pas"/>
-        <Caret Line="217" Column="25" TopLine="186"/>
+        <Caret Line="34" Column="48" TopLine="13"/>
       </Position>
       <Position>
         <Filename Value="table_manipulation.pas"/>
-        <Caret Line="26" Column="23"/>
-      </Position>
-      <Position>
-        <Filename Value="tables.pas"/>
-        <Caret Line="56" Column="11"/>
+        <Caret Line="83" Column="11" TopLine="37"/>
       </Position>
       <Position>
         <Filename Value="table_manipulation.pas"/>
-        <Caret Line="51" Column="48" TopLine="25"/>
+        <Caret Line="26" Column="17"/>
       </Position>
       <Position>
         <Filename Value="table_manipulation.pas"/>
-        <Caret Line="122" TopLine="96"/>
+        <Caret Line="48" Column="20" TopLine="12"/>
       </Position>
       <Position>
         <Filename Value="table_manipulation.pas"/>
-        <Caret Line="121" TopLine="113"/>
-      </Position>
-      <Position>
-        <Filename Value="tables.pas"/>
-        <Caret Line="214" Column="16" TopLine="177"/>
-      </Position>
-      <Position>
-        <Filename Value="tables.pas"/>
-        <Caret Line="76" Column="17" TopLine="50"/>
-      </Position>
-      <Position>
-        <Filename Value="tables.pas"/>
-        <Caret Line="18" Column="46"/>
-      </Position>
-      <Position>
-        <Filename Value="tables.pas"/>
-        <Caret Line="19" Column="41" TopLine="5"/>
+        <Caret Line="443" Column="30" TopLine="421"/>
       </Position>
       <Position>
         <Filename Value="table_manipulation.pas"/>
-        <Caret Line="12" Column="37"/>
-      </Position>
-      <Position>
-        <Filename Value="table_manipulation.pas"/>
-        <Caret Line="28" Column="34"/>
-      </Position>
-      <Position>
-        <Filename Value="table_manipulation.pas"/>
-        <Caret Line="22" Column="34"/>
-      </Position>
-      <Position>
-        <Filename Value="table_manipulation.pas"/>
-        <Caret Line="50" Column="50" TopLine="20"/>
-      </Position>
-      <Position>
-        <Filename Value="table_manipulation.pas"/>
-        <Caret Line="210" Column="5" TopLine="183"/>
-      </Position>
-      <Position>
-        <Filename Value="table_manipulation.pas"/>
-        <Caret Line="208" Column="9" TopLine="191"/>
-      </Position>
-      <Position>
-        <Filename Value="table_manipulation.pas"/>
-        <Caret Line="25" Column="20" TopLine="20"/>
-      </Position>
-      <Position>
-        <Filename Value="tables.pas"/>
-        <Caret Line="19" Column="14"/>
-      </Position>
-      <Position>
-        <Filename Value="table_manipulation.pas"/>
-        <Caret Line="51" Column="14" TopLine="34"/>
-      </Position>
-      <Position>
-        <Filename Value="table_manipulation.pas"/>
-        <Caret Line="289" Column="27" TopLine="266"/>
-      </Position>
-      <Position>
-        <Filename Value="table_manipulation.pas"/>
-        <Caret Line="296" Column="61" TopLine="275"/>
+        <Caret Line="447" Column="62" TopLine="421"/>
       </Position>
     </JumpHistory>
     <RunParams>
@@ -257,6 +258,9 @@
     <Watches>
       <Item>
         <Expression Value="table21"/>
+      </Item>
+      <Item>
+        <Expression Value="nodeCount"/>
       </Item>
     </Watches>
   </Debugging>
