@@ -14,8 +14,7 @@ begin
   SetConsoleTitle('DataBase');
 
   {áÂÌ ÂÌÃÎ ÀÇÃ  ÆÂ Ï ÜÎ  ÂÌ Ï !!! İ Á ÁÏ ÂÆË}
-  menu_obj:=Menu.Init(1, 1, 100, 30, 0);
+  menu_obj:=Menu.Init(1, 1, 200, 30, 0);
   menu_obj.Main;
-  readkey();
 end.
 

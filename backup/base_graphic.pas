@@ -57,8 +57,10 @@ implementation
     text := abs_text;
     text_color := 15;
     if length(text) < width then
-      for i := length(text) to width do
+    begin
+      for i := length(text) to width-1 do
         text := text + ' ';
+    end;
   end;
 
   destructor TextButton.Del;
@@ -104,6 +106,8 @@ implementation
   constructor Cell.Init(width, height, x_cord, y_cord, abs_background: integer; abs_text: string);
   begin
     inherited Init(width, height, x_cord, y_cord, abs_background, abs_text);
+    //text := text[1..length(text)-2] + '+';
+    //text :=  '+' + text[2..length(text)-1];
     visibleTextSize := 6;
   end;
 
@@ -122,7 +126,7 @@ implementation
     TextColor(text_color);
 
     gotoxy(1, 1);
-    if length(text) > button_width then
+    if (length(text) > button_width) and (text <> '') then
       visible_text := copy(text, 1, button_width-3) + '...'
     else if length(text) <= button_width then
       visible_text := text;

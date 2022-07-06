@@ -10,46 +10,52 @@ uses
 type
   Header = array of string;
   InheritedTableCls = class
-    background, countColumn, head_width, head_height, on_vertical_button, on_horizontal_button, elementsNumber: integer;
-    x, y, x_border, y_border, lineCount: integer;
-    pageNumber, pageCount: word;
-    head_buttons: array of TextButton;
-    lineList: Cls_List;
-    line: PLine; {Не забыть переименовать}
-    borderFreeSpace: integer;
+    strict protected
+      countColumn: integer;
+    private
+      procedure Key_UP;
+      procedure Key_DOWN;
+      procedure Key_RIGHT;
+      procedure Key_Left;
+      procedure DelKey_UP;
+      procedure DelKey_DOWN;
 
-    constructor Init(start_x, start_y, border_y, width, height, columnCount: integer);
-    procedure showPage;
-    procedure showPosition;
-    procedure showLine(lineNumber: integer);
-    procedure showHead;
-    procedure createNewPage;
-    {procedure createPage;}
-    procedure writeInCell;
-    procedure switchPage(key: char);
-    procedure deleteLine(lineNumber: integer);
-    procedure LineLighting(lineNumber, color: integer);
-    procedure turnOffDeleteLight;
-    procedure nextPage;
-    procedure previousPage;
-    procedure positional_hint;
-    procedure Key_UP;
-    procedure Key_DOWN;
-    procedure Key_RIGHT;
-    procedure Key_Left;
-    procedure DelKey_UP;
-    procedure DelKey_DOWN;
-    procedure SetBackground(abs_background: integer);
-    function createInputField(): TextButton;
-    function getFirstLineNumber(page: word): word;
-    function isInteger(text: string): boolean;
-    function isString(text: string): boolean;
-    function deleteText(text: string; delCount: integer): string;
-    function enterText(symbolsCount: integer): string;
-    function calculationLineCount: integer;
-    function setHeadOfColumns(): Header; virtual;
-    function enterTextFormat: string; virtual;
-    function getLineYPosition(lineNum: integer): integer;
+    public
+      background, head_width, head_height, on_vertical_button, on_horizontal_button, elementsNumber: integer;
+      x, y, x_border, y_border, lineCount: integer;
+      pageNumber, pageCount: word;
+      head_buttons: array of TextButton;
+      lineList: Cls_List;
+      line: PLine; {Не забыть переименовать}
+      borderFreeSpace: integer;
+
+      constructor Init(start_x, start_y, border_y, width, height, columnCount: integer);
+      procedure showPage;
+      procedure showPosition;
+      procedure showLine(lineNumber: integer);
+      procedure showHead;
+      procedure createNewPage;
+      {procedure createPage;}
+      procedure writeInCell;
+      procedure switchPage(key: char);
+      procedure deleteLine(lineNumber: integer);
+      procedure LineLighting(lineNumber, color: integer);
+      procedure turnOffDeleteLight;
+      procedure nextPage;
+      procedure previousPage;
+      procedure positional_hint;
+      procedure SetBackground(abs_background: integer);
+      function createInputField(): TextButton;
+      function getFirstLineNumber(page: word): word;
+      function isInteger(text: string): boolean;
+      function isString(text: string): boolean;
+      function deleteText(text: string; delCount: integer): string;
+      function enterText(symbolsCount: integer): string;
+      function enterNumber(digitsCount: integer): string;
+      function calculationLineCount: integer;
+      function setHeadOfColumns(): Header; virtual;
+      function enterTextFormat: string; virtual;
+      function getLineYPosition(lineNum: integer): integer;
   end;
 
   generic ViewTable<T> = class
@@ -95,7 +101,7 @@ var
 begin
   headSize := head_height + (borderFreeSpace*2);
   lineSize := head_height + borderFreeSpace;
-  result := (y_border - ((borderFreeSpace div 2) + headSize)) div lineSize;
+  result := (y_border - headSize - (x-1)) div lineSize;
 end;
 
 procedure InheritedTableCls.positional_hint;
@@ -286,27 +292,52 @@ end;
 function InheritedTableCls.enterText(symbolsCount: integer): string;
 var
   key: char;
-  text: string;
 begin
   key := ' ';
-  text := '';
+  result := '';
   while key <> #13 do
   begin
     key := readkey;
-    if isString(key) and (symbolsCount > length(text)) then
+    if isString(key) and (symbolsCount > length(result)) then
     begin
-      text := text + key;
+      result := result + key;
       write(key);
     end
     else if key = #8 then
-      text := deleteText(text, 1)
+      result := deleteText(result, 1)
     else if key = #32 then
     begin
-      text := text + ' ';
+      result := result + ' ';
       write(' ');
     end;
   end;
-  enterText := text;
+end;
+
+function InheritedTableCls.enterNumber(digitsCount: integer): string;
+var
+  key: char;
+begin
+  key := ' ';
+  while key <> #13 do
+  begin
+    key := readkey;
+    if isInteger(key) and (digitsCount > length(result)) then
+    begin
+      result := result + key;
+      write(key);
+    end
+    else if key = #8 then
+      result := deleteText(result, 1)
+    else if key = #32 then
+    begin
+      result := result + ' ';
+      write(' ');
+    end;
+  end;
+  if result = '' then
+    result := ' ';
+  while (result[1] = '0') and (result <> '') and (length(result) > 1) do
+    result := result[2..length(result)];
 end;
 
 function InheritedTableCls.deleteText(text: string; delCount: integer): string;
@@ -405,14 +436,14 @@ end;
 procedure InheritedTableCls.Key_UP();
 begin
   if on_vertical_button = getFirstLineNumber(pageNumber) then
-    on_vertical_button := getFirstLineNumber(pageNumber) + lineCount
+    on_vertical_button := getFirstLineNumber(pageNumber) + (lineCount-1)
   else
     on_vertical_button := on_vertical_button - 1;
 end;
 
 procedure InheritedTableCls.Key_DOWN();
 begin
-  if on_vertical_button = getFirstLineNumber(pageNumber) + lineCount then
+  if on_vertical_button = getFirstLineNumber(pageNumber) + (lineCount-1) then
     on_vertical_button := getFirstLineNumber(pageNumber)
   else
     on_vertical_button := on_vertical_button + 1;
@@ -438,7 +469,7 @@ procedure ViewTable.Main;
 var
   key: char;
 begin
-  table := T.Init(2, 2, 56, 8, 1, 0);
+  table := T.Init(2, 2, 56, 8, 1);
   table.showPage;
   table.showPosition;
   key := ' ';

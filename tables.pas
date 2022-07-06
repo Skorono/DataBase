@@ -10,38 +10,49 @@ uses
 type
   Header = array of string;
 
+  { Table1 }
+
   Table1 = class sealed (InheritedTableCls)
-    constructor Init(start_x, start_y, border_y, width, height, columnCount: integer);
-    procedure showPage;
-    procedure showLine(lineNumber: integer);
-    procedure showHead;
-    function enterTextFormat: string; override;
-    function setHeadOfColumns(): Header; override;
-    {function enterDateForm: string;}
-    function checkDayFormat(day: string): boolean;
-    function checkMonthFormat(month: string): boolean;
-    function checkYearFormat(year: string): boolean;
-    function checkOrganizationName(text: string): boolean;
-    function enterOrganizationName: string;
-    {procedure enterSubmissionForm;
-    procedure enterNumberForm;
-    procedure enterAddressForm;}
+  private
+    function enterFlatNumber: string;
+    function enterTownName: string;
+    public
+      constructor Init(start_x, start_y, border_y, width, height: integer);
+      procedure showPage;
+      procedure showLine(lineNumber: integer);
+      procedure showHead;
+      function enterStreetName: string;
+      function enterTextFormat: string; override;
+      function setHeadOfColumns(): Header; override;
+      {function enterDateForm: string;}
+      function checkDayFormat(day: string): boolean;
+      function checkMonthFormat(month: string): boolean;
+      function checkYearFormat(year: string): boolean;
+      function checkOrganizationName(text: string): boolean;
+      function enterOrganizationName: string;
+      function enterAddress: string;
+      function enterHomeNumber: string;
+      {procedure enterSubmissionForm;
+      procedure enterNumberForm;
+      procedure enterAddressForm;}
   end;
 
   Table2 = class sealed (InheritedTableCls)
-    constructor Init(start_x, start_y, border_y, width, height, columnCount: integer);
-    function setHeadOfColumns(): Header; override;
-    function enterTextFormat: string; override;
+    public
+      constructor Init(start_x, start_y, border_y, width, height: integer);
+      function setHeadOfColumns(): Header; override;
+      function enterTextFormat: string; override;
   end;
 
   Table3 = class sealed (InheritedTableCls)
-    constructor Init(start_x, start_y, border_y, width, height, columnCount: integer);
-    function setHeadOfColumns(): Header; override;
-    function enterTextFormat: string; override;
+    public
+      constructor Init(start_x, start_y, border_y, width, height: integer);
+      function setHeadOfColumns(): Header; override;
+      function enterTextFormat: string; override;
   end;
 
 implementation
-constructor Table1.Init(start_x, start_y, border_y, width, height, columnCount: integer);
+constructor Table1.Init(start_x, start_y, border_y, width, height: integer);
 begin
   countColumn := 7;
   inherited Init(start_x, start_y, border_y, width, height, countColumn);
@@ -66,8 +77,8 @@ function Table1.enterTextFormat: string;
 begin
   case on_horizontal_button of
     1: enterTextFormat := enterOrganizationName;
-    {2: ;
-    3: ;
+    2: enterTextFormat := enterAddress;
+    {3: ;
     4: ;
     5: ;
     6: ;
@@ -78,13 +89,13 @@ end;
 function Table1.setHeadOfColumns(): Header;
 begin
   setlength(result, countColumn);
-  Result[0] := 'Íàçâàíèå';
-  Result[1] := 'Àäğåñ';
-  Result[2] := 'Òèï ïîä÷èíåíèÿ';
-  Result[3] := 'Ãîä îñíîâàíèÿ';
-  Result[4] := 'Íîìåğ ëèöåíçèè';
-  Result[5] := 'Íîìåğ àêêğåäèòàöèè';
-  Result[6] := 'Äàòà îêîí÷àíèÿ äåéñòâèÿ àêêğåäèòàöèè';
+  Result[0] := 'ÍÀÇÂÀÍÈÅ';
+  Result[1] := 'ÀÄĞÅÑ';
+  Result[2] := 'ÒÈÏ ÏÎÄ×ÈÍÅÍÈß';
+  Result[3] := 'ÃÎÄ ÎÑÍÎÂÀÍÈß';
+  Result[4] := 'ÍÎÌÅĞ ËÈÖÅÍÇÈÈ';
+  Result[5] := 'ÍÎÌÅĞ ÀÊÊĞÅÄÈÒÀÖÈÈ';
+  Result[6] := 'ÄÀÒÀ ÎÊÎÍ×ÀÍÈß ÄÅÉÑÒÂÈß ÀÊÊĞÅÄÈÒÀÖÈÈ';
 end;
 
 function Table1.checkDayFormat(day: string): boolean;
@@ -179,7 +190,43 @@ begin
     deleteText(yearLen);
     enterText(yearLen);
   until (checkYearFormat(text));
-end;                    }
+end;}
+
+function Table1.enterStreetName: string;
+begin
+  write('óë.');
+  enterStreetName := 'óë.' + enterText(34);
+end;
+
+function Table1.enterHomeNumber: string;
+begin
+  write('ä.');
+  enterHomeNumber := 'ä.' + enterNumber(4);
+end;
+
+function Table1.enterTownName: string;
+begin
+  write('ã.');
+  enterTownName := enterText(25);
+end;
+
+function Table1.enterFlatNumber: string;
+begin
+  write('ê.');
+  enterFlatNumber := 'ê.' + enterNumber(2);
+end;
+
+function Table1.enterAddress: string;
+begin
+  result := enterStreetName;
+  write(' ');
+  result := result + ' ' + enterHomeNumber;
+  write(' ');
+  result := result + ' ' + enterFlatNumber;
+  write(' ');
+  result := result + ' ' + enterTownName;
+  //result := ;
+end;
 
 function Table1.enterOrganizationName: string;
 const
@@ -188,7 +235,7 @@ begin
   enterOrganizationName := enterText(MaxOrgNameSize);
 end;
 
-constructor Table2.Init(start_x, start_y, border_y, width, height, columnCount: integer);
+constructor Table2.Init(start_x, start_y, border_y, width, height: integer);
 begin
   countColumn := 4;
   setBackground(7);
@@ -209,7 +256,7 @@ begin
 
 end;
 
-constructor Table3.Init(start_x, start_y, border_y, width, height, columnCount: integer);
+constructor Table3.Init(start_x, start_y, border_y, width, height: integer);
 begin
   countColumn := 3;
   inherited Init(start_x, start_y, border_y, width, height, countColumn);
