@@ -9,10 +9,10 @@ uses
 
 type
   Header = array of string;
+
+  { InheritedTableCls }
+
   InheritedTableCls = class
-    strict protected
-      countColumn: integer;
-    private
       procedure Key_UP;
       procedure Key_DOWN;
       procedure Key_RIGHT;
@@ -20,18 +20,25 @@ type
       procedure DelKey_UP;
       procedure DelKey_DOWN;
 
+  private
+    procedure additionalTextDelete;
+    procedure cellsDelete;
+    procedure createPositionHint;
+    procedure headerDelete;
     public
+      countColumn: integer; { вернуть в strict protected }
       background, head_width, head_height, on_vertical_button, on_horizontal_button, elementsNumber: integer;
       x, y, x_border, y_border, lineCount: integer;
       pageNumber, pageCount: word;
-      head_buttons: array of TextButton;
+      head_buttons, additional_textbutton: array of TextButton;
       lineList: Cls_List;
       line: PLine; {Ќе забыть переименовать}
       borderFreeSpace: integer;
 
       constructor Init(start_x, start_y, border_y, width, height, columnCount: integer);
+      destructor Destroy; override;
       procedure showPage;
-      procedure showPosition;
+      procedure showPositionHint;
       procedure showLine(lineNumber: integer);
       procedure showHead;
       procedure createNewPage;
@@ -58,14 +65,6 @@ type
       function getLineYPosition(lineNum: integer): integer;
   end;
 
-  generic ViewTable<T> = class
-      table: T;
-    public
-      procedure Main;
-      procedure DeleteMode;
-      procedure WriteMode;
-  end;
-
 implementation
 
 constructor InheritedTableCls.Init(start_x, start_y, border_y, width, height, columnCount: integer);
@@ -88,10 +87,14 @@ begin
   showHead;
   createNewPage;
   positional_hint;
+  createPositionHint;
+  showPositionHint;
 end;
 
 procedure InheritedTableCls.SetBackground(abs_background: integer);
 begin
+  window(x, y, x_border, y_border);
+  Textbackground(abs_background);
   background := abs_background;
 end;
 
@@ -107,46 +110,46 @@ end;
 procedure InheritedTableCls.positional_hint;
 const
   height = 1;
+  hintCount = 4;
 var
-  text: string;
   hint: TextButton;
-  pos_x, pos_y: integer;
+  text: array[1..hintCount] of string = ('ESC - выход из программы/выход из режима', 'Ctrl + A - EditMode',
+                                          'Ctrl + D - DeleteMode', 'Ctrl + <- / -> - ѕереключение между страницами');
+  i, pos_x, pos_y: integer;
 begin
-  text := 'ESC - выход из программы/выход из режима';
   line := lineList.getNode(1);
   pos_x := line^.data[countColumn].x_pos + line^.data[countColumn].button_width + (borderFreeSpace * 2);
   pos_y := line^.data[countColumn].y_pos;
-  hint := TextButton.Init(length(text), height, pos_x, pos_y, 0, text);
-  hint.show;
-  inc(pos_y);
-  text := 'Ctrl + A - EditMode';
-  hint := TextButton.Init(length(text), height, pos_x, pos_y, 0, text);
-  hint.show;
-  inc(pos_y);
-  text := 'Ctrl + D - DeleteMode';
-  hint := TextButton.Init(length(text), height, pos_x, pos_y, 0, text);
-  hint.show;
-  inc(pos_y);
-  text := 'Ctrl + <- / -> - ѕереключение между страницами';
-  hint := TextButton.Init(length(text), height, pos_x, pos_y, 0, text);
-  hint.show;
+  for i := 1 to hintCount do
+  begin
+    setlength(additional_textbutton, length(additional_textbutton) + 1);
+    hint := TextButton.Init(length(text[i]), height, pos_x, pos_y, background, text[i]);
+    hint.show;
+    additional_textbutton[length(additional_textbutton)-1] := hint;
+    inc(pos_y);
+  end;
 end;
 
-procedure InheritedTableCls.showPosition;
+procedure InheritedTableCls.createPositionHint;
 const
   MAX_TEXT_SIZE = 35;
 var
-  inf_button: TextButton;
-  position: string;
-  x_pos, y_pos: integer;
   last_line: PLine;
+  x_pos, y_pos: byte;
+  inf_button: TextButton;
 begin
-  position := 'страница: ' + inttostr(pageNumber) + ' строка: ' + inttostr(on_vertical_button) + ' €чейка: ' + inttostr(on_horizontal_button);
   last_line := lineList.getNode(lineCount);
   x_pos := (last_line^.data[countColumn].x_pos + last_line^.data[countColumn].button_width + borderFreeSpace) - MAX_TEXT_SIZE;
   y_pos := last_line^.data[countColumn].y_pos + borderFreeSpace;
-  inf_button := TextButton.Init(MAX_TEXT_SIZE, 1, x_pos, y_pos, 0, position);
-  inf_button.Show;
+  inf_button := TextButton.Init(MAX_TEXT_SIZE, 1, x_pos, y_pos, background, '');
+  setlength(additional_textbutton, length(additional_textbutton) + 1);
+  additional_textbutton[length(additional_textbutton) - 1] := inf_button;
+end;
+
+procedure InheritedTableCls.showPositionHint;
+begin
+  additional_textbutton[length(additional_textbutton) - 1].text := 'страница: ' + inttostr(pageNumber) + ' строка: ' + inttostr(on_vertical_button) + ' €чейка: ' + inttostr(on_horizontal_button);
+  additional_textbutton[length(additional_textbutton) - 1].Show;
 end;
 
 procedure InheritedTableCls.showHead;
@@ -165,6 +168,7 @@ begin
     head_buttons[i] := TextButton.Init(head_width, head_height, x_pos, y_pos, background, columnHeader[i]);
     head_buttons[i].Border := border.Init('-', borderFreeSpace, x_pos, y_pos, y_pos, head_width);
     head_buttons[i].Border.ChangeColor(1);
+    head_buttons[i].Border.ChangeColor(background);
     head_buttons[i].Show;
     x_pos := x_pos + length(columnHeader[i]) + borderFreeSpace;
   end;
@@ -210,8 +214,9 @@ begin
   line := lineList.getNode(getFirstLineNumber(pageNumber) + (lineNumber-1));
   for i := 1 to countColumn do
   begin
-      line^.data[i].show;
       line^.data[i].Border.ChangeColor(1);
+      line^.data[i].Border.ChangeBackground(background);
+      line^.data[i].show;
   end;
 end;
 
@@ -240,7 +245,7 @@ begin
   if pageNumber > pageCount then
     createNewPage;
   showPage();
-  showPosition;
+  showPositionHint;
 end;
 
 procedure InheritedTableCls.previousPage;
@@ -249,7 +254,7 @@ begin
   begin
     pageNumber := pageNumber - 1;
     showPage();
-    showPosition;
+    showPositionHint;
   end;
 end;
 
@@ -303,7 +308,7 @@ begin
       result := result + key;
       write(key);
     end
-    else if key = #8 then
+    else if (key = #8) and (result <> '')then
       result := deleteText(result, 1)
     else if key = #32 then
     begin
@@ -326,7 +331,7 @@ begin
       result := result + key;
       write(key);
     end
-    else if key = #8 then
+    else if (key = #8) and (result <> '') then
       result := deleteText(result, 1)
     else if key = #32 then
     begin
@@ -334,21 +339,22 @@ begin
       write(' ');
     end;
   end;
-  if result = nil then
+  if result = '' then
     result := ' ';
   while (result[1] = '0') and (result <> '') and (length(result) > 1) do
     result := result[2..length(result)];
 end;
 
 function InheritedTableCls.deleteText(text: string; delCount: integer): string;
+const
+  stepDel = 1;
 var
-  x_, y_, stepDel, count: integer;
+  x_, y_, count: integer;
 begin
   x_ := whereX;
   y_ := whereY;
-  stepDel := 1;
+  count := delCount;
   repeat
-    count := delCount;
     x_ := x_ - stepDel;
     gotoxy(x_, y_);
     write(' ');
@@ -385,7 +391,6 @@ begin
   line^.data[on_horizontal_button].show;
   input_field.del;
   input_field.border.del;
-
   window(x, y, x_border, y_border);
   gotoxy(line^.data[on_horizontal_button].x_pos, line^.data[on_horizontal_button].y_pos);
 end;
@@ -465,84 +470,49 @@ begin
     on_horizontal_button := on_horizontal_button - 1;
 end;
 
-procedure ViewTable.Main;
+procedure InheritedTableCls.headerDelete;
 var
-  key: char;
+  cell: byte;
 begin
-  table := T.Init(2, 2, 56, 8, 1);
-  table.showPage;
-  table.showPosition;
-  key := ' ';
-  window(table.x, table.y, table.x_border, table.y_border);
-  table.line := table.lineList.getNode(table.getFirstLineNumber(table.pageNumber) + (table.on_vertical_button-1));
-  gotoxy(table.line^.data[1].x_pos, table.line^.data[1].y_pos);
-  repeat
-  key := readkey;
-  case key of
-    #1: WriteMode;
-    #4: DeleteMode;
-  end;
-  table.switchPage(key);
-  until (key = #27);
-end;
-
-procedure ViewTable.WriteMode; { ¬ременно main}
-var
-  key: char;
-begin
-  table.showPosition;
-  window(table.x, table.y, table.x_border, table.y_border);
-  table.line := table.lineList.getNode(table.getFirstLineNumber(table.pageNumber) + (table.on_vertical_button-1));
-  gotoxy(table.line^.data[table.on_horizontal_button].x_pos, table.line^.data[table.on_horizontal_button].y_pos);
-  repeat
-    key := readkey;
-    if key = #0 then
-    begin
-      case readkey of
-        #72: table.Key_UP;
-        #80: table.Key_DOWN;
-        #75: table.Key_LEFT;
-        #77: table.Key_RIGHT;
-      end;
-      table.showPosition;
-      window(table.x, table.y, table.x_border, table.y_border);
-      table.line := table.lineList.getNode(table.getFirstLineNumber(table.pageNumber) + (table.on_vertical_button-1));
-      gotoxy(table.line^.data[table.on_horizontal_button].x_pos, table.line^.data[table.on_horizontal_button].y_pos);
-    end
-    else if key = #13 then
-    begin
-      table.writeInCell;
-    end;
-  until key = #27;
-end;
-
-procedure ViewTable.DeleteMode;
-var
-  key: char;
-begin
-  table.showPosition;
-  key := ' ';
-  table.on_horizontal_button := 1;
-  table.on_vertical_button := 1;
-  table.LineLighting(table.getFirstLineNumber(table.pageNumber) + (table.on_vertical_button-1), 7);
-  repeat
-  key := readkey;
-  if key = #0 then
+  for cell := 0 to countColumn-1 do
   begin
-    case readkey of
-      #72: table.DelKey_UP;
-      #80: table.DelKey_DOWN;
-    end;
-    table.showPosition;
-  end
-  else if key = #4 then
-  begin
-    table.deleteLine(table.getFirstLineNumber(table.pageNumber) + (table.on_vertical_button-1));
+    head_buttons[cell].del;
+    head_buttons[cell].border.del;
   end;
-  until (key = #27);
-  table.turnOffDeleteLight;
 end;
 
+procedure InheritedTableCls.cellsDelete;
+var
+  cell, linenum: byte;
+begin
+  for linenum := 1 to lineCount do
+  begin
+    line := lineList.getNode(linenum);
+    for cell := 1 to countColumn do
+    begin
+      line^.data[cell].del;
+      line^.data[cell].border.del
+    end;
+  end;
+end;
+
+procedure InheritedTableCls.additionalTextDelete;
+var
+  cell: byte;
+begin
+  for cell := 0 to length(additional_textbutton) - 1 do
+    additional_textbutton[cell].del;
+end;
+
+destructor InheritedTableCls.Destroy;
+begin
+  headerDelete;
+  cellsDelete;
+  additionalTextDelete;
+  lineList.del;
+  //dispose(line);
+  self := nil;
+end;
 begin
 end.
 

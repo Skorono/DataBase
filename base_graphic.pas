@@ -13,7 +13,7 @@ type
       symbol: char;
 
     constructor Init(fsymbol: char; freeSpace, std_x, start_y, last_y, t_size: integer);
-    destructor del;
+    destructor Del;
     procedure Show;
     procedure ChangeColor(color: integer);
     procedure ChangeBackground(color: integer);
@@ -195,13 +195,14 @@ implementation
     write(' ' + horizontal_text + ' ');
   end;
 
-  destructor Border.del;
+  destructor Border.Del;
   begin
     start_x := start_x - borderFreeSpace;
     top_y := top_y - borderFreeSpace;
     window(start_x, top_y, last_x, bottom_y);
     TextBackground(0);
     ClrScr;
+    self := nil;
   end;
 
   begin

@@ -12,8 +12,7 @@ type
       x, y, x_border, y_border, background: integer;
       buttons: array[1..10] of TextButton;
       menu_border: Border;
-
-      countButtons: integer;
+      countButtons: byte;
     strict private
       procedure press_enter(on_button: integer);
       procedure Show_menu;
@@ -53,11 +52,11 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
   begin
     Window(x, y, x_border, y_border);
     {x и y определ€ютс€ относительно окна. “о есть если € ввожу x=10 и y=10 то это значени€ станов€тс€ начальными.   ограничению конца строки это правило вроде как не действует}
-    x := 1;
-    y := 1;
     {Paint_Background();}
-    cord_x := (x_border div 2) - (text_size div 2);
-    cord_y := (y_border div 2) + spaceBetweenButtons;
+    //cord_x := (x_border div 2) - (text_size div 2);
+    //cord_y := (y_border div 2) + spaceBetweenButtons;
+    cord_x := x;
+    cord_y := y;
 
     for i:= 1 to base_count do
       begin
@@ -177,6 +176,7 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
   begin
     for i := 1 to countButtons do
       buttons[i].del;
+    self := nil;
   end;
 end.
 

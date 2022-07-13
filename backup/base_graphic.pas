@@ -5,7 +5,7 @@ unit base_graphic;
 interface
 
 uses
-  Classes, SysUtils, Crt;
+  Classes, SysUtils, Crt, base_menu;
 type
   Border = class
     public
@@ -13,7 +13,7 @@ type
       symbol: char;
 
     constructor Init(fsymbol: char; freeSpace, std_x, start_y, last_y, t_size: integer);
-    destructor del;
+    destructor Del;
     procedure Show;
     procedure ChangeColor(color: integer);
     procedure ChangeBackground(color: integer);
@@ -106,7 +106,7 @@ implementation
   constructor Cell.Init(width, height, x_cord, y_cord, abs_background: integer; abs_text: string);
   begin
     inherited Init(width, height, x_cord, y_cord, abs_background, abs_text);
-    //text := text[1..length(text)-2] + '+';
+    text := text[1..length(text)-2] + '+';
     //text :=  '+' + text[2..length(text)-1];
     visibleTextSize := 6;
   end;
@@ -195,13 +195,14 @@ implementation
     write(' ' + horizontal_text + ' ');
   end;
 
-  destructor Border.del;
+  destructor Border.Del;
   begin
     start_x := start_x - borderFreeSpace;
     top_y := top_y - borderFreeSpace;
     window(start_x, top_y, last_x, bottom_y);
     TextBackground(0);
     ClrScr;
+    self := nil;
   end;
 
   begin

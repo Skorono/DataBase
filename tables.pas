@@ -5,7 +5,7 @@ unit tables;
 interface
 
 uses
-  Classes, SysUtils, table_manipulation;
+  Classes, SysUtils, Crt, table_manipulation;
 
 type
   Header = array of string;
@@ -14,8 +14,11 @@ type
 
   Table1 = class sealed (InheritedTableCls)
   private
+    function enterDateForm: string;
     function enterFlatNumber: string;
+    function enterLicence: string;
     function enterTownName: string;
+    function enterYear: string;
     public
       constructor Init(start_x, start_y, border_y, width, height: integer);
       procedure showPage;
@@ -60,17 +63,17 @@ end;
 
 procedure Table1.showPage;
 begin
-  inherited showPage;
+  inherited;
 end;
 
 procedure Table1.showLine(lineNumber: integer);
 begin
-  inherited showLine(lineNumber);
+  inherited;
 end;
 
 procedure Table1.showHead;
 begin
-  inherited showHead;
+  inherited;
 end;
 
 function Table1.enterTextFormat: string;
@@ -78,11 +81,11 @@ begin
   case on_horizontal_button of
     1: enterTextFormat := enterOrganizationName;
     2: enterTextFormat := enterAddress;
-    {3: ;
-    4: ;
-    5: ;
-    6: ;
-    7: text := enterDateForm;}
+    {3: ;}
+    4: enterTextFormat := enterYear;
+    5: enterTextFormat := enterLicence;
+    {6: ;                       }
+    7: enterTextFormat := enterDateForm;
   end;
 end;
 
@@ -158,7 +161,7 @@ begin
   end;
 end;
 
-{procedure Table1.enterDateForm;
+function Table1.enterDateForm: string;
 const
   otherLen = 2; { переименовать }
   yearLen = 4;
@@ -166,7 +169,7 @@ var
   x_, y_: integer;
   text: string;
 begin
-  x_ := 1;
+ { x_ := 1;
   y_ := 1;
 
   write('  .  .');
@@ -189,8 +192,8 @@ begin
   repeat
     deleteText(yearLen);
     enterText(yearLen);
-  until (checkYearFormat(text));
-end;}
+  until (checkYearFormat(text)); }
+end;
 
 function Table1.enterStreetName: string;
 begin
@@ -235,10 +238,25 @@ begin
   enterOrganizationName := enterText(MaxOrgNameSize);
 end;
 
+function Table1.enterYear: string;
+begin
+  repeat
+    enterYear := enterNumber(4);
+    if (strtoint(enterYear) < 1400) or (strtoint(enterYear) > 2022) then
+      enterYear := deleteText(enterYear, length(enterYear));
+  until length(enterYear) > 0;
+  enterYear := enterYear + ' г.';
+end;
+
+function Table1.enterLicence: string;
+begin
+  enterLicence := '№' + enterNumber(8);
+end;
+
 constructor Table2.Init(start_x, start_y, border_y, width, height: integer);
 begin
   countColumn := 4;
-  setBackground(7);
+  setBackground(8);
   inherited Init(start_x, start_y, border_y, width, height, countColumn);
 end;
 

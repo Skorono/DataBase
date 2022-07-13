@@ -8,7 +8,7 @@ uses
 type PLine = ^Line_Node;
      Line_Node = record
        data: array[1..7] of Cell;
-       number: byte;
+       number: word;
        next: PLine;
        previous: PLine;
      end;
@@ -19,6 +19,7 @@ type PLine = ^Line_Node;
        public
          nodeCount: integer;
          constructor Init;
+         destructor Del;
          function getNode(n: integer): PLine;
          procedure add_line(cells: array of Cell);
          procedure rewrite_cell;
@@ -82,6 +83,18 @@ implementation
          getNode := line_copy;
        end;
      end;
+  end;
+
+  destructor Cls_List.Del;
+  var
+    t: PLine;
+  begin
+    while p<>nil do
+    begin
+      t:=line;
+      line:=line^.next;
+      Dispose(t);
+    end;
   end;
 end.
 
