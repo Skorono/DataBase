@@ -5,7 +5,7 @@ unit db_representation;
 interface
 
 uses
-  Classes, SysUtils, Crt, base_graphic;
+  Classes, SysUtils, Crt, Storage, base_graphic;
 
 type
     Menu = class sealed
@@ -159,8 +159,9 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
   procedure ViewTable.Main(var menu: Menu);
 var
   key: char;
+  line: PLine;
 begin
-  table := T.Init(2, 2, 56, 8, 1);
+  table := T.Init(2, 2, 38, 8, 1);
   menu.x := table.head_buttons[table.countColumn-1].x_pos + length(table.head_buttons[table.countColumn-1].text) + 12;
   menu.y := table.head_buttons[table.countColumn-1].y_pos + 18;
   menu.x_border := table.head_buttons[table.countColumn-1].x_pos + 30;
@@ -168,8 +169,8 @@ begin
   menu.show_menu;
   table.showPage;
   key := ' ';
-  table.line := table.lineList.getNode(table.getFirstLineNumber(table.pageNumber) + (table.on_vertical_button-1));
-  gotoxy(table.line^.data[1].x_pos, table.line^.data[1].y_pos);
+  line := table.lineList.getNode(table.getFirstLineNumber(table.pageNumber) + (table.on_vertical_button-1));
+  gotoxy(line^.data[1].x_pos, line^.data[1].y_pos);
   repeat
   key := readkey;
   case key of
@@ -184,11 +185,12 @@ end;
 procedure ViewTable.WriteMode; { Временно main}
 var
   key: char;
+  line: PLine;
 begin
   table.showPositionHint;
   window(table.x, table.y, table.x_border, table.y_border);
-  table.line := table.lineList.getNode(table.getFirstLineNumber(table.pageNumber) + (table.on_vertical_button-1));
-  gotoxy(table.line^.data[table.on_horizontal_button].x_pos, table.line^.data[table.on_horizontal_button].y_pos);
+  line := table.lineList.getNode(table.getFirstLineNumber(table.pageNumber) + (table.on_vertical_button-1));
+  gotoxy(line^.data[table.on_horizontal_button].x_pos, line^.data[table.on_horizontal_button].y_pos);
   repeat
     key := readkey;
     if key = #0 then
@@ -201,8 +203,8 @@ begin
       end;
       table.showPositionHint;
       window(table.x, table.y, table.x_border, table.y_border);
-      table.line := table.lineList.getNode(table.getFirstLineNumber(table.pageNumber) + (table.on_vertical_button-1));
-      gotoxy(table.line^.data[table.on_horizontal_button].x_pos, table.line^.data[table.on_horizontal_button].y_pos);
+      line := table.lineList.getNode(table.getFirstLineNumber(table.pageNumber) + (table.on_vertical_button-1));
+      gotoxy(line^.data[table.on_horizontal_button].x_pos, line^.data[table.on_horizontal_button].y_pos);
     end
     else if key = #13 then
     begin
@@ -247,6 +249,7 @@ begin
   for y := 1 to table.y_border do
   begin
     gotoxy(1, y);
+    //delline;
     clreol;
     sleep(1);
   end;

@@ -7,7 +7,7 @@ uses
 
 type PLine = ^Line_Node;
      Line_Node = record
-       data: array[1..7] of Cell;
+       data: array[0..6] of Cell;
        number: word;
        next: PLine;
        previous: PLine;
@@ -89,7 +89,7 @@ implementation
   var
     t: PLine;
   begin
-    while p<>nil do
+    while line<>nil do
     begin
       t:=line;
       line:=line^.next;

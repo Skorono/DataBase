@@ -35,8 +35,6 @@ type
   end;
 
   Cell = class(TextButton)
-    private
-      visibleTextSize: integer;
     public
       constructor Init(width, height, x_cord, y_cord, abs_background: integer; abs_text: string);
       procedure Show;
@@ -56,16 +54,13 @@ implementation
     background := abs_background;
     text := abs_text;
     text_color := 15;
-    if length(text) < width then
-    begin
-      for i := length(text) to width-1 do
-        text := text + ' ';
-    end;
+    for i := length(text) to width-1 do
+      text := text + ' ';
   end;
 
   destructor TextButton.Del;
   begin
-    window(x_pos, y_pos, x_pos + button_width, y_pos + button_height);
+    window(x_pos, y_pos, x_pos + button_width, y_pos);
     TextBackground(0);
     ClrScr;
   end;
@@ -86,19 +81,16 @@ implementation
   var
     i: integer;
   begin
-    Window(x_pos, y_pos, x_pos + button_width, y_pos + button_height);
-    gotoxy(1, 1);
-    for i := 1 to button_width do
-      write(' ')
+    Window(x_pos, y_pos, x_pos + (button_width-1), y_pos);
+    TextBackground(background);
+    ClrScr;
   end;
 
   procedure TextButton.Show();
   begin
     clearButton;
-    Window(x_pos, y_pos, x_pos + button_width, y_pos + button_height);
-    TextBackground(background);
+    Window(x_pos, y_pos, x_pos + (button_width-1), y_pos);
     TextColor(text_color);
-
     gotoxy(x_pos, y_pos);
     write(text);
   end;
@@ -107,8 +99,6 @@ implementation
   begin
     inherited Init(width, height, x_cord, y_cord, abs_background, abs_text);
     text := text[1..length(text)-2] + '+';
-    //text :=  '+' + text[2..length(text)-1];
-    visibleTextSize := 6;
   end;
 
   procedure Cell.clearCell;
@@ -121,12 +111,12 @@ implementation
     visible_text: string;
   begin
     clearCell;
-    Window(x_pos, y_pos, x_pos + button_width, y_pos + button_height);
+    Window(x_pos, y_pos, x_pos + (button_width-1), y_pos);
     TextBackground(background);
     TextColor(text_color);
 
     gotoxy(1, 1);
-    if (length(text) > button_width) and (text <> '') then
+    if length(text) > button_width then
       visible_text := copy(text, 1, button_width-3) + '...'
     else if length(text) <= button_width then
       visible_text := text;
@@ -202,6 +192,7 @@ implementation
     window(start_x, top_y, last_x, bottom_y);
     TextBackground(0);
     ClrScr;
+    write(1);
     self := nil;
   end;
 

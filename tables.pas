@@ -5,7 +5,7 @@ unit tables;
 interface
 
 uses
-  Classes, SysUtils, Crt, table_manipulation;
+  Classes, SysUtils, Crt, table_manipulation, base_graphic;
 
 type
   Header = array of string;
@@ -14,6 +14,7 @@ type
 
   Table1 = class sealed (InheritedTableCls)
   private
+    function enterAccreditation: string;
     function enterDateForm: string;
     function enterFlatNumber: string;
     function enterLicence: string;
@@ -25,7 +26,7 @@ type
       procedure showLine(lineNumber: integer);
       procedure showHead;
       function enterStreetName: string;
-      function enterTextFormat: string; override;
+      function enterTextFormat(InputField: TextButton): string; override;
       function setHeadOfColumns(): Header; override;
       {function enterDateForm: string;}
       function checkDayFormat(day: string): boolean;
@@ -44,14 +45,14 @@ type
     public
       constructor Init(start_x, start_y, border_y, width, height: integer);
       function setHeadOfColumns(): Header; override;
-      function enterTextFormat: string; override;
+      function enterTextFormat(InputField: TextButton): string; override;
   end;
 
   Table3 = class sealed (InheritedTableCls)
     public
       constructor Init(start_x, start_y, border_y, width, height: integer);
       function setHeadOfColumns(): Header; override;
-      function enterTextFormat: string; override;
+      function enterTextFormat(InputField: TextButton): string; override;
   end;
 
 implementation
@@ -76,17 +77,28 @@ begin
   inherited;
 end;
 
-function Table1.enterTextFormat: string;
+function Table1.enterTextFormat(InputField: TextButton): string;
 begin
-  case on_horizontal_button of
-    1: enterTextFormat := enterOrganizationName;
-    2: enterTextFormat := enterAddress;
-    {3: ;}
-    4: enterTextFormat := enterYear;
-    5: enterTextFormat := enterLicence;
-    {6: ;                       }
-    7: enterTextFormat := enterDateForm;
+  gotoxy(1 + borderFreeSpace, 1 + (borderFreeSpace-1));
+  if on_horizontal_button <> 3 then
+  begin
+    case on_horizontal_button of
+      1: enterTextFormat := enterOrganizationName;
+      2: enterTextFormat := enterAddress;
+      4: enterTextFormat := enterYear;
+      5: enterTextFormat := enterLicence;
+      6: enterTextFormat := enterAccreditation;
+      7: enterTextFormat := enterDateForm;
+    end;
+    InputField.border.del;
+    InputField.del;
+  end
+  else
+  begin
+    InputField.border.del;
+    InputField.del;
   end;
+    {enterTextFormat := ;}
 end;
 
 function Table1.setHeadOfColumns(): Header;
@@ -249,14 +261,26 @@ begin
 end;
 
 function Table1.enterLicence: string;
+const
+  licenseType = 'ЛО1';
 begin
-  enterLicence := '№' + enterNumber(8);
+  enterLicence := enterNumber(2) + licenseType + '-№';
+  write(licenseType + '-№');
+  enterLicence := enterLicence + enterNumber(7);
+end;
+
+function Table1.enterAccreditation: string;
+const
+  accreditationType = 'АО1';
+begin
+  enterAccreditation := enterNumber(2) + accreditationType + '-№';
+  write(accreditationType + '-№');
+  enterAccreditation := enterAccreditation + enterNumber(7);
 end;
 
 constructor Table2.Init(start_x, start_y, border_y, width, height: integer);
 begin
   countColumn := 4;
-  setBackground(8);
   inherited Init(start_x, start_y, border_y, width, height, countColumn);
 end;
 
@@ -269,9 +293,11 @@ begin
   Result[3] := 'Количество коммерческих мест';
 end;
 
-function Table2.enterTextFormat: string;
+function Table2.enterTextFormat(InputField: TextButton): string;
 begin
-
+  gotoxy(1 + borderFreeSpace, 1 + (borderFreeSpace-1));
+  InputField.del;
+  InputField.border.del;
 end;
 
 constructor Table3.Init(start_x, start_y, border_y, width, height: integer);
@@ -288,8 +314,11 @@ begin
   Result[2] := 'Длительсность обучения';
 end;
 
-function Table3.enterTextFormat: string;
+function Table3.enterTextFormat(InputField: TextButton): string;
 begin
+  gotoxy(1 + borderFreeSpace, 1 + (borderFreeSpace-1));
+  InputField.del;
+  InputField.border.del;
 end;
 end.
 

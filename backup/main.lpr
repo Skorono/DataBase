@@ -46,13 +46,11 @@ var
 begin
   menu_obj:=Menu.Init(110, 22, 240, 40, 0);
   menu_obj.Main(launched_table);
-  menu_obj.del;
   createTable(table1, table2, table3, menu_obj, launched_table);
   repeat
     prev_table := launched_table;
-    destroyPreviousTable(table1, table2, table3, prev_table);
-    menu_obj.del;
     menu_obj.Main(launched_table);
+    destroyPreviousTable(table1, table2, table3, prev_table);
     createTable(table1, table2, table3, menu_obj, launched_table);
   until launched_table = 0;
 end;
@@ -62,6 +60,7 @@ begin
   SetConsoleOutputCP(1251);
   ShowWindow(GetConsoleWindow(), SW_MAXIMIZE);
   SetConsoleTitle('DataBase');
+  TextMode(CO40);
   main;
 
   {áÂÌ ÂÌÃÎ ÀÇÃ  ÆÂ Ï ÜÎ  ÂÌ Ï !!! İ Á ÁÏ ÂÆË}
