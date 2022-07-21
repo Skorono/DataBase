@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <PathDelim Value="\"/>
+    <Version Value="12"/>
+    <BuildModes Active="Default"/>
+    <Units>
+      <Unit>
+        <Filename Value="Storage.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="10" Y="9"/>
+        <UsageCount Value="22"/>
+      </Unit>
+      <Unit>
+        <Filename Value="storage.pas"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="2"/>
+        <CursorPos X="8" Y="25"/>
+        <UsageCount Value="22"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="base_graphic.pas"/>
+        <EditorIndex Value="5"/>
+        <CursorPos X="20" Y="103"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="main.pas"/>
+        <UnitName Value="storage"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="4"/>
+        <CursorPos X="28" Y="25"/>
+        <UsageCount Value="10"/>
+      </Unit>
+      <Unit>
+        <Filename Value="main.lpr"/>
+        <UnitName Value="Main"/>
+        <IsVisibleTab Value="True"/>
+        <CursorPos X="50" Y="9"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="example_file.pas"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="10"/>
+      </Unit>
+      <Unit>
+        <Filename Value="base_menu.pas"/>
+        <EditorIndex Value="4"/>
+        <CursorPos X="10" Y="124"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="table_manipulation.pas"/>
+        <EditorIndex Value="3"/>
+        <CursorPos Y="338"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="tables.pas"/>
+        <EditorIndex Value="1"/>
+        <CursorPos X="21" Y="8"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit>
+    </Units>
+    <JumpHistory>
+      <Position>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="56" Column="17" TopLine="7"/>
+      </Position>
+    </JumpHistory>
+    <RunParams>
+      <FormatVersion Value="2"/>
+      <Modes ActiveMode="default"/>
+    </RunParams>
+    <HistoryLists>
+      <List Name="LaunchingApplication" Type="File" Count="1">
+        <Item1 Value="C:\WINDOWS\system32\cmd.exe /C ${TargetCmdLine}"/>
+      </List>
+    </HistoryLists>
+  </ProjectSession>
+</CONFIG>
