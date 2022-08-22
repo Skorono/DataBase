@@ -8,24 +8,32 @@ uses
   Classes, SysUtils, Crt, Storage, base_graphic;
 
 type
+    { Menu }
     Menu = class sealed
       x, y, x_border, y_border, background: integer;
       buttons: array[1..10] of TextButton;
       menu_border: Border;
       countButtons: byte;
     private
-      procedure Show_menu;
+      procedure changePos(x_pos, y_pos: byte);
+      procedure clearMenu;
+      procedure showMenu;
       function Key_UP(on_button: integer): integer;
       function Key_DOWN(on_button: integer): integer;
     public
       procedure Main(var result: integer);
       constructor Init(start_x, start_y, border_x , border_y, abs_background: integer);
+      procedure addButton(text: string);
       {procedure paint_background;}
-      destructor del;
+      destructor Destroy; override;
   end;
+
+  { ViewTable }
 
   generic ViewTable<T> = class
       table: T;
+  private
+    procedure SortMode;
     public
       procedure Main(var menu: Menu);
       procedure DeleteMode;
@@ -40,42 +48,67 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
     y := start_y;
     x_border := border_x;
     y_border := border_y;
-    countButtons := 3;
+    countButtons := 0;
     background := abs_background;
   end;
 
-  procedure Menu.Show_menu();
+  procedure Menu.showMenu();
   const
-    base_count = 3;
-    spaceBetweenButtons = 2;
-    text_size = 10;
+    text_size = 24;
   var
-    text: string;
-    cord_x, cord_y, i: integer;
-    //allert: TextButton;
+    i: integer;
   begin
     Window(x, y, x_border, y_border);
     {x и y определяются относительно окна. То есть если я ввожу x=10 и y=10 то это значения становятся начальными. К ограничению конца строки это правило вроде как не действует}
     {Paint_Background();}
     //cord_x := (x_border div 2) - (text_size div 2);
     //cord_y := (y_border div 2) + spaceBetweenButtons;
-    cord_x := x;
-    cord_y := y;
 
-    for i:= 1 to base_count do
+    for i:= 1 to countButtons do
       begin
-        text := 'Таблица №' + inttostr(i);
-        buttons[i] := TextButton.Init(text_size, spaceBetweenButtons, cord_x, cord_y, background, text);
         buttons[i].show();
-        cord_y := cord_y + spaceBetweenButtons;
       end;
-    menu_border := border.Init('~', 9, buttons[1].x_pos, buttons[1].y_pos, buttons[countButtons].y_pos, text_size);
+    menu_border := border.Init('~', 5, 6, buttons[1].x_pos, buttons[1].y_pos, buttons[countButtons].y_pos, text_size);
     menu_border.show;
+  end;
+
+  procedure Menu.changePos(x_pos, y_pos: byte);
+  const
+    spaceBetweenButtons = 2;
+  var
+    i: integer;
+  begin
+    x := x_pos;
+    y := y_pos;
+    for i := 1 to countButtons do
+    begin
+      buttons[i].x_pos := x;
+      if i = 1 then
+        buttons[i].y_pos := y
+      else
+        buttons[i].y_pos := buttons[i-1].y_pos + spaceBetweenButtons;
+    end;
+  end;
+
+  procedure Menu.addButton(text: string);
+  const
+    spaceBetweenButtons = 2;
+  var
+    cord_x, cord_y: integer;
+  begin
+    cord_x := x;
+    if countButtons > 0 then
+      cord_y := buttons[countButtons].y_pos + spaceBetweenButtons
+    else
+      cord_y := y;
+    countButtons := countButtons + 1;
+    buttons[countButtons] := TextButton.Init(length(text)+1, spaceBetweenButtons, cord_x, cord_y, background, text);
   end;
 
   function Menu.Key_UP(on_button: integer): integer;
   begin
-    buttons[on_button].background := 0;
+    //buttons[on_button].background := 0;
+    buttons[on_button].text_color := 15;
     buttons[on_button].show();
     if on_button = 1 then
       on_button := countButtons
@@ -86,7 +119,7 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
 
   function Menu.Key_DOWN(on_button: integer): integer;
   begin
-    buttons[on_button].background := 0;
+    buttons[on_button].text_color := 15;
     buttons[on_button].show();
     if on_button = countButtons then
       on_button := 1
@@ -95,20 +128,22 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
     Key_DOWN := on_button;
   end;
 
+  {Достойно рефакторинга}
   procedure Menu.Main(var result: integer);
   var
     run: boolean;
     on_button: integer;
     key: char;
   begin
-    Show_menu;
+    cursoroff;
+    showMenu;
     window(x, y, x_border, y_border);
     run := true;
     on_button := 1;
     while run do
     begin
-      buttons[on_button].background := 5;
-      gotoxy(buttons[on_button].x_pos, buttons[on_button].y_pos);
+      //buttons[on_button].background := 2;
+      buttons[on_button].text_color := 2;
       buttons[on_button].show();
       key := readkey;
       if key = #0 then
@@ -120,17 +155,21 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
         #80: begin
             on_button := Key_DOWN(on_button);
           end;
-        end
+        end;
       end
       else if key = #13 then
       begin
         result := on_button;
         run := false;
-        del;
       end
       else if key = #27 then
+      begin
+        result := 0;
         run := false;
-    end
+      end;
+    end;
+    clearMenu;
+    cursoron;
   end;
 
   {procedure Menu.paint_background();
@@ -145,15 +184,22 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
       write('1');
     end;
   end;  }
-
-  destructor Menu.Del;
+  procedure Menu.clearMenu;
   var
     i: integer;
   begin
     for i := 1 to countButtons do
-      buttons[i].del;
-    menu_border.del;
-    self := nil;
+      buttons[i].clearButton;
+    menu_border.clearBorder;
+  end;
+
+  destructor Menu.Destroy;
+  var
+    i: integer;
+  begin
+    for i := 1 to countButtons do
+      buttons[i].Destroy;
+    menu_border.Destroy;
   end;
 
   procedure ViewTable.Main(var menu: Menu);
@@ -161,12 +207,10 @@ var
   key: char;
   line: PLine;
 begin
-  table := T.Init(2, 2, 38, 8, 1);
-  menu.x := table.head_buttons[table.countColumn-1].x_pos + length(table.head_buttons[table.countColumn-1].text) + 12;
-  menu.y := table.head_buttons[table.countColumn-1].y_pos + 18;
-  menu.x_border := table.head_buttons[table.countColumn-1].x_pos + 30;
-  menu.y_border := table.head_buttons[table.countColumn-1].y_pos + 30; {Костыль. Надо отслеживать координаты подсказки}
-  menu.show_menu;
+  table := T.Init(2, 2, 46, 8, 1);
+  //достойно экстерминатуса
+  menu.changePos(table.head_buttons[table.countColumn-1].x_pos + length(table.head_buttons[table.countColumn-1].text) + (menu.menu_border.XborderFreeSpace + 3), table.additional_textbutton[3].y_pos + (menu.menu_border.XborderFreeSpace + 3));
+  menu.showMenu;
   table.showPage;
   key := ' ';
   line := table.lineList.getNode(table.getFirstLineNumber(table.pageNumber) + (table.on_vertical_button-1));
@@ -176,10 +220,10 @@ begin
   case key of
     #1: WriteMode;
     #4: DeleteMode;
+    #16: SortMode;
   end;
   table.switchPage(key);
   until (key = #27);
-  //Destroy;
 end;
 
 procedure ViewTable.WriteMode; { Временно main}
@@ -240,12 +284,19 @@ begin
   table.turnOffDeleteLight;
 end;
 
+procedure ViewTable.SortMode;
+begin
+  table.SortTable(1);
+  table.showPage;
+end;
+
 destructor ViewTable.Destroy;
 var
   y: integer;
 begin
   cursoroff;
   window(table.x, table.y, table.x_border, table.y_border);
+  TextBackground(0);
   for y := 1 to table.y_border do
   begin
     gotoxy(1, y);
@@ -255,7 +306,7 @@ begin
   end;
   cursoron;
   table.destroy;
-  self := nil
+  //table.free;
 end;
 
 end.

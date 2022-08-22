@@ -5,13 +5,10 @@ unit tables;
 interface
 
 uses
-  Classes, SysUtils, Crt, table_manipulation, base_graphic;
+  Classes, SysUtils, Crt, GeneralTypes, table_manipulation, base_graphic;
 
 type
-  Header = array of string;
-
   { Table1 }
-
   Table1 = class sealed (InheritedTableCls)
   private
     function enterAccreditation: string;
@@ -23,7 +20,7 @@ type
     public
       constructor Init(start_x, start_y, border_y, width, height: integer);
       procedure showPage;
-      procedure showLine(lineNumber: integer);
+      procedure showLine(lineNumber: word);
       procedure showHead;
       function enterStreetName: string;
       function enterTextFormat(InputField: TextButton): string; override;
@@ -57,8 +54,16 @@ type
 
 implementation
 constructor Table1.Init(start_x, start_y, border_y, width, height: integer);
+//var
+//  i: byte;
+//  win: WindowManager;
 begin
   countColumn := 7;
+  //win := WindowManager.Init;
+  //win.createNewWindow(1, 1, 170, 5, 7);
+  //win.createNewWindow(120, 1, 220, 50, 7);
+  //for i := 1 to win.activeWindows do
+  //  win.showWindow(i);
   inherited Init(start_x, start_y, border_y, width, height, countColumn);
 end;
 
@@ -67,7 +72,7 @@ begin
   inherited;
 end;
 
-procedure Table1.showLine(lineNumber: integer);
+procedure Table1.showLine(lineNumber: word);
 begin
   inherited;
 end;
@@ -79,7 +84,6 @@ end;
 
 function Table1.enterTextFormat(InputField: TextButton): string;
 begin
-  gotoxy(1 + borderFreeSpace, 1 + (borderFreeSpace-1));
   if on_horizontal_button <> 3 then
   begin
     case on_horizontal_button of
@@ -90,13 +94,13 @@ begin
       6: enterTextFormat := enterAccreditation;
       7: enterTextFormat := enterDateForm;
     end;
-    InputField.border.del;
-    InputField.del;
+    InputField.border.Destroy;
+    InputField.Destroy;
   end
   else
   begin
-    InputField.border.del;
-    InputField.del;
+    InputField.Border.Destroy;
+    InputField.Destroy;
   end;
     {enterTextFormat := ;}
 end;
@@ -295,9 +299,8 @@ end;
 
 function Table2.enterTextFormat(InputField: TextButton): string;
 begin
-  gotoxy(1 + borderFreeSpace, 1 + (borderFreeSpace-1));
-  InputField.del;
-  InputField.border.del;
+  InputField.border.Destroy;
+  InputField.Destroy;
 end;
 
 constructor Table3.Init(start_x, start_y, border_y, width, height: integer);
@@ -316,9 +319,8 @@ end;
 
 function Table3.enterTextFormat(InputField: TextButton): string;
 begin
-  gotoxy(1 + borderFreeSpace, 1 + (borderFreeSpace-1));
-  InputField.del;
-  InputField.border.del;
+  InputField.border.Destroy;
+  InputField.Destroy;
 end;
 end.
 

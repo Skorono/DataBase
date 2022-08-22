@@ -5,18 +5,21 @@ unit base_graphic;
 interface
 
 uses
-  Classes, SysUtils, Crt;
+  Classes, SysUtils, Crt, GeneralTypes;
 type
-  Border = class
-    public
-      borderFreeSpace, start_x, top_y, bottom_y, text_size, last_x, border_color, background: integer;
-      symbol: char;
 
-    constructor Init(fsymbol: char; freeSpace, std_x, start_y, last_y, t_size: integer);
-    destructor Del;
+  { Border }
+  Border = class
+  public
+    XborderFreeSpace, YborderFreeSpace, start_x, top_y, bottom_y, text_size, last_x, border_color, background: integer;
+    symbol: char;
+
+    constructor Init(fsymbol: char; XfreeSpace, YfreeSpace, std_x, start_y, last_y, t_size: integer);
+    destructor Destroy; override;
     procedure Show;
     procedure ChangeColor(color: integer);
     procedure ChangeBackground(color: integer);
+    procedure clearBorder;
   end;
 
   TextButton = class { Сделать так чтобы параметры для рамки передавались из параметров текста}
@@ -31,7 +34,7 @@ type
       procedure clearButton;
       procedure ChangeColor(color: integer);
       procedure ChangeBackground(color: integer);
-      destructor del;
+      destructor Destroy; override;
   end;
 
   Cell = class(TextButton)
@@ -40,6 +43,20 @@ type
       procedure Show;
       procedure write_info;
       procedure clearCell;
+  end;
+
+  { WindowManager }
+
+  WindowManager = class
+    activeWindows: byte;
+    windows: array[1..10] of ObjOnScreenInf;
+    constructor Init;
+    procedure createNewWindow(start_x, start_y, last_x, last_y, background: byte);
+    procedure changeWindowColor(number, color: byte);
+    procedure showWindow(number: byte);
+    destructor Destroy; override;
+  private
+    procedure changeWindowSize(start_x, start_y, last_x, last_y, number: byte);
   end;
 
 implementation
@@ -58,11 +75,9 @@ implementation
       text := text + ' ';
   end;
 
-  destructor TextButton.Del;
+  destructor TextButton.Destroy;
   begin
-    window(x_pos, y_pos, x_pos + button_width, y_pos);
-    TextBackground(0);
-    ClrScr;
+    clearButton;
   end;
 
   procedure TextButton.ChangeColor(color: integer);
@@ -78,8 +93,6 @@ implementation
   end;
 
   procedure TextButton.clearButton;
-  var
-    i: integer;
   begin
     Window(x_pos, y_pos, x_pos + (button_width-1), y_pos);
     TextBackground(background);
@@ -128,14 +141,15 @@ implementation
 
   end;
 
-  constructor Border.Init(fsymbol: char; freeSpace, std_x, start_y, last_y, t_size: integer);
+  constructor Border.Init(fsymbol: char; XfreeSpace, YfreeSpace, std_x, start_y, last_y, t_size: integer);
   begin
-    borderFreeSpace := freeSpace;
+    XborderFreeSpace := XfreeSpace;
+    YborderFreeSpace := YfreeSpace;
     start_x := std_x;
-    last_x := start_x + t_size + borderFreeSpace;
+    last_x := start_x + t_size + XborderFreeSpace;
     top_y := start_y;
-    bottom_y := last_y + borderFreeSpace;
-    text_size := (t_size + (borderFreespace * 2)) - 2;
+    bottom_y := last_y + YborderFreeSpace;
+    text_size := (t_size + (XborderFreespace * 2)) - 2;
     symbol := fsymbol;
     border_color := 3;
     background := 0;
@@ -158,8 +172,8 @@ implementation
     horizontal_text: string;
     _start_x, _top_y, _last_x, _bottom_y, i: integer;
   begin
-    _start_x := start_x - borderFreeSpace;
-    _top_y := top_y - borderFreeSpace;
+    _start_x := start_x - XborderFreeSpace;
+    _top_y := top_y - YborderFreeSpace;
     Window(_start_x, _top_y, last_x, bottom_y);
 
     _last_x := last_x - _start_x;
@@ -185,16 +199,64 @@ implementation
     write(' ' + horizontal_text + ' ');
   end;
 
-  destructor Border.Del;
+  procedure Border.clearBorder;
   begin
-    start_x := start_x - borderFreeSpace;
-    top_y := top_y - borderFreeSpace;
+    start_x := start_x - XborderFreeSpace;
+    top_y := top_y - YborderFreeSpace;
     window(start_x, top_y, last_x, bottom_y);
     TextBackground(0);
     ClrScr;
-    write(1);
-    self := nil;
   end;
 
+  destructor Border.Destroy;
   begin
+    clearBorder;
+  end;
+
+    constructor WindowManager.Init;
+    begin
+      activeWindows := 0;
+    end;
+
+    procedure WindowManager.createNewWindow(start_x, start_y, last_x, last_y, background: byte);
+    begin
+      activeWindows := activeWindows + 1;
+      windows[activeWindows].x := start_x;
+      windows[activeWindows].y := start_y;
+      windows[activeWindows].last_x := last_x;
+      windows[activeWindows].last_y := last_y;
+      windows[activeWindows].background := background;
+    end;
+
+    procedure WindowManager.showWindow(number: byte);
+    begin
+      window(windows[number].x, windows[number].y, windows[number].last_x, windows[number].last_y);
+      TextBackground(windows[number].background);
+      ClrScr;
+    end;
+
+    procedure WindowManager.changeWindowColor(number, color: byte);
+    begin
+      windows[number].background := color;
+    end;
+
+    procedure WindowManager.changeWindowSize(start_x, start_y, last_x, last_y, number: byte);
+    begin
+      windows[number].x := start_x;
+      windows[number].y := start_y;
+      windows[number].last_x := last_x;
+      windows[number].last_y := last_y;
+    end;
+
+    destructor WindowManager.Destroy;
+    var
+      i: integer;
+    begin
+    for i := 1 to activeWindows do
+    begin
+      changeWindowColor(i, 0);
+      showWindow(i);
+    end;
+    end;
+
   end.

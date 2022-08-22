@@ -5,13 +5,12 @@ unit table_manipulation;
 interface
 
 uses
-  Classes, SysUtils, Storage, Crt, base_graphic;
+  base_graphic, Classes, Crt, GeneralTypes, SysUtils, Storage;
 
 type
-  Header = array of string;
+  CellArray = array of Cell;
 
   { InheritedTableCls }
-
   InheritedTableCls = class
       procedure Key_UP;
       procedure Key_DOWN;
@@ -26,47 +25,49 @@ type
     procedure createPositionHint;
     procedure headerDelete;
     public
-      countColumn: integer; { вернуть в strict protected }
-      background, head_width, head_height, on_vertical_button, on_horizontal_button, elementsNumber: integer;
-      x, y, x_border, y_border, lineCount: integer;
+      countColumn: byte; { вернуть в strict protected }
+      on_vertical_button, on_horizontal_button,
+      background, head_width, head_height, elementsNumber,
+      x, y, x_border, y_border, lineCount, borderFreeSpace: byte;
       pageNumber, pageCount: word;
       head_buttons, additional_textbutton: array of TextButton;
       lineList: Cls_List;
-      borderFreeSpace: integer;
 
-      constructor Init(start_x, start_y, border_y, width, height, columnCount: integer; abs_background: byte = 0);
+      constructor Init(start_x, start_y, border_y, width, height, columnCount: byte;
+        abs_background: byte=0);
       destructor Destroy; override;
       procedure showPage;
       procedure showPositionHint;
-      procedure showLine(lineNumber: integer);
+      procedure showLine(lineNumber: word);
       procedure showHead;
       procedure createNewPage;
       {procedure createPage;}
       procedure writeInCell;
       procedure switchPage(key: char);
-      procedure deleteLine(lineNumber: integer);
-      procedure LineLighting(lineNumber, color: integer);
+      procedure deleteLine(lineNumber: byte);
+      procedure LineLighting(lineNumber, color: byte);
       procedure turnOffDeleteLight;
       procedure nextPage;
       procedure previousPage;
       procedure positional_hint;
-      procedure SetBackground(abs_background: integer);
+      procedure SetBackground(abs_background: byte);
+      procedure SortTable(column: byte);
       function createInputField(): TextButton;
       function getFirstLineNumber(page: word): word;
       function isInteger(text: string): boolean;
       function isString(text: string): boolean;
-      function deleteText(text: string; delCount: integer): string;
-      function enterText(symbolsCount: integer): string;
-      function enterNumber(digitsCount: integer): string;
-      function calculationLineCount: integer;
+      function deleteText(text: string; delCount: byte): string;
+      function enterText(symbolsCount: byte): string;
+      function enterNumber(digitsCount: byte): string;
+      function calculationLineCount: byte;
       function setHeadOfColumns(): Header; virtual;
+      function getLineYPosition(lineNum: word): word;
       function enterTextFormat(InputField: TextButton): string; virtual;
-      function getLineYPosition(lineNum: integer): integer;
   end;
 
 implementation
 
-constructor InheritedTableCls.Init(start_x, start_y, border_y, width, height, columnCount: integer; abs_background: byte = 0);
+constructor InheritedTableCls.Init(start_x, start_y, border_y, width, height, columnCount: byte; abs_background: byte = 0);
 begin
   countColumn := columnCount;
   borderFreeSpace := 2;
@@ -92,7 +93,7 @@ begin
   showPositionHint;
 end;
 
-procedure InheritedTableCls.SetBackground(abs_background: integer);
+procedure InheritedTableCls.SetBackground(abs_background: byte);
 begin
   window(x, y, x_border, y_border);
   TextBackground(abs_background);
@@ -100,7 +101,7 @@ begin
   ClrScr;
 end;
 
-function InheritedTableCls.calculationLineCount: integer;
+function InheritedTableCls.calculationLineCount: byte;
 var
   lineSize, headSize: integer;
 begin
@@ -169,16 +170,16 @@ begin
   begin
     head_width := length(columnHeader[i]);
     head_buttons[i] := TextButton.Init(head_width, head_height, x_pos, y_pos, background, columnHeader[i]);
-    head_buttons[i].Border := border.Init('-', borderFreeSpace, x_pos, y_pos, y_pos, head_width);
+    head_buttons[i].Border := border.Init('-', borderFreeSpace, borderFreeSpace, x_pos, y_pos, y_pos, head_width);
     head_buttons[i].Border.ChangeColor(1);
     head_buttons[i].Border.ChangeBackground(background);
     head_buttons[i].Show;
     x_pos := x_pos + length(columnHeader[i]) + borderFreeSpace;
   end;
-  x_border := head_buttons[countColumn-1].x_pos + head_buttons[countColumn-1].button_width + head_buttons[countColumn-1].border.borderFreeSpace;
+  x_border := head_buttons[countColumn-1].x_pos + head_buttons[countColumn-1].button_width + head_buttons[countColumn-1].border.XborderFreeSpace;
 end;
 
-function InheritedTableCls.getLineYPosition(lineNum: integer): integer;
+function InheritedTableCls.getLineYPosition(lineNum: word): word;
 begin
   result := (head_buttons[1].y_pos + (borderFreeSpace+1)) + ((lineNum-1) mod lineCount) * borderFreeSpace;
 end;
@@ -204,13 +205,13 @@ begin
     for j := 0 to countColumn-1 do
     begin
       Cells[j] := Cell.Init(length(head_buttons[j].text), head_height, head_buttons[j].x_pos, y_line_pos, background, '');
-      Cells[j].Border := Border.Init('-', borderFreeSpace-1, head_buttons[j].x_pos, y_line_pos, y_line_pos, length(head_buttons[j].text));
+      Cells[j].Border := Border.Init('-', borderFreeSpace-1, borderFreeSpace-1, head_buttons[j].x_pos, y_line_pos, y_line_pos, length(head_buttons[j].text));
     end;
     lineList.add_line(Cells);
   end;
 end;
 
-procedure InheritedTableCls.showLine(lineNumber: integer);
+procedure InheritedTableCls.showLine(lineNumber: word);
 var
   i: integer;
   line: PLine;
@@ -222,11 +223,6 @@ begin
       line^.data[i].Border.ChangeBackground(background);
       line^.data[i].show;
   end;
-end;
-
-
-function InheritedTableCls.setHeadOfColumns: Header;
-begin
 end;
 
 procedure InheritedTableCls.showPage();
@@ -294,11 +290,7 @@ begin
   end;
 end;
 
-function InheritedTableCls.enterTextFormat(InputField: TextButton): string;
-begin
-end;
-
-function InheritedTableCls.enterText(symbolsCount: integer): string;
+function InheritedTableCls.enterText(symbolsCount: byte): string;
 var
   key: char;
 begin
@@ -322,7 +314,7 @@ begin
   end;
 end;
 
-function InheritedTableCls.enterNumber(digitsCount: integer): string;
+function InheritedTableCls.enterNumber(digitsCount: byte): string;
 var
   key: char;
 begin
@@ -349,7 +341,7 @@ begin
     result := result[2..length(result)];
 end;
 
-function InheritedTableCls.deleteText(text: string; delCount: integer): string;
+function InheritedTableCls.deleteText(text: string; delCount: byte): string;
 const
   stepDel = 1;
 var
@@ -380,9 +372,10 @@ begin
   y_ := line^.data[countColumn].y_pos + (borderFreeSpace * 2);
   width := line^.data[countColumn].x_pos + line^.data[countColumn].button_width - borderFreeSpace;
   createInputField := TextButton.Init(width, height, x_, y_, 0, '');
-  createInputField.Border := Border.Init('-', borderFreeSpace-1, x_, y_, y_, width);
+  createInputField.Border := Border.Init('-', borderFreeSpace-1, borderFreeSpace-1, x_, y_, y_, width);
   createInputField.show;
   createInputField.Border.ChangeColor(15);
+  gotoxy(1 + borderFreeSpace, 1 + (borderFreeSpace-1));
 end;
 
 procedure InheritedTableCls.writeInCell;
@@ -395,7 +388,7 @@ begin
   gotoxy(line^.data[on_horizontal_button].x_pos, line^.data[on_horizontal_button].y_pos);
 end;
 
-procedure InheritedTableCls.LineLighting(lineNumber, color: integer);
+procedure InheritedTableCls.LineLighting(lineNumber, color: byte);
 var
   i: integer;
   line: PLine;
@@ -415,7 +408,7 @@ begin
   gotoxy(line^.data[1].x_pos, line^.data[1].y_pos);
 end;
 
-procedure InheritedTableCls.deleteLine(lineNumber: integer);
+procedure InheritedTableCls.deleteLine(lineNumber: byte);
 var
   i: integer;
   line: PLine;
@@ -466,7 +459,7 @@ begin
     on_horizontal_button := on_horizontal_button + 1;
 end;
 
-procedure InheritedTableCls.Key_LEFT();
+procedure InheritedTableCls.Key_Left;
 begin
   if on_horizontal_button = 1 then
     on_horizontal_button := countColumn
@@ -480,8 +473,8 @@ var
 begin
   for cell := 0 to countColumn-1 do
   begin
-    head_buttons[cell].Border.del;
-    head_buttons[cell].del;
+    head_buttons[cell].Border.Destroy;
+    head_buttons[cell].Destroy;
   end;
 
 end;
@@ -494,13 +487,13 @@ var
 begin
   for page := 1 to pageCount do
   begin
-    for linenum := 1 to lineCount do
+    for linenum := 0 to lineCount-1 do
     begin
       line := lineList.getNode(getFirstLineNumber(page) + linenum);
       for cell := 1 to countColumn do
       begin
-        line^.data[cell].Border.del;
-        line^.data[cell].del;
+        line^.data[cell].Border.Destroy;
+        line^.data[cell].Destroy;
       end;
     end;
   end;
@@ -511,8 +504,34 @@ var
   cell: byte;
 begin
   for cell := 0 to length(additional_textbutton) - 1 do
+    additional_textbutton[cell].Destroy;
+end;
+
+function InheritedTableCls.setHeadOfColumns: Header;
+begin
+end;
+
+function InheritedTableCls.enterTextFormat(InputField: TextButton): string;
+begin
+end;
+
+procedure InheritedTableCls.SortTable(column: byte);
+var
+  j, i: integer;
+  line: PLine;
+begin
+  for j := 1 to lineList.nodeCount do
   begin
-    additional_textbutton[cell].del;
+    line := lineList.getNode(1);
+    for i := 2 to lineList.nodeCount - j do
+    begin
+      line := line^.next;
+      if line^.data[column].text[1] < line^.previous^.data[column].text[1] then
+      begin
+        lineList.insert(line^.previous, i);
+        line := line^.next^.next;
+      end;
+    end;
   end;
 end;
 
@@ -521,8 +540,7 @@ begin
   headerDelete;
   cellsDelete;
   additionalTextDelete;
-  lineList.del;
-  self := nil;
+  lineList.Destroy;
 end;
 
 begin
