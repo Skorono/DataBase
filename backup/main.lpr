@@ -18,23 +18,23 @@ begin
     end;
 end;
 
-procedure createTable(var table1: _table1;  var table2: _table2; var table3: _table3; var main_menu: Menu; launched_table: integer);
+procedure createTable(var table1: _table1;  var table2: _table2; var table3: _table3; var menu_obj: Menu; launched_table: integer);
 begin
   case launched_table of
       1: begin
         table1 := _table1.Create;
-        table1.main(main_menu);
+        table1.main(menu_obj);
       end;
       2: begin
         table2 := _table2.Create;
-        table2.main(main_menu);
+        table2.main(menu_obj);
       end;
       3: begin
         table3 := _table3.Create;
-        table3.main(main_menu);
+        table3.main(menu_obj);
       end
   else
-    main_menu.Destroy;
+    menu_obj.Destroy;
   end;
 end;
 
@@ -64,6 +64,7 @@ begin
     destroyPreviousTable(table1, table2, table3, prev_table);
     createTable(table1, table2, table3, main_menu, launched_table);
   end;
+  readkey;
 end;
 
 begin

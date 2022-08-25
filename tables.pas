@@ -5,7 +5,7 @@ unit tables;
 interface
 
 uses
-  Classes, SysUtils, Crt, GeneralTypes, table_manipulation, base_graphic;
+  Classes, db_representation, SysUtils, Crt, GeneralTypes, table_manipulation, base_graphic;
 
 type
   { Table1 }
@@ -16,6 +16,7 @@ type
     function enterFlatNumber: string;
     function enterLicence: string;
     function enterTownName: string;
+    function enterTypeOfSubordination: string;
     function enterYear: string;
     public
       constructor Init(start_x, start_y, border_y, width, height: integer);
@@ -101,6 +102,7 @@ begin
   begin
     InputField.Border.Destroy;
     InputField.Destroy;
+    enterTextFormat := enterTypeOfSubordination;
   end;
     {enterTextFormat := ;}
 end;
@@ -280,6 +282,20 @@ begin
   enterAccreditation := enterNumber(2) + accreditationType + '-№';
   write(accreditationType + '-№');
   enterAccreditation := enterAccreditation + enterNumber(7);
+end;
+
+function Table1.enterTypeOfSubordination: string;
+var
+  mmenu: Menu;
+  i: integer;
+begin
+  mmenu := Menu.Init(x_border div 2, y_border div 2, (x_border div 2) + 8, (y_border div 2) + 15, 0);
+  mmenu.addButton('Федеральный');
+  mmenu.addButton('Региональный');
+  mmenu.main(i);
+  result := mmenu.buttons[i].text;
+  mmenu.Destroy;
+  showPage;
 end;
 
 constructor Table2.Init(start_x, start_y, border_y, width, height: integer);

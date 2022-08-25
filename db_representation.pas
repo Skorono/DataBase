@@ -10,7 +10,7 @@ uses
 type
     { Menu }
     Menu = class sealed
-      x, y, x_border, y_border, background: integer;
+      x, y, x_border, y_border, on_button, background: byte;
       buttons: array[1..10] of TextButton;
       menu_border: Border;
       countButtons: byte;
@@ -18,8 +18,9 @@ type
       procedure changePos(x_pos, y_pos: byte);
       procedure clearMenu;
       procedure showMenu;
-      function Key_UP(on_button: integer): integer;
-      function Key_DOWN(on_button: integer): integer;
+      procedure SetBackground;
+      function Key_UP: integer;
+      function Key_DOWN: integer;
     public
       procedure Main(var result: integer);
       constructor Init(start_x, start_y, border_x , border_y, abs_background: integer);
@@ -49,7 +50,17 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
     x_border := border_x;
     y_border := border_y;
     countButtons := 0;
+    on_button := 1;
     background := abs_background;
+  end;
+
+  procedure Menu.SetBackground;
+  var
+    window: WindowManager;
+  begin
+    window := WindowManager.Init;
+    window.createNewWindow(x - 5, y - 6, x_border, y_border, background);
+    window.showWindow(1);
   end;
 
   procedure Menu.showMenu();
@@ -65,9 +76,7 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
     //cord_y := (y_border div 2) + spaceBetweenButtons;
 
     for i:= 1 to countButtons do
-      begin
-        buttons[i].show();
-      end;
+      buttons[i].show();
     menu_border := border.Init('~', 5, 6, buttons[1].x_pos, buttons[1].y_pos, buttons[countButtons].y_pos, text_size);
     menu_border.show;
   end;
@@ -105,7 +114,7 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
     buttons[countButtons] := TextButton.Init(length(text)+1, spaceBetweenButtons, cord_x, cord_y, background, text);
   end;
 
-  function Menu.Key_UP(on_button: integer): integer;
+  function Menu.Key_UP: integer;
   begin
     //buttons[on_button].background := 0;
     buttons[on_button].text_color := 15;
@@ -117,7 +126,7 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
     Key_UP := on_button;
   end;
 
-  function Menu.Key_DOWN(on_button: integer): integer;
+  function Menu.Key_DOWN: integer;
   begin
     buttons[on_button].text_color := 15;
     buttons[on_button].show();
@@ -132,9 +141,10 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
   procedure Menu.Main(var result: integer);
   var
     run: boolean;
-    on_button: integer;
     key: char;
   begin
+    buttons[on_button].text_color := 15;
+    //SetBackground;
     cursoroff;
     showMenu;
     window(x, y, x_border, y_border);
@@ -150,10 +160,10 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
       begin
         case readkey of
         #72: begin
-            on_button := Key_UP(on_button);
+            on_button := Key_UP;
           end;
         #80: begin
-            on_button := Key_DOWN(on_button);
+            on_button := Key_DOWN;
           end;
         end;
       end
@@ -216,13 +226,13 @@ begin
   line := table.lineList.getNode(table.getFirstLineNumber(table.pageNumber) + (table.on_vertical_button-1));
   gotoxy(line^.data[1].x_pos, line^.data[1].y_pos);
   repeat
-  key := readkey;
-  case key of
-    #1: WriteMode;
-    #4: DeleteMode;
-    #16: SortMode;
-  end;
-  table.switchPage(key);
+    key := readkey;
+    case key of
+      #1: WriteMode;
+      #4: DeleteMode;
+      #16: SortMode;
+    end;
+    table.switchPage(key);
   until (key = #27);
 end;
 
@@ -251,9 +261,7 @@ begin
       gotoxy(line^.data[table.on_horizontal_button].x_pos, line^.data[table.on_horizontal_button].y_pos);
     end
     else if key = #13 then
-    begin
       table.writeInCell;
-    end;
   until key = #27;
 end;
 
