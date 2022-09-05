@@ -9,8 +9,8 @@
         <Filename Value="main.lpr"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Main"/>
-        <TopLine Value="30"/>
-        <CursorPos Y="62"/>
+        <TopLine Value="17"/>
+        <CursorPos X="28" Y="51"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit>
@@ -26,8 +26,8 @@
         <Filename Value="table_manipulation.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="502"/>
-        <CursorPos Y="531"/>
+        <TopLine Value="11"/>
+        <CursorPos X="37" Y="321"/>
         <UsageCount Value="207"/>
         <Loaded Value="True"/>
       </Unit>
@@ -42,17 +42,17 @@
         <Filename Value="tables.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="5"/>
-        <TopLine Value="287"/>
-        <CursorPos X="74" Y="292"/>
+        <CursorPos X="3" Y="243"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="base_graphic.pas"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="4"/>
-        <TopLine Value="25"/>
-        <CursorPos X="30" Y="54"/>
+        <TopLine Value="101"/>
+        <CursorPos X="16" Y="114"/>
         <UsageCount Value="204"/>
         <Loaded Value="True"/>
       </Unit>
@@ -60,18 +60,17 @@
         <Filename Value="storage.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="92"/>
-        <CursorPos Y="110"/>
+        <TopLine Value="91"/>
+        <CursorPos Y="125"/>
         <UsageCount Value="204"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="db_representation.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="135"/>
-        <CursorPos X="7" Y="147"/>
+        <TopLine Value="203"/>
+        <CursorPos X="3" Y="220"/>
         <UsageCount Value="205"/>
         <Loaded Value="True"/>
       </Unit>
@@ -81,130 +80,130 @@
         <UnitName Value="GeneralTypes"/>
         <EditorIndex Value="6"/>
         <CursorPos X="28" Y="11"/>
-        <UsageCount Value="138"/>
+        <UsageCount Value="143"/>
         <Loaded Value="True"/>
       </Unit>
     </Units>
     <JumpHistory HistoryIndex="29">
       <Position>
-        <Filename Value="db_representation.pas"/>
-        <Caret Line="236" TopLine="212"/>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="484" TopLine="466"/>
+      </Position>
+      <Position>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="97" Column="20" TopLine="66"/>
+      </Position>
+      <Position>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="159" TopLine="142"/>
+      </Position>
+      <Position>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="43" Column="21" TopLine="36"/>
+      </Position>
+      <Position>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="52" Column="26" TopLine="36"/>
+      </Position>
+      <Position>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="40" Column="18" TopLine="35"/>
+      </Position>
+      <Position>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="160" TopLine="132"/>
       </Position>
       <Position>
         <Filename Value="db_representation.pas"/>
-        <Caret Line="235" TopLine="212"/>
+        <Caret Line="223" Column="3" TopLine="215"/>
       </Position>
       <Position>
         <Filename Value="db_representation.pas"/>
-        <Caret Line="227" TopLine="206"/>
+        <Caret Line="222" Column="82" TopLine="205"/>
       </Position>
       <Position>
-        <Filename Value="main.lpr"/>
-        <Caret Line="26" TopLine="10"/>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="53" Column="29" TopLine="25"/>
       </Position>
       <Position>
-        <Filename Value="db_representation.pas"/>
-        <Caret Line="247" TopLine="227"/>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="89" Column="24" TopLine="71"/>
       </Position>
       <Position>
-        <Filename Value="db_representation.pas"/>
-        <Caret Line="249" Column="153" TopLine="222"/>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="92" Column="10" TopLine="73"/>
       </Position>
       <Position>
-        <Filename Value="main.lpr"/>
-        <Caret Line="39" Column="73" TopLine="10"/>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="42" Column="19" TopLine="20"/>
       </Position>
       <Position>
-        <Filename Value="db_representation.pas"/>
-        <Caret Line="227" TopLine="220"/>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="33" Column="35" TopLine="24"/>
       </Position>
       <Position>
-        <Filename Value="db_representation.pas"/>
-        <Caret Line="231" TopLine="220"/>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="151" Column="15" TopLine="133"/>
       </Position>
       <Position>
-        <Filename Value="db_representation.pas"/>
-        <Caret Line="247" TopLine="219"/>
-      </Position>
-      <Position>
-        <Filename Value="db_representation.pas"/>
-        <Caret Line="265" TopLine="245"/>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="54" Column="32" TopLine="36"/>
       </Position>
       <Position>
         <Filename Value="db_representation.pas"/>
-        <Caret Line="235" TopLine="214"/>
+        <Caret Line="220" Column="39" TopLine="204"/>
       </Position>
       <Position>
-        <Filename Value="db_representation.pas"/>
-        <Caret Line="236" TopLine="214"/>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="46" Column="18" TopLine="37"/>
       </Position>
       <Position>
-        <Filename Value="db_representation.pas"/>
-        <Caret Line="235" TopLine="214"/>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="67" Column="19" TopLine="36"/>
       </Position>
       <Position>
-        <Filename Value="db_representation.pas"/>
-        <Caret Line="236" TopLine="214"/>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="528" Column="26" TopLine="524"/>
       </Position>
       <Position>
-        <Filename Value="db_representation.pas"/>
-        <Caret Line="147" TopLine="121"/>
+        <Filename Value="tables.pas"/>
+        <Caret Line="88" Column="41" TopLine="71"/>
       </Position>
       <Position>
-        <Filename Value="db_representation.pas"/>
-        <Caret Line="148" TopLine="121"/>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="62" Column="24" TopLine="34"/>
       </Position>
       <Position>
-        <Filename Value="main.lpr"/>
-        <Caret Line="26" TopLine="5"/>
+        <Filename Value="tables.pas"/>
+        <Caret Line="26" Column="25" TopLine="15"/>
       </Position>
       <Position>
-        <Filename Value="db_representation.pas"/>
-        <Caret Line="227" TopLine="206"/>
+        <Filename Value="tables.pas"/>
+        <Caret Line="337" Column="46" TopLine="303"/>
       </Position>
       <Position>
-        <Filename Value="db_representation.pas"/>
-        <Caret Line="231" TopLine="206"/>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="317" Column="26" TopLine="300"/>
       </Position>
       <Position>
-        <Filename Value="db_representation.pas"/>
-        <Caret Line="247" TopLine="213"/>
+        <Filename Value="tables.pas"/>
+        <Caret Line="26" Column="26" TopLine="18"/>
       </Position>
       <Position>
-        <Filename Value="db_representation.pas"/>
-        <Caret Line="265" TopLine="245"/>
+        <Filename Value="tables.pas"/>
+        <Caret Line="311" Column="19" TopLine="285"/>
       </Position>
       <Position>
-        <Filename Value="db_representation.pas"/>
-        <Caret Line="235" TopLine="214"/>
+        <Filename Value="tables.pas"/>
+        <Caret Line="35" Column="24" TopLine="21"/>
       </Position>
       <Position>
-        <Filename Value="db_representation.pas"/>
-        <Caret Line="236" TopLine="214"/>
+        <Filename Value="tables.pas"/>
+        <Caret Line="243" Column="3" TopLine="240"/>
       </Position>
       <Position>
-        <Filename Value="db_representation.pas"/>
-        <Caret Line="235" TopLine="214"/>
-      </Position>
-      <Position>
-        <Filename Value="db_representation.pas"/>
-        <Caret Line="236" TopLine="214"/>
-      </Position>
-      <Position>
-        <Filename Value="main.lpr"/>
-        <Caret Line="62" TopLine="35"/>
-      </Position>
-      <Position>
-        <Filename Value="db_representation.pas"/>
-        <Caret Line="298" TopLine="265"/>
-      </Position>
-      <Position>
-        <Filename Value="db_representation.pas"/>
-        <Caret Line="147" Column="5" TopLine="115"/>
-      </Position>
-      <Position>
-        <Filename Value="db_representation.pas"/>
-        <Caret Line="62" TopLine="42"/>
+        <Filename Value="base_graphic.pas"/>
+        <Caret Line="116" Column="43" TopLine="92"/>
       </Position>
     </JumpHistory>
     <RunParams>
