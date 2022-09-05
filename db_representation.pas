@@ -22,7 +22,7 @@ type
       function Key_UP: integer;
       function Key_DOWN: integer;
     public
-      procedure Main(var result: integer);
+      procedure Main;
       constructor Init(start_x, start_y, border_x , border_y, abs_background: integer);
       procedure addButton(text: string);
       {procedure paint_background;}
@@ -34,6 +34,7 @@ type
   generic ViewTable<T> = class
       table: T;
   private
+    procedure Save;
     procedure SortMode;
     public
       procedure Main(var menu: Menu);
@@ -138,7 +139,7 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
   end;
 
   {Достойно рефакторинга}
-  procedure Menu.Main(var result: integer);
+  procedure Menu.Main();
   var
     run: boolean;
     key: char;
@@ -168,13 +169,10 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
         end;
       end
       else if key = #13 then
-      begin
-        result := on_button;
-        run := false;
-      end
+        run := false
       else if key = #27 then
       begin
-        result := 0;
+        on_button := 0;
         run := false;
       end;
     end;
@@ -231,6 +229,7 @@ begin
       #1: WriteMode;
       #4: DeleteMode;
       #16: SortMode;
+      #19: Save;
     end;
     table.switchPage(key);
   until (key = #27);
@@ -298,6 +297,22 @@ begin
   table.showPage;
 end;
 
+procedure ViewTable.Save;
+var
+  line, lastLineInTable: PLine;
+  field: TextButton;
+  x_, y_, width: integer;
+begin
+  lastLineInTable := table.lineList.getNode(table.lineCount);
+  x_ := lastLineInTable^.data[1].x_pos;
+  y_ := lastLineInTable^.data[table.countColumn].y_pos + (table.borderFreeSpace * 2);
+  width := lastLineInTable^.data[table.countColumn].x_pos + lastLineInTable^.data[table.countColumn].button_width - table.borderFreeSpace;
+  field := table.createInputField(x_, y_, width);
+  table.enterSavePath(field);
+  table.Save(field.text);
+  field.destroy;
+end;
+
 destructor ViewTable.Destroy;
 var
   y: integer;
@@ -314,6 +329,7 @@ begin
   end;
   cursoron;
   table.destroy;
+  self := nil;
   //table.free;
 end;
 

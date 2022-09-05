@@ -90,7 +90,6 @@ begin
     case on_horizontal_button of
       1: enterTextFormat := enterOrganizationName;
       2: enterTextFormat := enterAddress;
-      //3: enterTextFormat := ;
       4: enterTextFormat := enterYear;
       5: enterTextFormat := enterLicence;
       6: enterTextFormat := enterAccreditation;
@@ -103,6 +102,7 @@ begin
   begin
     InputField.Border.Destroy;
     InputField.Destroy;
+    enterTextFormat := enterTypeOfSubordination;
   end;
     {enterTextFormat := ;}
 end;
@@ -287,12 +287,11 @@ end;
 function Table1.enterTypeOfSubordination: string;
 var
   mmenu: Menu;
-  i: integer;
 begin
   mmenu := Menu.Init(x_border div 2, y_border div 2, (x_border div 2) + 8, (y_border div 2) + 15, 0);
   mmenu.addButton('Федеральный');
   mmenu.addButton('Региональный');
-  mmenu.main(i);
+  mmenu.main;
   result := mmenu.buttons[i].text;
   mmenu.Destroy;
   showPage;

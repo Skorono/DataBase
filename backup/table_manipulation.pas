@@ -52,10 +52,10 @@ type
       procedure positional_hint;
       procedure SetBackground(abs_background: byte);
       procedure SortTable(column: byte);
-      function createInputField(): TextButton;
+      procedure enterSavePath(field: TextButton);
+      procedure Save(fName: string);
+      function createInputField(x_, y_, last_y: word): TextButton;
       function getFirstLineNumber(page: word): word;
-      function isInteger(text: string): boolean;
-      function isString(text: string): boolean;
       function deleteText(text: string; delCount: byte): string;
       function enterText(symbolsCount: byte): string;
       function enterNumber(digitsCount: byte): string;
@@ -258,36 +258,12 @@ begin
   end;
 end;
 
-function InheritedTableCls.isInteger(text: string): boolean;
-var
-  i: integer;
-begin
-  result := true;
-  for i := 1 to length(text) do
-  begin
-    if not (text[i] in ['0'..'9']) then
-      result := false;
-  end;
-end;
-
 procedure InheritedTableCls.switchPage(key: char);
 begin
   if key = #116 then
     nextPage()
   else if key = #115 then
     previousPage();
-end;
-
-function InheritedTableCls.isString(text: string): boolean;
-var
-  i: integer;
-begin
-  result := false;
-  for i := 1 to length(text) do
-  begin
-    if (text[i] in ['A'..'Z']) or (text[i] in ['a'..'z']) or (text[i] in ['À'..'ß']) or (text[i] in ['à'..'ÿ']) or (text[i] in ['0'..'9'])  then
-      result := true;
-  end;
 end;
 
 function InheritedTableCls.enterText(symbolsCount: byte): string;
@@ -360,19 +336,14 @@ begin
   deleteText := copy(text, 1, length(text) - delCount);
 end;
 
-function InheritedTableCls.createInputField(): TextButton;
+function InheritedTableCls.createInputField(x_, y_, last_y: word): TextButton;
 const
   height = 1;
 var
-  x_, y_, width: integer;
   line: PLine;
 begin
-  line := lineList.getNode(lineCount);
-  x_ := line^.data[1].x_pos;
-  y_ := line^.data[countColumn].y_pos + (borderFreeSpace * 2);
-  width := line^.data[countColumn].x_pos + line^.data[countColumn].button_width - borderFreeSpace;
-  createInputField := TextButton.Init(width, height, x_, y_, 0, '');
-  createInputField.Border := Border.Init('-', borderFreeSpace-1, borderFreeSpace-1, x_, y_, y_, width);
+  createInputField := TextButton.Init(last_y, height, x_, y_, 0, '');
+  createInputField.Border := Border.Init('-', borderFreeSpace-1, borderFreeSpace-1, x_, y_, y_, last_y);
   createInputField.show;
   createInputField.Border.ChangeColor(15);
   gotoxy(1 + borderFreeSpace, 1 + (borderFreeSpace-1));
@@ -380,10 +351,15 @@ end;
 
 procedure InheritedTableCls.writeInCell;
 var
-  line: PLine;
+  line, lastLineInTable: PLine;
+  x_, y_, width: integer;
 begin
+  lastLineInTable := lineList.getNode(lineCount);
+  x_ := lastLineInTable^.data[1].x_pos;
+  y_ := lastLineInTable^.data[countColumn].y_pos + (borderFreeSpace * 2);
+  width := lastLineInTable^.data[countColumn].x_pos + lastLineInTable^.data[countColumn].button_width - borderFreeSpace;
   line := lineList.getNode(getFirstLineNumber(pageNumber) + (on_vertical_button-1));
-  line^.data[on_horizontal_button].text := enterTextFormat(createInputField);
+  line^.data[on_horizontal_button].text := enterTextFormat(createInputField(x_, y_, width));
   line^.data[on_horizontal_button].show;
   gotoxy(line^.data[on_horizontal_button].x_pos, line^.data[on_horizontal_button].y_pos);
 end;
@@ -520,19 +496,46 @@ var
   j, i: integer;
   line: PLine;
 begin
-  //for j := 1 to lineList.nodeCount do
-  //begin
+  for j := 1 to lineList.nodeCount do
+  begin
     line := lineList.getNode(1);
-    //for i := 2 to lineList.nodeCount - j do
-    //begin
+    for i := 2 to lineList.nodeCount - j do
+    begin
       line := line^.next;
-      //if line^.data[column].text[1] < line^.previous^.data[column].text[1] then
-      //begin
-        lineList.insert(line^.previous, 2);
-        //line := line^.next;
-  //    end;
-  //  end;
-  //end;
+      if line^.data[column].text[1] < line^.previous^.data[column].text[1] then
+      begin
+        lineList.insert(line^.previous, i);
+        line := line^.next^.next;
+      end;
+    end;
+  end;
+end;
+
+procedure InheritedTableCls.enterSavePath(field: TextButton);
+var
+  flag: boolean;
+begin
+  flag := false;
+  field.text := readkey;
+  while not flag do
+  begin
+    if (field.text[1] in ['C'..'z']) and not (field.text[1] in ['a', 'b']) then
+    begin
+      if field.text[1] in ['a'..'z'] then
+        field.text := chr(ord(field.text[1]) - 32);
+      write(field.text + ':\');
+      field.text := field.text + ':\';
+      flag := true;
+    end
+    else if field.text <> '' then
+      deleteText(field.text, 1);
+  end;
+  field.text := field.text + enterText(trunc(field.button_width - (field.button_width/3)));
+end;
+
+procedure InheritedTableCls.Save(fName: string);
+begin
+  lineList.save(fName);
 end;
 
 destructor InheritedTableCls.Destroy;
@@ -541,6 +544,7 @@ begin
   cellsDelete;
   additionalTextDelete;
   lineList.Destroy;
+  self := nil;
 end;
 
 begin

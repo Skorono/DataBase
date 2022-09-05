@@ -30,7 +30,7 @@ type
          procedure add_line(cells: array of Cell);
          procedure rewrite_cell;
          procedure insert(var elm: PLine; i: integer);
-         procedure save;
+         procedure save(name: string);
          {procedure rewrite_line;}
      end;
 
@@ -77,9 +77,32 @@ implementation
      end;
   end;
 
-  procedure Cls_List.save;
+  procedure Cls_List.save(name: string);
+  var
+    i: integer;
+    text: string;
+    line_copy: PLine;
+    f: file;
   begin
-
+    assign(f, name);
+    line_copy := Line;
+    try
+      rewrite(f, 1);
+      while line_copy^.next <> nil do
+      begin
+        for i := 1 to 7 do //columnCount
+        begin
+         text := line_copy^.data[i].text;
+         if not isInteger(text) then
+          BlockWrite(f, join('$', split(' ', text)), length(text)*sizeof(char))
+         else
+          BlockWrite(f, text, length(text)*sizeof(byte));
+        end;
+      line_copy := line_copy^.next;
+      end;
+    finally
+      close(f);
+    end;
   end;
 
   {Возвращает строку таблицы с определенным номером.
@@ -179,7 +202,7 @@ implementation
       if node <> nil then
       begin
         if node^.previous <> nil then
-          node^.number := node^.previous^.number + 1;
+          node^.number := node^.previous^.number + 1
         else
           node^.number := 1;
         node := node^.next;
