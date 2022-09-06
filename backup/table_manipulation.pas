@@ -30,11 +30,12 @@ type
       background, head_width, head_height, elementsNumber,
       x, y, x_border, y_border, lineCount, borderFreeSpace: byte;
       pageNumber, pageCount: word;
-      head_buttons, additional_textbutton: array of TextButton;
+      head_buttons: array of Cell;
+      additional_textbutton: array of TextButton;
       lineList: Cls_List;
 
       constructor Init(start_x, start_y, border_y, width, height, columnCount: byte;
-        abs_background: byte=0);
+        abs_background: byte=0; addaptive: boolean=false);
       destructor Destroy; override;
       procedure showPage;
       procedure showPositionHint;
@@ -50,14 +51,15 @@ type
       procedure nextPage;
       procedure previousPage;
       procedure positional_hint;
+      procedure addaptiveToSize(Xborder: byte);
       procedure SetBackground(abs_background: byte);
       procedure SortTable(column: byte);
-      function createInputField(): TextButton;
+      procedure Save(fName: string);
+      procedure enterSavePath(field: TextButton);
+      function createInputField(x_, y_, last_y: word): TextButton;
       function getFirstLineNumber(page: word): word;
-      function isInteger(text: string): boolean;
-      function isString(text: string): boolean;
       function deleteText(text: string; delCount: byte): string;
-      function enterText(symbolsCount: byte): string;
+      function enterText(text: string; symbolsCount: byte): string;
       function enterNumber(digitsCount: byte): string;
       function calculationLineCount: byte;
       function setHeadOfColumns(): Header; virtual;
@@ -67,13 +69,12 @@ type
 
 implementation
 
-constructor InheritedTableCls.Init(start_x, start_y, border_y, width, height, columnCount: byte; abs_background: byte = 0);
+constructor InheritedTableCls.Init(start_x, start_y, border_y, width, height, columnCount: byte; abs_background: byte = 0; addaptive: boolean=false);
 begin
   countColumn := columnCount;
   borderFreeSpace := 2;
   on_horizontal_button := 1;
   on_vertical_button := 1;
-  head_width := width;
   head_height := height;
   x := start_x;
   y := start_y;
@@ -85,6 +86,10 @@ begin
   lineCount := calculationLineCount;
   lineList := Cls_List.Init;
   setlength(head_buttons, countColumn);
+  if addaptive then
+    addaptiveToSize(75)
+  else
+    head_width := width;
   showHead;
   //SetBackground(background);
   createNewPage;
@@ -143,7 +148,7 @@ var
   inf_button: TextButton;
 begin
   last_line := lineList.getNode(lineCount);
-  x_pos := (last_line^.data[countColumn].x_pos + last_line^.data[countColumn].button_width + borderFreeSpace) - MAX_TEXT_SIZE;
+  x_pos := abs((last_line^.data[countColumn].x_pos + last_line^.data[countColumn].button_width + borderFreeSpace) - MAX_TEXT_SIZE);
   y_pos := last_line^.data[countColumn].y_pos + borderFreeSpace;
   inf_button := TextButton.Init(MAX_TEXT_SIZE, 1, x_pos, y_pos, background, '');
   setlength(additional_textbutton, length(additional_textbutton) + 1);
@@ -168,13 +173,12 @@ begin
   columnHeader := setHeadOfColumns;
   for i := 0 to countColumn-1 do
   begin
-    head_width := length(columnHeader[i]);
-    head_buttons[i] := TextButton.Init(head_width, head_height, x_pos, y_pos, background, columnHeader[i]);
+    head_buttons[i] := Cell.Init(head_width, head_height, x_pos, y_pos, background, columnHeader[i]);
     head_buttons[i].Border := border.Init('-', borderFreeSpace, borderFreeSpace, x_pos, y_pos, y_pos, head_width);
     head_buttons[i].Border.ChangeColor(1);
     head_buttons[i].Border.ChangeBackground(background);
     head_buttons[i].Show;
-    x_pos := x_pos + length(columnHeader[i]) + borderFreeSpace;
+    x_pos := x_pos + head_width + borderFreeSpace;
   end;
   x_border := head_buttons[countColumn-1].x_pos + head_buttons[countColumn-1].button_width + head_buttons[countColumn-1].border.XborderFreeSpace;
 end;
@@ -187,6 +191,11 @@ end;
 function InheritedTableCls.getFirstLineNumber(page: word): word;
 begin
     result := (lineCount * (page-1)) + 1;
+end;
+
+procedure InheritedTableCls.addaptiveToSize(Xborder: byte);
+begin
+  head_width := trunc(Xborder * 1/countColumn);
 end;
 
 procedure InheritedTableCls.createNewPage();
@@ -204,8 +213,8 @@ begin
     lineNum := lineNum + 1;
     for j := 0 to countColumn-1 do
     begin
-      Cells[j] := Cell.Init(length(head_buttons[j].text), head_height, head_buttons[j].x_pos, y_line_pos, background, '');
-      Cells[j].Border := Border.Init('-', borderFreeSpace-1, borderFreeSpace-1, head_buttons[j].x_pos, y_line_pos, y_line_pos, length(head_buttons[j].text));
+      Cells[j] := Cell.Init(head_width, head_height, head_buttons[j].x_pos, y_line_pos, background, '');
+      Cells[j].Border := Border.Init('-', borderFreeSpace-1, borderFreeSpace-1, head_buttons[j].x_pos, y_line_pos, y_line_pos, head_width);
     end;
     lineList.add_line(Cells);
   end;
@@ -258,18 +267,6 @@ begin
   end;
 end;
 
-function InheritedTableCls.isInteger(text: string): boolean;
-var
-  i: integer;
-begin
-  result := true;
-  for i := 1 to length(text) do
-  begin
-    if not (text[i] in ['0'..'9']) then
-      result := false;
-  end;
-end;
-
 procedure InheritedTableCls.switchPage(key: char);
 begin
   if key = #116 then
@@ -278,19 +275,7 @@ begin
     previousPage();
 end;
 
-function InheritedTableCls.isString(text: string): boolean;
-var
-  i: integer;
-begin
-  result := false;
-  for i := 1 to length(text) do
-  begin
-    if (text[i] in ['A'..'Z']) or (text[i] in ['a'..'z']) or (text[i] in ['À'..'ß']) or (text[i] in ['à'..'ÿ']) or (text[i] in ['0'..'9'])  then
-      result := true;
-  end;
-end;
-
-function InheritedTableCls.enterText(symbolsCount: byte): string;
+function InheritedTableCls.enterText(text: string; symbolsCount: byte): string;
 var
   key: char;
 begin
@@ -299,19 +284,20 @@ begin
   while key <> #13 do
   begin
     key := readkey;
-    if (isString(key) or (key = '-')) and (symbolsCount > length(result)) then
+    if (isString(key) or (key in ['-', '/'])) and (symbolsCount > length(text)) then
     begin
-      result := result + key;
+      text := text + key;
       write(key);
     end
-    else if (key = #8) and (result <> '')then
-      result := deleteText(result, 1)
+    else if (key = #8) and (text <> '')then
+      text := deleteText(text, 1)
     else if key = #32 then
     begin
-      result := result + ' ';
+      text := text + ' ';
       write(' ');
     end;
   end;
+  result := text;
 end;
 
 function InheritedTableCls.enterNumber(digitsCount: byte): string;
@@ -360,19 +346,12 @@ begin
   deleteText := copy(text, 1, length(text) - delCount);
 end;
 
-function InheritedTableCls.createInputField(): TextButton;
+function InheritedTableCls.createInputField(x_, y_, last_y: word): TextButton;
 const
   height = 1;
-var
-  x_, y_, width: integer;
-  line: PLine;
 begin
-  line := lineList.getNode(lineCount);
-  x_ := line^.data[1].x_pos;
-  y_ := line^.data[countColumn].y_pos + (borderFreeSpace * 2);
-  width := line^.data[countColumn].x_pos + line^.data[countColumn].button_width - borderFreeSpace;
-  createInputField := TextButton.Init(width, height, x_, y_, 0, '');
-  createInputField.Border := Border.Init('-', borderFreeSpace-1, borderFreeSpace-1, x_, y_, y_, width);
+  createInputField := TextButton.Init(last_y, height, x_, y_, 0, '');
+  createInputField.Border := Border.Init('-', borderFreeSpace-1, borderFreeSpace-1, x_, y_, y_, last_y);
   createInputField.show;
   createInputField.Border.ChangeColor(15);
   gotoxy(1 + borderFreeSpace, 1 + (borderFreeSpace-1));
@@ -380,10 +359,18 @@ end;
 
 procedure InheritedTableCls.writeInCell;
 var
-  line: PLine;
+  line, lastLineInTable: PLine;
+  x_, y_, width: integer;
+  InputField: TextButton;
 begin
+  lastLineInTable := lineList.getNode(lineCount);
+  x_ := lastLineInTable^.data[1].x_pos;
+  y_ := lastLineInTable^.data[countColumn].y_pos + (borderFreeSpace * 2);
+  width := lastLineInTable^.data[countColumn].x_pos + lastLineInTable^.data[countColumn].button_width - borderFreeSpace;
   line := lineList.getNode(getFirstLineNumber(pageNumber) + (on_vertical_button-1));
-  line^.data[on_horizontal_button].text := enterTextFormat(createInputField);
+  InputField := createInputField(x_, y_, width);
+  InputField.text := line^.data[on_horizontal_button].text;
+  line^.data[on_horizontal_button].text := enterTextFormat(InputField);
   line^.data[on_horizontal_button].show;
   gotoxy(line^.data[on_horizontal_button].x_pos, line^.data[on_horizontal_button].y_pos);
 end;
@@ -513,6 +500,7 @@ end;
 
 function InheritedTableCls.enterTextFormat(InputField: TextButton): string;
 begin
+  write(InputField.text);
 end;
 
 procedure InheritedTableCls.SortTable(column: byte);
@@ -520,19 +508,46 @@ var
   j, i: integer;
   line: PLine;
 begin
-  //for j := 1 to lineList.nodeCount do
-  //begin
+  for j := 1 to lineList.nodeCount do
+  begin
     line := lineList.getNode(1);
-    //for i := 2 to lineList.nodeCount - j do
-    //begin
+    for i := 2 to lineList.nodeCount - j do
+    begin
       line := line^.next;
-      //if line^.data[column].text[1] < line^.previous^.data[column].text[1] then
-      //begin
-        lineList.insert(line^.previous, 2);
-        //line := line^.next;
-  //    end;
-  //  end;
-  //end;
+      if line^.data[column].text[1] < line^.previous^.data[column].text[1] then
+      begin
+        lineList.insert(line^.previous, i);
+        line := line^.next^.next;
+      end;
+    end;
+  end;
+end;
+
+procedure InheritedTableCls.enterSavePath(field: TextButton);
+var
+  flag: boolean;
+begin
+  flag := false;
+  field.text := readkey;
+  while not flag do
+  begin
+    if (field.text[1] in ['C'..'z']) and not (field.text[1] in ['a', 'b']) then
+    begin
+      if field.text[1] in ['a'..'z'] then
+        field.text := chr(ord(field.text[1]) - 32);
+      write(field.text + ':\');
+      field.text := field.text + ':\';
+      flag := true;
+    end
+    else if field.text <> '' then
+      deleteText(field.text, 1);
+  end;
+  field.text := enterText(field.text, trunc(field.button_width - (field.button_width/3)));
+end;
+
+procedure InheritedTableCls.Save(fName: string);
+begin
+  lineList.save(fName);
 end;
 
 destructor InheritedTableCls.Destroy;

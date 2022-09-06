@@ -109,9 +109,15 @@ implementation
   end;
 
   constructor Cell.Init(width, height, x_cord, y_cord, abs_background: integer; abs_text: string);
+  var
+    STD_VISION: string;
+    i: integer;
   begin
     inherited Init(width, height, x_cord, y_cord, abs_background, abs_text);
-    text := text[1..length(text)-2] + '+';
+    for i := 1 to width do
+      STD_VISION := STD_VISION + ' ';
+    if (text = '') or (text = STD_VISION) then
+      text := text[1..length(text)-2] + '+';
   end;
 
   procedure Cell.clearCell;

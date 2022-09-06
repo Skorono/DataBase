@@ -48,7 +48,7 @@ var
    //backdrop: WindowManager;
 begin
   //backdrop := WindowManager.Init;
-  main_menu := Menu.Init(110, 22, 240, 40, 0);
+  main_menu := Menu.Init(75, 10, 240, 40, 0);
   main_menu.addButton('Учреждения');
   main_menu.addButton('Контрольные цифры приема');
   main_menu.addButton('Специальности');
@@ -64,7 +64,6 @@ begin
     destroyPreviousTable(table1, table2, table3, prev_table);
     createTable(table1, table2, table3, main_menu, launched_table);
   end;
-  readkey;
 end;
 
 begin

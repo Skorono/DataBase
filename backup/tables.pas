@@ -31,7 +31,7 @@ type
       function checkMonthFormat(month: string): boolean;
       function checkYearFormat(year: string): boolean;
       function checkOrganizationName(text: string): boolean;
-      function enterOrganizationName: string;
+      function enterOrganizationName(text: string): string;
       function enterAddress: string;
       function enterHomeNumber: string;
       {procedure enterSubmissionForm;
@@ -65,7 +65,7 @@ begin
   //win.createNewWindow(120, 1, 220, 50, 7);
   //for i := 1 to win.activeWindows do
   //  win.showWindow(i);
-  inherited Init(start_x, start_y, border_y, width, height, countColumn);
+  inherited Init(start_x, start_y, border_y, width, height, countColumn, 0, true);
 end;
 
 procedure Table1.showPage;
@@ -85,12 +85,12 @@ end;
 
 function Table1.enterTextFormat(InputField: TextButton): string;
 begin
+  inherited enterTextFormat(InputField);
   if on_horizontal_button <> 3 then
   begin
     case on_horizontal_button of
-      1: enterTextFormat := enterOrganizationName;
+      1: enterTextFormat := enterOrganizationName(InputField.text);
       2: enterTextFormat := enterAddress;
-      //3: enterTextFormat := ;
       4: enterTextFormat := enterYear;
       5: enterTextFormat := enterLicence;
       6: enterTextFormat := enterAccreditation;
@@ -103,6 +103,7 @@ begin
   begin
     InputField.Border.Destroy;
     InputField.Destroy;
+    enterTextFormat := enterTypeOfSubordination;
   end;
     {enterTextFormat := ;}
 end;
@@ -216,7 +217,7 @@ end;
 function Table1.enterStreetName: string;
 begin
   write('ул.');
-  enterStreetName := 'ул.' + enterText(34);
+  enterStreetName := 'ул.' + enterText(result, 34);
 end;
 
 function Table1.enterHomeNumber: string;
@@ -228,7 +229,7 @@ end;
 function Table1.enterTownName: string;
 begin
   write('г.');
-  enterTownName := enterText(25);
+  enterTownName := enterText(result, 25);
 end;
 
 function Table1.enterFlatNumber: string;
@@ -249,11 +250,12 @@ begin
   //result := ;
 end;
 
-function Table1.enterOrganizationName: string;
+function Table1.enterOrganizationName(text: string): string;
 const
   MaxOrgNameSize = 100;
 begin
-  enterOrganizationName := enterText(MaxOrgNameSize);
+  enterOrganizationName := text;
+  enterOrganizationName := enterText(result, MaxOrgNameSize);
 end;
 
 function Table1.enterYear: string;
@@ -292,8 +294,8 @@ begin
   mmenu := Menu.Init(x_border div 2, y_border div 2, (x_border div 2) + 8, (y_border div 2) + 15, 0);
   mmenu.addButton('Федеральный');
   mmenu.addButton('Региональный');
-  mmenu.main(i);
-  result := mmenu.buttons[i].text;
+  mmenu.main;
+  result := mmenu.buttons[mmenu.on_button].text;
   mmenu.Destroy;
   showPage;
 end;
