@@ -12,22 +12,21 @@ type
 
   { InheritedTableCls }
   InheritedTableCls = class
+      procedure Key_UP;
+      procedure Key_DOWN;
+      procedure Key_RIGHT;
+      procedure Key_Left;
+      procedure DelKey_UP;
+      procedure DelKey_DOWN;
+      procedure SwitchHeadButton_Left(var on_headButton: byte);
+      procedure SwitchHeadButton_Right(var on_headButton: byte);
+      procedure PutButtonOnEachOther(number: byte);
+      procedure PutButtonsOnEachOther(fromButton, toButton: byte);
   private
-    procedure Key_UP;
-    procedure Key_DOWN;
-    procedure Key_RIGHT;
-    procedure Key_Left;
-    procedure DelKey_UP;
-    procedure DelKey_DOWN;
-    procedure SwitchHeadButton_Right(on_headButton: byte);
-    procedure SwitchHeadButton_Left(on_headButton: byte);
     procedure additionalTextDelete;
     procedure cellsDelete;
     procedure createPositionHint;
     procedure headerDelete;
-    procedure PutButtonOnEachOther(number: byte);
-    procedure PutButtonsOnEachOther(fromButton, toButton: byte);
-
   public
     countColumn: byte; { вернуть в strict protected }
     on_vertical_button, on_horizontal_button,
@@ -46,6 +45,7 @@ type
     procedure showLine(lineNumber: word);
     procedure showHead;
     procedure createNewPage;
+    procedure clearHeadButtons;
     {procedure createPage;}
     procedure writeInCell;
     procedure switchPage(key: char);
@@ -58,10 +58,10 @@ type
     procedure addaptiveToSize(Xborder: byte);
     procedure SetBackground(abs_background: byte);
     procedure SortTable(column: byte);
-    function createInputField(): TextButton;
+    procedure Save(fName: string);
+    procedure enterSavePath(field: TextButton);
+    function createInputField(x_, y_, last_y: word): TextButton;
     function getFirstLineNumber(page: word): word;
-    function isInteger(text: string): boolean;
-    function isString(text: string): boolean;
     function deleteText(text: string; delCount: byte): string;
     function enterText(text: string; symbolsCount: byte): string;
     function enterNumber(digitsCount: byte): string;
@@ -95,10 +95,19 @@ begin
   else
     head_width := width;
   showHead;
+  //SetBackground(background);
   createNewPage;
   positional_hint;
   createPositionHint;
   showPositionHint;
+end;
+
+procedure InheritedTableCls.clearHeadButtons;
+var
+  button: byte;
+begin
+  for button := 0 to countColumn - 1 do
+    head_buttons[button].border.clearBorder;
 end;
 
 procedure InheritedTableCls.SetBackground(abs_background: byte);
@@ -270,36 +279,12 @@ begin
   end;
 end;
 
-function InheritedTableCls.isInteger(text: string): boolean;
-var
-  i: integer;
-begin
-  result := true;
-  for i := 1 to length(text) do
-  begin
-    if not (text[i] in ['0'..'9']) then
-      result := false;
-  end;
-end;
-
 procedure InheritedTableCls.switchPage(key: char);
 begin
   if key = #116 then
     nextPage()
   else if key = #115 then
     previousPage();
-end;
-
-function InheritedTableCls.isString(text: string): boolean;
-var
-  i: integer;
-begin
-  result := false;
-  for i := 1 to length(text) do
-  begin
-    if (text[i] in ['A'..'Z']) or (text[i] in ['a'..'z']) or (text[i] in ['А'..'Я']) or (text[i] in ['а'..'я']) or (text[i] in ['0'..'9'])  then
-      result := true;
-  end;
 end;
 
 function InheritedTableCls.enterText(text: string; symbolsCount: byte): string;
@@ -311,7 +296,7 @@ begin
   while key <> #13 do
   begin
     key := readkey;
-    if (isString(key) or (key = '-')) and (symbolsCount > length(text)) then
+    if (isString(key) or (key in ['-', '/', '\'])) and (symbolsCount > length(text)) then
     begin
       text := text + key;
       write(key);
@@ -373,19 +358,12 @@ begin
   deleteText := copy(text, 1, length(text) - delCount);
 end;
 
-function InheritedTableCls.createInputField(): TextButton;
+function InheritedTableCls.createInputField(x_, y_, last_y: word): TextButton;
 const
   height = 1;
-var
-  x_, y_, width: integer;
-  line: PLine;
 begin
-  line := lineList.getNode(lineCount);
-  x_ := line^.data[1].x_pos;
-  y_ := line^.data[countColumn].y_pos + (borderFreeSpace * 2);
-  width := line^.data[countColumn].x_pos + line^.data[countColumn].button_width - borderFreeSpace;
-  createInputField := TextButton.Init(width, height, x_, y_, 0, '');
-  createInputField.Border := Border.Init('-', borderFreeSpace-1, borderFreeSpace-1, x_, y_, y_, width);
+  createInputField := TextButton.Init(last_y, height, x_, y_, 0, '');
+  createInputField.Border := Border.Init('-', borderFreeSpace-1, borderFreeSpace-1, x_, y_, y_, last_y);
   createInputField.show;
   createInputField.Border.ChangeColor(15);
   gotoxy(1 + borderFreeSpace, 1 + (borderFreeSpace-1));
@@ -393,11 +371,16 @@ end;
 
 procedure InheritedTableCls.writeInCell;
 var
-  line: PLine;
+  line, lastLineInTable: PLine;
+  x_, y_, width: integer;
   InputField: TextButton;
 begin
+  lastLineInTable := lineList.getNode(lineCount);
+  x_ := lastLineInTable^.data[1].x_pos;
+  y_ := lastLineInTable^.data[countColumn].y_pos + (borderFreeSpace * 2);
+  width := lastLineInTable^.data[countColumn].x_pos + lastLineInTable^.data[countColumn].button_width - borderFreeSpace;
   line := lineList.getNode(getFirstLineNumber(pageNumber) + (on_vertical_button-1));
-  InputField := createInputField;
+  InputField := createInputField(x_, y_, width);
   InputField.text := line^.data[on_horizontal_button].text;
   line^.data[on_horizontal_button].text := enterTextFormat(InputField);
   line^.data[on_horizontal_button].show;
@@ -429,12 +412,7 @@ var
   i: integer;
   line: PLine;
 begin
-  line := lineList.getNode(lineNumber);
-  for i := 1 to countColumn do
-  begin
-    line^.data[i].text := '';
-    line^.data[i].show;
-  end;
+  Linelist.delete(lineNumber);
 end;
 
 procedure InheritedTableCls.DelKey_UP;
@@ -454,7 +432,7 @@ end;
 procedure InheritedTableCls.Key_UP();
 begin
   if on_vertical_button = getFirstLineNumber(pageNumber) then
-    on_vertical_button := getFirstLineNumber(pageNumber) + (lineCount-1)
+    on_vertical_button := getFirstLineNumber(pageNumber) + (lineCount-1)   {баг с номером строки}
   else
     on_vertical_button := on_vertical_button - 1;
 end;
@@ -537,58 +515,94 @@ var
   j, i: integer;
   line: PLine;
 begin
-  for j := 1 to lineList.nodeCount do
+  for j := 0 to lineList.nodeCount - 1 do
   begin
     line := lineList.getNode(1);
     for i := 2 to lineList.nodeCount - j do
     begin
       line := line^.next;
-      if line^.data[column].text[1] < line^.previous^.data[column].text[1] then
+      if (line^.data[column].text[1] < line^.previous^.data[column].text[1]) and (isString(line^.previous^.data[column].text[1])) then
       begin
-        lineList.insert(line^.previous, i);
-        line := line^.next^.next;
+        lineList.insert(line, line^.previous);
+        line := line^.next;
       end;
     end;
   end;
 end;
 
+
 procedure InheritedTableCls.PutButtonOnEachOther(number: byte);
 begin
-  if (number <> 1) and (number <= countColumn)then
-    head_buttons[number].x_pos := head_buttons[number-1].x_pos div 2;
+  if (number <> 0) and (number < countColumn) then
+  begin
+    head_buttons[number].x_pos := (head_buttons[number-1].x_pos + head_buttons[number-1].button_width) div 2;
+    head_buttons[number].border.start_x := head_buttons[number].x_pos - 1;
+  end;
 end;
 
 procedure InheritedTableCls.PutButtonsOnEachOther(fromButton, toButton: byte);
 var
   button: byte;
 begin
-  if (fromButton > 0) and (fromButton <= countColumn) then
+  if (fromButton >= 0) and (fromButton < countColumn) then
   begin
-    for button := fromButton to columnCount do
+    for button := fromButton to toButton do
       PutButtonOnEachOther(button);
   end;
 end;
 
-procedure SwitchHeadButton_Right(var on_headButton: byte);
+procedure InheritedTableCls.SwitchHeadButton_Right(var on_headButton: byte);
 begin
-  if on_headButton <> countColumn then
+  clearHeadButtons;
+  if on_headButton <> countColumn-1 then
   begin
     on_headButton := on_headButton + 1;
-    PutButtonOnEachOther(on_headButton, countColumn);
+    PutButtonOnEachOther(on_headButton);
     head_buttons[on_headButton].show;
-    PutButtonOnEachOther(on_headButton+1, countColumn);
+    head_buttons[on_headButton].border.show;
+    PutButtonsOnEachOther(on_headButton+2, countColumn);
   end;
 end;
 
-procedure SwitchHeadButton_Left(var on_headButton: byte);
+procedure InheritedTableCls.SwitchHeadButton_Left(var on_headButton: byte);
 begin
-  if on_headButton <> 1 then
+  clearHeadButtons;
+  if on_headButton <> 0 then
   begin
+    PutButtonsOnEachOther(on_headButton + 1, countColumn);
     on_headButton := on_headButton - 1;
-    PutButtonOnEachOther(on_headButton);
     head_buttons[on_headButton].show;
-    PutButtonOnEachOther(on_headButton+1);
+    head_buttons[on_headButton].border.show;
+    //PutButtonOnEachOther(on_headButton+1);
   end;
+end;
+
+procedure InheritedTableCls.enterSavePath(field: TextButton);
+var
+  flag: boolean;
+begin
+  flag := false;
+  while not flag do
+  begin
+    field.text := readkey;
+    if (field.text[1] in ['C'..'z']) and not (field.text[1] in ['a', 'b']) then
+    begin
+      //if field.text[1] in ['a'..'z'] then
+      //  field.text := chr(ord(field.text[1]) - 32);
+      field.text := UpCase(field.text[1]);
+      write(field.text + ':\');
+      field.text := field.text + ':\';
+      flag := true;
+    end
+    else
+      field.text := '';
+  end;
+  field.text := enterText(field.text, trunc(field.button_width - (field.button_width/3)));
+end;
+
+procedure InheritedTableCls.Save(fName: string);
+begin
+  lineList.save(fName);
 end;
 
 destructor InheritedTableCls.Destroy;

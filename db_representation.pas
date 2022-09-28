@@ -22,7 +22,7 @@ type
       function Key_UP: integer;
       function Key_DOWN: integer;
     public
-      procedure Main(var result: integer);
+      procedure Main;
       constructor Init(start_x, start_y, border_x , border_y, abs_background: integer);
       procedure addButton(text: string);
       {procedure paint_background;}
@@ -34,10 +34,11 @@ type
   generic ViewTable<T> = class
       table: T;
   private
+    procedure Save;
     procedure SortMode;
+    procedure ShowHeadMod;
     procedure DeleteMode;
     procedure WriteMode;
-    procedure ShowHeadMod;
   public
     procedure Main(var menu: Menu);
     destructor Destroy; override;
@@ -139,7 +140,7 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
   end;
 
   {Достойно рефакторинга}
-  procedure Menu.Main(var result: integer);
+  procedure Menu.Main();
   var
     run: boolean;
     key: char;
@@ -169,13 +170,10 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
         end;
       end
       else if key = #13 then
-      begin
-        result := on_button;
-        run := false;
-      end
+        run := false
       else if key = #27 then
       begin
-        result := 0;
+        on_button := 0;
         run := false;
       end;
     end;
@@ -232,6 +230,8 @@ begin
       #1: WriteMode;
       #4: DeleteMode;
       #16: SortMode;
+      #19: Save;
+      #8: ShowHeadMod;
     end;
     table.switchPage(key);
   until (key = #27);
@@ -297,6 +297,45 @@ procedure ViewTable.SortMode;
 begin
   table.SortTable(1);
   table.showPage;
+end;
+
+procedure ViewTable.Save;
+var
+  lastLineInTable: PLine;
+  field: TextButton;
+  x_, y_, width: integer;
+begin
+  lastLineInTable := table.lineList.getNode(table.lineCount);
+  x_ := lastLineInTable^.data[1].x_pos;
+  y_ := lastLineInTable^.data[table.countColumn].y_pos + (table.borderFreeSpace * 2);
+  width := lastLineInTable^.data[table.countColumn].x_pos + lastLineInTable^.data[table.countColumn].button_width - table.borderFreeSpace;
+  field := table.createInputField(x_, y_, width);
+  table.enterSavePath(field);
+  table.Save(field.text);
+  field.border.destroy;
+  field.destroy;
+end;
+
+procedure ViewTable.ShowHeadMod;
+var
+  key: char;
+  on_button: byte = 0;
+  button: byte;
+begin
+  table.clearHeadButtons;
+  table.PutButtonsOnEachOther(on_button+1, table.countColumn);
+  for button := 0 to table.countColumn - 1 do
+  begin
+    table.head_buttons[button].show;
+    table.head_buttons[button].border.show;
+  end;
+  repeat
+    key := readkey;
+    case key of
+      #75: table.SwitchHeadButton_Left(on_button);
+      #77: table.SwitchHeadButton_Right(on_button);
+    end;
+  until key = #27;
 end;
 
 destructor ViewTable.Destroy;

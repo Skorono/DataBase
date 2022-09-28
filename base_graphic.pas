@@ -116,7 +116,7 @@ implementation
     inherited Init(width, height, x_cord, y_cord, abs_background, abs_text);
     for i := 1 to width do
       STD_VISION := STD_VISION + ' ';
-    if (text = '') or (text = STD_VISION) then
+    if (text = STD_VISION) and (text <> '') then
       text := text[1..length(text)-2] + '+';
   end;
 

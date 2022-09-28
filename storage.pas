@@ -4,11 +4,12 @@ unit storage;
 interface
 uses
   Classes, SysUtils, GeneralTypes, base_graphic;
-
+const
+  MAX_COUNT_OF_COLUMNS = 7;
 type
      PLine = ^Line_Node;
      Line_Node = record
-       data: array[1..7] of Cell;
+       data: array[1..MAX_COUNT_OF_COLUMNS] of Cell;
        number: word;
        next: PLine;
        previous: PLine;
@@ -21,7 +22,8 @@ type
          Line: PLine;
          procedure _pullOffElmFromList(var elm: PLine);
          procedure _insert(var elm: PLine; i: integer);
-         procedure _renumberList(fromI, toI: integer);
+         procedure _renumberList;
+         procedure _propetiesTransmission(sender: PLine; var recipient: PLine);
        public
          nodeCount: integer;
          constructor Init;
@@ -29,8 +31,9 @@ type
          function getNode(n: integer): PLine;
          procedure add_line(cells: array of Cell);
          procedure rewrite_cell;
-         procedure insert(var elm: PLine; i: integer);
-         procedure save;
+         procedure insert(var elm: PLine; var replaceableNode: PLine);
+         procedure delete(lineNumber: word);
+         procedure save(name: string);
          {procedure rewrite_line;}
      end;
 
@@ -77,9 +80,32 @@ implementation
      end;
   end;
 
-  procedure Cls_List.save;
+  procedure Cls_List.save(name: string);
+  var
+    i: integer;
+    text: string;
+    line_copy: PLine;
+    f: file;
   begin
-
+    assign(f, name);
+    line_copy := Line;
+    try
+      rewrite(f, 1);
+      while line_copy^.next <> nil do
+      begin
+        for i := 1 to MAX_COUNT_OF_COLUMNS do //columnCount
+        begin
+         text := line_copy^.data[i].text;
+         if not isInteger(text) then
+          BlockWrite(f, join('$', split(' ', text)), length(text)*sizeof(char))
+         else
+          BlockWrite(f, text, length(text)*sizeof(byte));
+        end;
+      line_copy := line_copy^.next;
+      end;
+    finally
+      close(f);
+    end;
   end;
 
   {Возвращает строку таблицы с определенным номером.
@@ -102,22 +128,62 @@ implementation
      end;
   end;
 
-  procedure Cls_List.insert(var elm: PLine; i: integer);
+  procedure Cls_List.delete(lineNumber: word);
   var
-    number: integer;
+    i: integer;
+    newEmptyElm, elm: PLine;
   begin
-     number := elm^.number + 1;
-     _pullOffElmFromList(elm);
-     _renumberList(number, nodeCount);
-     _insert(elm, i);
-     _renumberList(i, nodeCount);
+    new(newEmptyElm);
+    newEmptyElm^.next := nil;
+    newEmptyElm^.previous := nil;
+    elm := getNode(lineNumber);
+    newEmptyElm^.number := elm^.number;
+    _propetiesTransmission(elm, newEmptyElm);
+    for i := 1 to MAX_COUNT_OF_COLUMNS do
+    begin
+      newEmptyElm^.data[i].text := '';
+      newEmptyElm^.data[i].show;
+    end;
+
+    _pullOffElmFromList(elm);
+    _insert(newEmptyElm, newEmptyElm^.number);
+  end;
+
+  procedure Cls_List.insert(var elm: PLine; var replaceableNode: PLine);
+  var
+    i: word;
+    elmDataCopy: PLine;
+  begin
+    new(elmDataCopy);
+    for i := 1 to MAX_COUNT_OF_COLUMNS do
+    begin
+      elmDataCopy^.data[i] := Cell.Create;
+      elmDataCopy^.data[i].border := Border.Create;
+    end;
+    _propetiesTransmission(elm, elmDataCopy);
+
+    i := replaceableNode^.number;
+    _pullOffElmFromList(elm);
+    _renumberList;
+    _insert(elm, i);
+    _renumberList;
+
+    replaceableNode := getNode(i+1);
+    _propetiesTransmission(replaceableNode, elm);
+    _propetiesTransmission(elmDataCopy, replaceableNode);
   end;
 
   procedure Cls_List._insert(var elm: PLine; i: integer);
   var
     node: PLine;
   begin
-    if i > 1 then
+    if i = nodeCount then
+    begin
+      node := getNode(i-1);
+      node^.next := elm;
+      elm^.previous := node;
+    end
+    else if i > 1 then
     begin
       node := getNode(i-1);
       elm^.next := node^.next;
@@ -131,12 +197,6 @@ implementation
       node^.previous := elm;
       elm^.next := node;
       Line := elm;
-    end
-    else if i = nodeCount then
-    begin
-      node := getNode(i);
-      node^.next := elm;
-      elm^.previous := node;
     end;
     elm^.number := i;
   end;
@@ -149,9 +209,12 @@ implementation
     newN^.data := elm^.data;
     newN^.next := nil;
     newN^.previous := nil;
-    if (elm^.number > 1) and (elm^.number <> nodeCount) then
+
+    node := elm^.previous;
+    if elm^.number = nodeCount then
+      node^.next := nil
+    else if elm^.number > 1 then
     begin
-      node := elm^.previous;
       node^.next := elm^.next;
       node^.next^.previous := node;
     end
@@ -161,20 +224,13 @@ implementation
     elm := newN;
   end;
 
-  procedure Cls_List._renumberList(fromI, toI: integer);
+  procedure Cls_List._renumberList;
   var
     j: integer;
     node: PLine;
   begin
-    node := getNode(fromI);
-    if fromI = 2 then
-    begin
-      node^.number := 1;
-      node := node^.next;
-      fromI := fromI + 1;
-    end;
-
-    for j := fromI to toI do
+    node := Line;
+    for j := 1 to nodeCount do
      begin
       if node <> nil then
       begin
@@ -182,11 +238,27 @@ implementation
           node^.number := node^.previous^.number + 1
         else
           node^.number := 1;
-        node := node^.next;
+        node := node^.next
       end;
      end;
-    if (node <> nil) and (node^.next = nil) then
-      nodeCount := node^.number;
+  end;
+
+  procedure Cls_List._propetiesTransmission(sender: PLine; var recipient: PLine);
+  var
+    cell: byte;
+  begin
+    for cell := 1 to MAX_COUNT_OF_COLUMNS do
+    begin
+      if (sender^.data[cell] <> nil) and (recipient^.data[cell] <> nil) then
+      begin
+        recipient^.data[cell].x_pos := sender^.data[cell].x_pos;
+        recipient^.data[cell].y_pos := sender^.data[cell].y_pos;
+        recipient^.data[cell].border.start_x := sender^.data[cell].border.start_x;
+        recipient^.data[cell].border.last_x := sender^.data[cell].border.last_x;
+        recipient^.data[cell].border.top_y := sender^.data[cell].border.top_y;
+        recipient^.data[cell].border.bottom_y := sender^.data[cell].border.bottom_y;
+      end;
+    end;
   end;
 
   {

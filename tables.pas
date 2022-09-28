@@ -252,7 +252,7 @@ end;
 
 function Table1.enterOrganizationName(text: string): string;
 const
-  MaxOrgNameSize = 100;
+  MaxOrgNameSize = 80;
 begin
   enterOrganizationName := text;
   enterOrganizationName := enterText(result, MaxOrgNameSize);
@@ -294,8 +294,8 @@ begin
   mmenu := Menu.Init(x_border div 2, y_border div 2, (x_border div 2) + 8, (y_border div 2) + 15, 0);
   mmenu.addButton('Федеральный');
   mmenu.addButton('Региональный');
-  mmenu.main(i);
-  result := mmenu.buttons[i].text;
+  mmenu.main;
+  result := mmenu.buttons[mmenu.on_button].text;
   mmenu.Destroy;
   showPage;
 end;
