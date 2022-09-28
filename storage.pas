@@ -138,12 +138,12 @@ implementation
     newEmptyElm^.previous := nil;
     elm := getNode(lineNumber);
     newEmptyElm^.number := elm^.number;
-    _propetiesTransmission(elm, newEmptyElm);
     for i := 1 to MAX_COUNT_OF_COLUMNS do
     begin
-      newEmptyElm^.data[i].text := '';
-      newEmptyElm^.data[i].show;
+      newEmptyElm^.data[i] := Cell.Create;
+      newEmptyElm^.data[i].border := Border.Create;
     end;
+    _propetiesTransmission(elm, newEmptyElm);
 
     _pullOffElmFromList(elm);
     _insert(newEmptyElm, newEmptyElm^.number);

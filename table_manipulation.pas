@@ -316,6 +316,7 @@ function InheritedTableCls.enterNumber(digitsCount: byte): string;
 var
   key: char;
 begin
+  result := '';
   key := ' ';
   while key <> #13 do
   begin
@@ -431,16 +432,16 @@ end;
 
 procedure InheritedTableCls.Key_UP();
 begin
-  if on_vertical_button = getFirstLineNumber(pageNumber) then
-    on_vertical_button := getFirstLineNumber(pageNumber) + (lineCount-1)   {баг с номером строки}
+  if on_vertical_button = 1 then
+    on_vertical_button := lineCount   {баг с номером строки}
   else
     on_vertical_button := on_vertical_button - 1;
 end;
 
 procedure InheritedTableCls.Key_DOWN();
 begin
-  if on_vertical_button = getFirstLineNumber(pageNumber) + (lineCount-1) then
-    on_vertical_button := getFirstLineNumber(pageNumber)
+  if on_vertical_button = lineCount then
+    on_vertical_button := 1
   else
     on_vertical_button := on_vertical_button + 1;
 end;
@@ -521,7 +522,10 @@ begin
     for i := 2 to lineList.nodeCount - j do
     begin
       line := line^.next;
-      if (line^.data[column].text[1] < line^.previous^.data[column].text[1]) and (isString(line^.previous^.data[column].text[1])) then
+      if ((line^.data[column].text[1] < line^.previous^.data[column].text[1])
+          and (isString(line^.previous^.data[column].text[1]))
+          and not (line^.data[column].text[1] = ' '))
+          or (line^.previous^.data[column].text[1] = ' ') then
       begin
         lineList.insert(line, line^.previous);
         line := line^.next;

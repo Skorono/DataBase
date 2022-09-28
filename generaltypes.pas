@@ -26,7 +26,11 @@ implementation
     result := true;
     for i := 1 to length(text) do
     begin
-      if not (((text[i] in ['A'..'Z']) or (text[i] in ['a'..'z']) or (text[i] in ['À'..'ß']) or (text[i] in ['à'..'ÿ']) or (text[i] in ['0'..'9'])) and (not (text[1] = ' ')))  then
+      if not (((text[i] in ['A'..'Z'])
+              or (text[i] in ['a'..'z'])
+              or (text[i] in ['À'..'ß'])
+              or (text[i] in ['à'..'ÿ'])
+              or (text[i] in ['0'..'9'])))  then
         result := false;
     end;
   end;
