@@ -8,6 +8,7 @@ uses
   Classes, SysUtils;
 
 type
+  Coords = array[1..2] of integer;
   Header = array of string;
   ArrOfString = Header;
   ObjOnScreenInf = record

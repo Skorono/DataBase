@@ -9,24 +9,39 @@ uses
 
 type
     { Menu }
-    Menu = class sealed
+    Menu = class
       x, y, x_border, y_border, on_button, background: byte;
       buttons: array[1..10] of TextButton;
       menu_border: Border;
       countButtons: byte;
     private
+      borderExistence: boolean;
       procedure changePos(x_pos, y_pos: byte);
       procedure clearMenu;
-      procedure showMenu;
+      procedure eventKeyDown(var key: char); virtual;
       procedure SetBackground;
-      function Key_UP: integer;
-      function Key_DOWN: integer;
+      procedure showMenu; virtual;
+      procedure Key_UP; virtual;
+      procedure Key_DOWN; virtual;
     public
       procedure Main;
       constructor Init(start_x, start_y, border_x , border_y, abs_background: integer);
-      procedure addButton(text: string);
+      procedure addButton(text: string); virtual;
       {procedure paint_background;}
       destructor Destroy; override;
+  end;
+
+  { SwitchMenu }
+
+  SwitchMenu = class(Menu)
+    private
+      procedure Key_UP; override;
+      procedure Key_DOWN; override;
+      procedure eventKeyDown(var key: char); override;
+      procedure showMenu; override;
+    public
+      constructor Init(start_x, start_y, border_x , border_y, abs_background: integer);
+      procedure addButton(text: string); override;
   end;
 
   { ViewTable }
@@ -54,6 +69,7 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
     countButtons := 0;
     on_button := 1;
     background := abs_background;
+    borderExistence := true;
   end;
 
   procedure Menu.SetBackground;
@@ -79,8 +95,12 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
 
     for i:= 1 to countButtons do
       buttons[i].show();
-    menu_border := border.Init('~', 5, 6, buttons[1].x_pos, buttons[1].y_pos, buttons[countButtons].y_pos, text_size);
-    menu_border.show;
+
+    if borderExistence then
+    begin
+      menu_border := border.Init('~', 5, 6, buttons[1].x_pos, buttons[1].y_pos, buttons[countButtons].y_pos, text_size);
+      menu_border.show;
+    end;
   end;
 
   procedure Menu.changePos(x_pos, y_pos: byte);
@@ -116,7 +136,7 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
     buttons[countButtons] := TextButton.Init(length(text)+1, spaceBetweenButtons, cord_x, cord_y, background, text);
   end;
 
-  function Menu.Key_UP: integer;
+  procedure Menu.Key_UP;
   begin
     //buttons[on_button].background := 0;
     buttons[on_button].text_color := 15;
@@ -125,10 +145,10 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
       on_button := countButtons
     else
       on_button := on_button - 1;
-    Key_UP := on_button;
+    //Key_UP := on_button;
   end;
 
-  function Menu.Key_DOWN: integer;
+  procedure Menu.Key_DOWN;
   begin
     buttons[on_button].text_color := 15;
     buttons[on_button].show();
@@ -136,7 +156,18 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
       on_button := 1
     else
       on_button := on_button + 1;
-    Key_DOWN := on_button;
+    //Key_DOWN := on_button;
+  end;
+
+  procedure Menu.eventKeyDown(var key: char);
+  begin
+    if key = #0 then
+      begin
+        case readkey of
+          #72: Key_UP;
+          #80: Key_DOWN;
+        end;
+      end
   end;
 
   {Достойно рефакторинга}
@@ -158,23 +189,13 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
       buttons[on_button].text_color := 2;
       buttons[on_button].show();
       key := readkey;
-      if key = #0 then
-      begin
-        case readkey of
-        #72: begin
-            on_button := Key_UP;
-          end;
-        #80: begin
-            on_button := Key_DOWN;
-          end;
-        end;
-      end
-      else if key = #13 then
+      eventKeyDown(key);
+      if key = #13 then
         run := false
       else if key = #27 then
       begin
-        on_button := 0;
         run := false;
+        on_button := 0;
       end;
     end;
     clearMenu;
@@ -199,7 +220,8 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
   begin
     for i := 1 to countButtons do
       buttons[i].clearButton;
-    menu_border.clearBorder;
+    if borderExistence then
+      menu_border.clearBorder;
   end;
 
   destructor Menu.Destroy;
@@ -208,7 +230,58 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
   begin
     for i := 1 to countButtons do
       buttons[i].Destroy;
-    menu_border.Destroy;
+
+    if menu_border <> nil then
+      menu_border.Destroy;
+  end;
+
+  constructor SwitchMenu.Init(start_x, start_y, border_x , border_y, abs_background: integer);
+  begin
+    inherited Init(start_x, start_y, border_x , border_y, abs_background);
+    borderExistence := false;
+    //menu_border := nil;
+  end;
+
+  procedure SwitchMenu.showMenu;
+  begin
+    inherited showMenu;
+    buttons[countButtons].clearButton;
+  end;
+
+  procedure SwitchMenu.Key_UP;
+  begin
+    inherited Key_UP;
+
+    if on_button <> countButtons then
+      buttons[on_button+1].clearButton
+    else
+      buttons[1].clearButton;
+  end;
+
+  procedure SwitchMenu.Key_DOWN;
+  begin
+    inherited Key_DOWN;
+    if on_button <> 1 then
+      buttons[on_button-1].clearButton
+    else
+      buttons[countButtons].clearButton;
+  end;
+
+  procedure SwitchMenu.eventKeyDown(var key: char);
+  begin
+    if key = #0 then
+      begin
+        case readkey of
+          #77: Key_DOWN;
+          #75: Key_UP;
+        end;
+      end
+  end;
+
+  procedure SwitchMenu.addButton(text: string);
+  begin
+    inherited addButton(text);
+    buttons[countButtons].y_pos := y;
   end;
 
   procedure ViewTable.Main(var menu: Menu);
@@ -294,8 +367,25 @@ begin
 end;
 
 procedure ViewTable.SortMode;
+const
+  preliminaryTextLen = 9;
+var
+  selectionDescription: TextButton;
+  selectionMenu: SwitchMenu;
+  head_name: byte;
 begin
-  table.SortTable(1);
+  table.additional_textbutton[length(table.additional_textbutton) - 1].clearButton;
+  selectionMenu := table.createSelectionMenu;
+  selectionDescription := TextButton.Init(preliminaryTextLen, 1, selectionMenu.x, selectionMenu.y, 0, 'Sort by: ');
+  selectionMenu.x := selectionMenu.x + preliminaryTextLen;
+
+  selectionDescription.show;
+  for head_name := 0 to table.countColumn - 1 do
+    selectionMenu.addButton(table.head_buttons[head_name].text);
+  selectionMenu.Main;
+  selectionDescription.Destroy;
+
+  table.SortTable(selectionmenu.on_button);
   table.showPage;
 end;
 

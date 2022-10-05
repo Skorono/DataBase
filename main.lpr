@@ -54,9 +54,9 @@ begin
 procedure main;
 var
    main_menu: Menu;
-   table1: _table1;
-   table2: _table2;
-   table3: _table3;
+   table1: _table1 = nil;
+   table2: _table2 = nil;
+   table3: _table3 = nil;
    //backdrop: WindowManager;
 begin
   //backdrop := WindowManager.Init;

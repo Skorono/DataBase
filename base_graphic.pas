@@ -209,7 +209,7 @@ implementation
   begin
     start_x := start_x - XborderFreeSpace;
     top_y := top_y - YborderFreeSpace;
-    window(start_x, top_y, last_x, bottom_y);
+    window(start_x-1, top_y, last_x, bottom_y);
     TextBackground(0);
     ClrScr;
   end;

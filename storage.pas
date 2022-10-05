@@ -20,13 +20,14 @@ type
      Cls_List = class
        strict private
          Line: PLine;
+         countOfColumns: byte;
          procedure _pullOffElmFromList(var elm: PLine);
          procedure _insert(var elm: PLine; i: integer);
          procedure _renumberList;
          procedure _propetiesTransmission(sender: PLine; var recipient: PLine);
        public
          nodeCount: integer;
-         constructor Init;
+         constructor Init(countColumns: byte);
          destructor Destroy; override;
          function getNode(n: integer): PLine;
          procedure add_line(cells: array of Cell);
@@ -38,9 +39,10 @@ type
      end;
 
 implementation
-  constructor Cls_List.Init;
+  constructor Cls_List.Init(countColumns: byte);
   begin
     nodeCount := 0;
+    countOfColumns := countColumns;
     Line:=nil;
   end;
 
@@ -138,7 +140,7 @@ implementation
     newEmptyElm^.previous := nil;
     elm := getNode(lineNumber);
     newEmptyElm^.number := elm^.number;
-    for i := 1 to MAX_COUNT_OF_COLUMNS do
+    for i := 1 to countOfColumns do
     begin
       newEmptyElm^.data[i] := Cell.Create;
       newEmptyElm^.data[i].border := Border.Create;
@@ -155,7 +157,7 @@ implementation
     elmDataCopy: PLine;
   begin
     new(elmDataCopy);
-    for i := 1 to MAX_COUNT_OF_COLUMNS do
+    for i := 1 to countOfColumns do
     begin
       elmDataCopy^.data[i] := Cell.Create;
       elmDataCopy^.data[i].border := Border.Create;
@@ -171,6 +173,11 @@ implementation
     replaceableNode := getNode(i+1);
     _propetiesTransmission(replaceableNode, elm);
     _propetiesTransmission(elmDataCopy, replaceableNode);
+    for i := 1 to countOfColumns do
+    begin
+      elmDataCopy^.data[i].border.Destroy;
+      elmDataCopy^.data[i].Destroy;
+    end;
   end;
 
   procedure Cls_List._insert(var elm: PLine; i: integer);
@@ -247,7 +254,7 @@ implementation
   var
     cell: byte;
   begin
-    for cell := 1 to MAX_COUNT_OF_COLUMNS do
+    for cell := 1 to countOfColumns do
     begin
       if (sender^.data[cell] <> nil) and (recipient^.data[cell] <> nil) then
       begin

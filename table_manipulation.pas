@@ -5,7 +5,7 @@ unit table_manipulation;
 interface
 
 uses
-  base_graphic, Classes, Crt, GeneralTypes, SysUtils, Storage;
+  base_graphic, Classes, Crt, db_representation, GeneralTypes, SysUtils, Storage;
 
 type
   CellArray = array of Cell;
@@ -26,6 +26,7 @@ type
     procedure additionalTextDelete;
     procedure cellsDelete;
     procedure createPositionHint;
+    function getCoordsOfTheLastLineOffset: Coords;
     procedure headerDelete;
   public
     countColumn: byte; { вернуть в strict protected }
@@ -61,6 +62,7 @@ type
     procedure Save(fName: string);
     procedure enterSavePath(field: TextButton);
     function createInputField(x_, y_, last_y: word): TextButton;
+    function createSelectionMenu: SwitchMenu;
     function getFirstLineNumber(page: word): word;
     function deleteText(text: string; delCount: byte): string;
     function enterText(text: string; symbolsCount: byte): string;
@@ -88,7 +90,7 @@ begin
   pageNumber := 1;
   pageCount := 0;
   lineCount := calculationLineCount;
-  lineList := Cls_List.Init;
+  lineList := Cls_List.Init(countColumn);
   setlength(head_buttons, countColumn);
   if addaptive then
     addaptiveToSize(75)
@@ -151,17 +153,26 @@ begin
   end;
 end;
 
+function InheritedTableCls.getCoordsOfTheLastLineOffset: Coords;
+var
+  last_line: PLine;
+begin
+  last_line := lineList.getNode(lineCount);
+  result[1] := abs(last_line^.data[countColumn].x_pos + last_line^.data[countColumn].button_width + borderFreeSpace);
+  result[2] := last_line^.data[countColumn].y_pos + borderFreeSpace;
+end;
+
 procedure InheritedTableCls.createPositionHint;
 const
   MAX_TEXT_SIZE = 35;
 var
-  last_line: PLine;
+  offSetCoords: Coords;
   x_pos, y_pos: byte;
   inf_button: TextButton;
 begin
-  last_line := lineList.getNode(lineCount);
-  x_pos := abs((last_line^.data[countColumn].x_pos + last_line^.data[countColumn].button_width + borderFreeSpace) - MAX_TEXT_SIZE);
-  y_pos := last_line^.data[countColumn].y_pos + borderFreeSpace;
+  offSetCoords := getCoordsOfTheLastLineOffset;
+  x_pos := abs(offSetCoords[1] - MAX_TEXT_SIZE);
+  y_pos := offSetCoords[2];
   inf_button := TextButton.Init(MAX_TEXT_SIZE, 1, x_pos, y_pos, background, '');
   setlength(additional_textbutton, length(additional_textbutton) + 1);
   additional_textbutton[length(additional_textbutton) - 1] := inf_button;
@@ -409,9 +420,6 @@ begin
 end;
 
 procedure InheritedTableCls.deleteLine(lineNumber: byte);
-var
-  i: integer;
-  line: PLine;
 begin
   Linelist.delete(lineNumber);
 end;
@@ -579,6 +587,19 @@ begin
     head_buttons[on_headButton].border.show;
     //PutButtonOnEachOther(on_headButton+1);
   end;
+end;
+
+function InheritedTableCls.createSelectionMenu: SwitchMenu;
+const
+  MAX_TEXT_SIZE = 45;
+var
+  offSetCoords: Coords;
+  x_pos, y_pos: byte;
+begin
+  offSetCoords := getCoordsOfTheLastLineOffset;
+  x_pos := abs(offSetCoords[1] - MAX_TEXT_SIZE);
+  y_pos := offSetCoords[2];
+  result := SwitchMenu.Init(x_pos, y_pos, x_pos + MAX_TEXT_SIZE, y_pos, 0);
 end;
 
 procedure InheritedTableCls.enterSavePath(field: TextButton);
