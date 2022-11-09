@@ -116,7 +116,7 @@ implementation
     inherited Init(width, height, x_cord, y_cord, abs_background, abs_text);
     for i := 1 to width do
       STD_VISION := STD_VISION + ' ';
-    if (text = '') or (text = STD_VISION) then
+    if (text = STD_VISION) and (text <> '') then
       text := text[1..length(text)-2] + '+';
   end;
 
@@ -209,7 +209,7 @@ implementation
   begin
     start_x := start_x - XborderFreeSpace;
     top_y := top_y - YborderFreeSpace;
-    window(start_x, top_y, last_x, bottom_y);
+    window(start_x-1, top_y, last_x, bottom_y);
     TextBackground(0);
     ClrScr;
   end;

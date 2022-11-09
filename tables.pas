@@ -39,14 +39,27 @@ type
       procedure enterAddressForm;}
   end;
 
+  { Table2 }
+
   Table2 = class sealed (InheritedTableCls)
+  private
+    function enterNameOfTheInstitution: string;
+    function enterNumberOfBudgetSeats: string;
+    function enterNumberOfCommercialSeats: string;
+    function enterSpecialtyCode: string;
     public
       constructor Init(start_x, start_y, border_y, width, height: integer);
       function setHeadOfColumns(): Header; override;
       function enterTextFormat(InputField: TextButton): string; override;
   end;
 
+  { Table3 }
+
   Table3 = class sealed (InheritedTableCls)
+  private
+    function enterDurationOfLearning: string;
+    function enterName: string;
+    function enterNumberOfSpeciality: string;
     public
       constructor Init(start_x, start_y, border_y, width, height: integer);
       function setHeadOfColumns(): Header; override;
@@ -252,7 +265,7 @@ end;
 
 function Table1.enterOrganizationName(text: string): string;
 const
-  MaxOrgNameSize = 100;
+  MaxOrgNameSize = 80;
 begin
   enterOrganizationName := text;
   enterOrganizationName := enterText(result, MaxOrgNameSize);
@@ -289,13 +302,12 @@ end;
 function Table1.enterTypeOfSubordination: string;
 var
   mmenu: Menu;
-  i: integer;
 begin
   mmenu := Menu.Init(x_border div 2, y_border div 2, (x_border div 2) + 8, (y_border div 2) + 15, 0);
   mmenu.addButton('Федеральный');
   mmenu.addButton('Региональный');
-  mmenu.main(i);
-  result := mmenu.buttons[i].text;
+  mmenu.main;
+  result := mmenu.buttons[mmenu.on_button].text;
   mmenu.Destroy;
   showPage;
 end;
@@ -309,14 +321,69 @@ end;
 function Table2.setHeadOfColumns(): Header;
 begin
   setlength(result, countColumn);
-  Result[0] := 'Учреждение';
-  Result[1] := 'Специальность';
-  Result[2] := 'Количество бюджетных мест';
-  Result[3] := 'Количество коммерческих мест';
+  Result[0] := 'УЧРЕЖДЕНИЕ';
+  Result[1] := 'СПЕЦИАЛЬНОСТЬ';
+  Result[2] := 'КОЛИЧЕСТВО БЮДЖЕТНЫХ МЕСТ';
+  Result[3] := 'КОЛИЧЕСТВО КОММЕРЧЕСКИХ МЕСТ';
+end;
+
+function Table2.enterNameOfTheInstitution: string;
+begin
+  result := '';
+  while result = '' do
+  begin
+    result := enterText(result, 80);
+    if isString(result) and isInteger(result) then
+      result := deleteText(result, length(result));
+  end;
+end;
+
+function Table2.enterSpecialtyCode: string;
+const
+  numberCount = 3;
+var
+  i: byte = 0;
+  intermediateText: string = '';
+begin
+  while i < numberCount do
+  begin
+    intermediateText := enterText(intermediateText, 2);
+    if isInteger(intermediateText) then
+      result := result + intermediateText
+    else
+      intermediateText := deleteText(intermediateText, 2);
+    if i < numberCount - 1 then
+    begin
+      result := result + '.';
+      write('.');
+    end;
+    i := i + 1;
+    intermediateText := '';
+  end;
+end;
+
+function Table2.enterNumberOfBudgetSeats: string;
+begin
+  result := enterNumber(3) + ' мест';
+  write('мест');
+end;
+
+function Table2.enterNumberOfCommercialSeats: string;
+begin
+  result := enterNumber(3) + ' мест';
+  write('мест');
 end;
 
 function Table2.enterTextFormat(InputField: TextButton): string;
 begin
+  inherited enterTextFormat(InputField);
+
+  case on_horizontal_button of
+      1: enterTextFormat := enterNameOfTheInstitution;
+      2: enterTextFormat := enterSpecialtyCode;
+      3: enterTextFormat := enterNumberOfBudgetSeats;
+      4: enterTextFormat := enterNumberOfCommercialSeats;
+    end;
   InputField.border.Destroy;
   InputField.Destroy;
 end;
@@ -332,11 +399,42 @@ begin
   setlength(result, countColumn);
   Result[0] := 'Номер';
   Result[1] := 'Название';
-  Result[2] := 'Длительсность обучения';
+  Result[2] := 'Длительность обучения';
+end;
+
+function Table3.enterNumberOfSpeciality: string;
+begin
+  write('№');
+  result := '№' + enterNumber(4);
+end;
+
+function Table3.enterName: string;
+begin
+  result := '';
+  while result = '' do
+  begin
+    result := enterText(result, 80);
+    if isString(result) and isInteger(result) then
+      result := deleteText(result, length(result));
+  end;
+end;
+
+function Table3.enterDurationOfLearning: string;
+const
+  postScriptum = 'a';
+begin
+
 end;
 
 function Table3.enterTextFormat(InputField: TextButton): string;
 begin
+  inherited enterTextFormat(InputField);
+
+  case on_horizontal_button of
+      1: enterTextFormat := enterNumberOfSpeciality;
+      2: enterTextFormat := enterName;
+      3: enterTextFormat := enterDurationOfLearning;
+    end;
   InputField.border.Destroy;
   InputField.Destroy;
 end;

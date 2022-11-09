@@ -9,18 +9,28 @@ type
   _table2 = specialize ViewTable<Table2>;
   _table3 = specialize ViewTable<Table3>;
 
-procedure destroyPreviousTable(var table1: _table1; var table2: _table2; var table3: _table3; prev_table: integer);
+procedure destroyPreviousTable(var table1: _table1; var table2: _table2; var table3: _table3);
 begin
-  case prev_table of
-      1: table1.destroy;
-      2: table2.destroy;
-      3: table3.destroy;
-    end;
+  if table1 <> nil then
+  begin
+    table1.destroy;
+    table1 := nil;
+  end
+  else if table2 <> nil then
+  begin
+    table2.destroy;
+    table2 := nil;
+  end
+  else if table3 <> nil then
+  begin
+    table3.destroy;
+    table3 := nil;
+  end;
 end;
 
-procedure createTable(var table1: _table1;  var table2: _table2; var table3: _table3; var menu_obj: Menu; launched_table: integer);
+procedure createTable(var table1: _table1;  var table2: _table2; var table3: _table3; var menu_obj: Menu);
 begin
-  case launched_table of
+  case menu_obj.on_button of
       1: begin
         table1 := _table1.Create;
         table1.main(menu_obj);
@@ -33,36 +43,37 @@ begin
         table3 := _table3.Create;
         table3.main(menu_obj);
       end
-  else
-    menu_obj.Destroy;
+    else
+      begin
+        menu_obj.Destroy;
+        menu_obj := nil;
+      end;
+    end;
   end;
-end;
 
 procedure main;
 var
    main_menu: Menu;
-   table1: _table1;
-   table2: _table2;
-   table3: _table3;
-   launched_table, prev_table: integer;
+   table1: _table1 = nil;
+   table2: _table2 = nil;
+   table3: _table3 = nil;
    //backdrop: WindowManager;
 begin
   //backdrop := WindowManager.Init;
-  main_menu := Menu.Init(75, 10, 240, 40, 0);
+  main_menu := Menu.Init(110, 22, 240, 40, 0);
   main_menu.addButton('Учреждения');
   main_menu.addButton('Контрольные цифры приема');
   main_menu.addButton('Специальности');
   //backdrop.createNewWindow(110, 22, 240, 40, 7);
   //backdrop.showWindow(1);
-  main_menu.Main(launched_table);
-  createTable(table1, table2, table3, main_menu, launched_table);
-  while launched_table <> 0 do
+  main_menu.Main;
+  createTable(table1, table2, table3, main_menu);
+  while main_menu <> nil do
   begin
-    prev_table := launched_table;
-    main_menu.Main(launched_table);
+    main_menu.Main;
     //backdrop.showWindow(1);
-    destroyPreviousTable(table1, table2, table3, prev_table);
-    createTable(table1, table2, table3, main_menu, launched_table);
+    destroyPreviousTable(table1, table2, table3);
+    createTable(table1, table2, table3, main_menu);
   end;
 end;
 
