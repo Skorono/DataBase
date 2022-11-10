@@ -49,6 +49,7 @@ type
   generic ViewTable<T> = class
       table: T;
   private
+    procedure Load;
     procedure Save;
     procedure SortMode;
     procedure ShowHeadMod;
@@ -304,6 +305,7 @@ begin
       #4: DeleteMode;
       #16: SortMode;
       #19: Save;
+      #12: Load;
       #8: ShowHeadMod;
     end;
     table.switchPage(key);
@@ -402,6 +404,23 @@ begin
   field := table.createInputField(x_, y_, width);
   table.enterSavePath(field);
   table.Save(field.text);
+  field.border.destroy;
+  field.destroy;
+end;
+
+procedure ViewTable.Load;
+var
+  lastLineInTable: PLine;
+  field: TextButton;
+  x_, y_, width: integer;
+begin
+  lastLineInTable := table.lineList.getNode(table.lineCount);
+  x_ := lastLineInTable^.data[1].x_pos;
+  y_ := lastLineInTable^.data[table.countColumn].y_pos + (table.borderFreeSpace * 2);
+  width := lastLineInTable^.data[table.countColumn].x_pos + lastLineInTable^.data[table.countColumn].button_width - table.borderFreeSpace;
+  field := table.createInputField(x_, y_, width);
+  table.enterSavePath(field);
+  table.Load(field.text);
   field.border.destroy;
   field.destroy;
 end;

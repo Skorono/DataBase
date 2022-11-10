@@ -11,6 +11,12 @@ type
   Coords = array[1..2] of integer;
   Header = array of string;
   ArrOfString = Header;
+  writeableRecord = record
+    Type_ID: char;
+    text: string;
+    number: integer;
+  end;
+
   ObjOnScreenInf = record
     x, y, last_x, last_y, background: byte;
   end;

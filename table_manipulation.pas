@@ -60,6 +60,7 @@ type
     procedure SetBackground(abs_background: byte);
     procedure SortTable(column: byte);
     procedure Save(fName: string);
+    procedure Load(fName: string);
     procedure enterSavePath(field: TextButton);
     function createInputField(x_, y_, last_y: word): TextButton;
     function createSelectionMenu: SwitchMenu;
@@ -628,6 +629,11 @@ end;
 procedure InheritedTableCls.Save(fName: string);
 begin
   lineList.save(fName);
+end;
+
+procedure InheritedTableCls.Load(fName: string);
+begin
+  lineList.Load(fName);
 end;
 
 destructor InheritedTableCls.Destroy;

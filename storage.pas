@@ -21,6 +21,8 @@ type
        strict private
          Line: PLine;
          countOfColumns: byte;
+         procedure readLineFromFile(var f: file; Cline: PLine);
+         procedure writingLineInAFile(var f: file; Cline: PLine);
          procedure _pullOffElmFromList(var elm: PLine);
          procedure _insert(var elm: PLine; i: integer);
          procedure _renumberList;
@@ -35,6 +37,7 @@ type
          procedure insert(var elm: PLine; var replaceableNode: PLine);
          procedure delete(lineNumber: word);
          procedure save(name: string);
+         procedure load(name: string);
          {procedure rewrite_line;}
      end;
 
@@ -82,33 +85,96 @@ implementation
      end;
   end;
 
-  procedure Cls_List.save(name: string);
+  procedure Cls_List.writingLineInAFile(var f: file; Cline: PLine);
+  const
+    STR_ID = '@';
+    INT_ID = '#';
   var
     i: integer;
     text: string;
-    line_copy: PLine;
-    f: file;
+    textW: writeableRecord;
   begin
-    assign(f, name);
-    line_copy := Line;
-    try
-      rewrite(f, 1);
-      while line_copy^.next <> nil do
-      begin
-        for i := 1 to MAX_COUNT_OF_COLUMNS do //columnCount
-        begin
-         text := line_copy^.data[i].text;
-         if not isInteger(text) then
-          BlockWrite(f, join('$', split(' ', text)), length(text)*sizeof(char))
-         else
-          BlockWrite(f, text, length(text)*sizeof(byte));
-        end;
-      line_copy := line_copy^.next;
-      end;
-    finally
-      close(f);
+    for i := 1 to countOfColumns do
+    begin
+     text := Cline^.data[i].text;
+     if not isInteger(text) then
+     begin
+      textW.text := join('$', split(' ', text));
+      textW.Type_ID := STR_ID;
+      BlockWrite(f, textW, 1)
+     end
+     else
+     begin
+      textW.number := strToInt(text);
+      textW.Type_ID := INT_ID;
+      BlockWrite(f, textW, 1);
+     end;
     end;
   end;
+
+  procedure Cls_List.save(name: string);
+   const
+     FType = '.dat';
+   var
+     f: file;
+     line_copy: Pline;
+   begin
+     name := name + FType;
+     line_copy := Line;
+     try
+       assign(f, name);
+       rewrite(f, sizeof(writeableRecord));
+       while line_copy^.next <> nil do
+       begin
+         writingLineInAFile(f, line_copy);
+         line_copy := line_copy^.next;
+       end;
+       close(f);
+     except
+     end;
+   end;
+
+   procedure Cls_List.readLineFromFile(var f: file; Cline: PLine);
+   const
+     STR_ID = '@';
+     INT_ID = '#';
+   var
+     i: byte;
+     intermediateText: writeableRecord;
+     text: string;
+   begin
+     for i := 1 to countOfColumns do
+     begin
+       BlockRead(f, intermediateText, 1);
+       case intermediateText.Type_ID of
+         STR_ID: text := join(' ', split('$', intermediateText.text));
+         INT_ID: text := intToStr(intermediateText.number);
+       end;
+       Cline^.data[i].text := text;
+     end;
+   end;
+
+   procedure Cls_List.load(name: string);
+   const
+     FType = '.dat';
+   var
+     f: File;
+     line_copy: PLine;
+   begin
+     name := name + FType;
+     line_copy := Line;
+     try
+       assign(f, name);
+       reset(f, sizeof(writeableRecord));
+       while not EOF(f) do
+       begin
+         readLineFromFile(f, line_copy);
+         line_copy := line_copy^.next;
+       end;
+       close(f);
+     except
+     end;
+   end;
 
   {Возвращает строку таблицы с определенным номером.
   Создается копия (line_copy) свойства класс Line ей передается ссылка на следующий элемент,
