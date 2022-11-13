@@ -13,7 +13,7 @@ type
   ArrOfString = Header;
   writeableRecord = record
     Type_ID: char;
-    text: string;
+    text: string[255];
     number: integer;
   end;
 

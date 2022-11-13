@@ -423,6 +423,7 @@ begin
   table.Load(field.text);
   field.border.destroy;
   field.destroy;
+  table.showpage;
 end;
 
 procedure ViewTable.ShowHeadMod;
