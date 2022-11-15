@@ -23,10 +23,11 @@ type
   end;
 
   TextButton = class { Сделать так чтобы параметры для рамки передавались из параметров текста}
+    protected
+      text: string;
     public
       button_width, button_height, x_pos, y_pos, text_color: integer;
       background: integer;
-      text: string;
       Border: Border;
 
       constructor Init(width, height, x_cord, y_cord, abs_background: integer; abs_text: string);
@@ -34,14 +35,21 @@ type
       procedure clearButton;
       procedure ChangeColor(color: integer);
       procedure ChangeBackground(color: integer);
+      procedure setText(newText: string); virtual;
+      function getText: string; virtual;
       destructor Destroy; override;
   end;
 
+  { Cell }
+
   Cell = class(TextButton)
+    strict private
+      STD_VISION: string;
     public
       constructor Init(width, height, x_cord, y_cord, abs_background: integer; abs_text: string);
       procedure Show;
-      procedure write_info;
+      procedure setText(newText: string);
+      function getText: string; override;
       procedure clearCell;
   end;
 
@@ -108,16 +116,30 @@ implementation
     write(text);
   end;
 
+  procedure TextButton.setText(newText: string);
+  begin
+    text := newText;
+  end;
+
+  function TextButton.getText(): string;
+  begin
+      result := text;
+  end;
+
   constructor Cell.Init(width, height, x_cord, y_cord, abs_background: integer; abs_text: string);
   var
-    STD_VISION: string;
     i: integer;
   begin
+    STD_VISION := '';
     inherited Init(width, height, x_cord, y_cord, abs_background, abs_text);
     for i := 1 to width do
       STD_VISION := STD_VISION + ' ';
-    if (text = STD_VISION) and (text <> '') then
-      text := text[1..length(text)-2] + '+';
+    STD_VISION := STD_VISION[1..length(STD_VISION)-2] + '+';
+
+    if (abs_text = '') then
+      text := STD_VISION
+    else
+      text := abs_text
   end;
 
   procedure Cell.clearCell;
@@ -142,9 +164,19 @@ implementation
     write(visible_text);
   end;
 
-  procedure Cell.write_info;
+  procedure Cell.setText(newText: string);
   begin
+    text := newText;
+    if (newText = '') then
+        text := STD_VISION;
+  end;
 
+  function Cell.getText(): string;
+  begin
+    if text = STD_VISION then
+      result := ''
+    else
+      result := text;
   end;
 
   constructor Border.Init(fsymbol: char; XfreeSpace, YfreeSpace, std_x, start_y, last_y, t_size: integer);
@@ -176,7 +208,7 @@ implementation
   procedure Border.Show;
   var
     horizontal_text: string;
-    _start_x, _top_y, _last_x, _bottom_y, i: integer;
+    _start_x, _top_y, _last_x, _bottom_y, char, pos: byte;
   begin
     _start_x := start_x - XborderFreeSpace;
     _top_y := top_y - YborderFreeSpace;
@@ -190,18 +222,18 @@ implementation
     TextColor(border_color);
     TextBackground(background);
     horizontal_text := '';
-    for i := 1 to text_size do
+    for char := 1 to text_size do
       horizontal_text := horizontal_text + symbol;
     gotoxy(_start_x, _top_y-1);
     write(' ' + horizontal_text + ' ');
-    for i := _top_y to _bottom_y do
+    for pos := _top_y to _bottom_y do
     begin
-      gotoxy(_start_x, i);
+      gotoxy(_start_x, pos);
       write('|');
-      gotoxy(_last_x, i);
+      gotoxy(_last_x, pos);
       write('|');
     end;
-    gotoxy(_start_x, _bottom_y + 1);
+    gotoxy(_start_x, _bottom_y+1);
     write(' ' + horizontal_text + ' ');
   end;
 
@@ -219,50 +251,50 @@ implementation
     clearBorder;
   end;
 
-    constructor WindowManager.Init;
-    begin
-      activeWindows := 0;
-    end;
+  constructor WindowManager.Init;
+  begin
+    activeWindows := 0;
+  end;
 
-    procedure WindowManager.createNewWindow(start_x, start_y, last_x, last_y, background: byte);
-    begin
-      activeWindows := activeWindows + 1;
-      windows[activeWindows].x := start_x;
-      windows[activeWindows].y := start_y;
-      windows[activeWindows].last_x := last_x;
-      windows[activeWindows].last_y := last_y;
-      windows[activeWindows].background := background;
-    end;
+  procedure WindowManager.createNewWindow(start_x, start_y, last_x, last_y, background: byte);
+  begin
+    activeWindows := activeWindows + 1;
+    windows[activeWindows].x := start_x;
+    windows[activeWindows].y := start_y;
+    windows[activeWindows].last_x := last_x;
+    windows[activeWindows].last_y := last_y;
+    windows[activeWindows].background := background;
+  end;
 
-    procedure WindowManager.showWindow(number: byte);
-    begin
-      window(windows[number].x, windows[number].y, windows[number].last_x, windows[number].last_y);
-      TextBackground(windows[number].background);
-      ClrScr;
-    end;
+  procedure WindowManager.showWindow(number: byte);
+  begin
+    window(windows[number].x, windows[number].y, windows[number].last_x, windows[number].last_y);
+    TextBackground(windows[number].background);
+    ClrScr;
+  end;
 
-    procedure WindowManager.changeWindowColor(number, color: byte);
-    begin
-      windows[number].background := color;
-    end;
+  procedure WindowManager.changeWindowColor(number, color: byte);
+  begin
+    windows[number].background := color;
+  end;
 
-    procedure WindowManager.changeWindowSize(start_x, start_y, last_x, last_y, number: byte);
-    begin
-      windows[number].x := start_x;
-      windows[number].y := start_y;
-      windows[number].last_x := last_x;
-      windows[number].last_y := last_y;
-    end;
+  procedure WindowManager.changeWindowSize(start_x, start_y, last_x, last_y, number: byte);
+  begin
+    windows[number].x := start_x;
+    windows[number].y := start_y;
+    windows[number].last_x := last_x;
+    windows[number].last_y := last_y;
+  end;
 
-    destructor WindowManager.Destroy;
-    var
-      i: integer;
-    begin
-    for i := 1 to activeWindows do
-    begin
-      changeWindowColor(i, 0);
-      showWindow(i);
-    end;
-    end;
+  destructor WindowManager.Destroy;
+  var
+    i: integer;
+  begin
+  for i := 1 to activeWindows do
+  begin
+    changeWindowColor(i, 0);
+    showWindow(i);
+  end;
+  end;
 
   end.

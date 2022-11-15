@@ -96,7 +96,7 @@ implementation
   begin
     for i := 1 to countOfColumns do
     begin
-     text := Cline^.data[i].text;
+     text := Cline^.data[i].getText();
      if not isInteger(text) then
      begin
       textW.text := join('$', split(' ', text));
@@ -150,7 +150,7 @@ implementation
          STR_ID: text := join(' ', split('$', intermediateText.text));
          INT_ID: text := intToStr(intermediateText.number);
        end;
-       Cline^.data[i].text := text;
+       Cline^.data[i].setText(text);
      end;
    end;
 

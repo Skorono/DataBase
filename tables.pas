@@ -102,7 +102,7 @@ begin
   if on_horizontal_button <> 3 then
   begin
     case on_horizontal_button of
-      1: enterTextFormat := enterOrganizationName(InputField.text);
+      1: enterTextFormat := enterOrganizationName(InputField.getText);
       2: enterTextFormat := enterAddress;
       4: enterTextFormat := enterYear;
       5: enterTextFormat := enterLicence;
@@ -307,7 +307,7 @@ begin
   mmenu.addButton('Федеральный');
   mmenu.addButton('Региональный');
   mmenu.main;
-  result := mmenu.buttons[mmenu.on_button].text;
+  result := mmenu.buttons[mmenu.on_button].getText;
   mmenu.Destroy;
   showPage;
 end;

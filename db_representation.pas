@@ -383,7 +383,7 @@ begin
 
   selectionDescription.show;
   for head_name := 0 to table.countColumn - 1 do
-    selectionMenu.addButton(table.head_buttons[head_name].text);
+    selectionMenu.addButton(table.head_buttons[head_name].getText);
   selectionMenu.Main;
   selectionDescription.Destroy;
 
@@ -403,7 +403,7 @@ begin
   width := lastLineInTable^.data[table.countColumn].x_pos + lastLineInTable^.data[table.countColumn].button_width - table.borderFreeSpace;
   field := table.createInputField(x_, y_, width);
   table.enterSavePath(field);
-  table.Save(field.text);
+  table.Save(field.getText);
   field.border.destroy;
   field.destroy;
 end;
@@ -420,7 +420,7 @@ begin
   width := lastLineInTable^.data[table.countColumn].x_pos + lastLineInTable^.data[table.countColumn].button_width - table.borderFreeSpace;
   field := table.createInputField(x_, y_, width);
   table.enterSavePath(field);
-  table.Load(field.text);
+  table.Load(field.getText);
   field.border.destroy;
   field.destroy;
   table.showpage;

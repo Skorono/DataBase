@@ -136,7 +136,7 @@ const
   hintCount = 4;
 var
   hint: TextButton;
-  text: array[1..hintCount] of string = ('ESC - выход из программы/выход из режима', 'Ctrl + A - EditMode',
+  text: array[1..hintCount] of string = ('ESC - выход из режима/выход из программы', 'Ctrl + A - EditMode',
                                           'Ctrl + D - DeleteMode', 'Ctrl + <- / -> - ѕереключение между страницами');
   line: PLine;
   i, pos_x, pos_y: integer;
@@ -181,7 +181,7 @@ end;
 
 procedure InheritedTableCls.showPositionHint;
 begin
-  additional_textbutton[length(additional_textbutton) - 1].text := 'страница: ' + inttostr(pageNumber) + ' строка: ' + inttostr(on_vertical_button) + ' €чейка: ' + inttostr(on_horizontal_button);
+  additional_textbutton[length(additional_textbutton) - 1].setText('страница: ' + inttostr(pageNumber) + ' строка: ' + inttostr(on_vertical_button) + ' €чейка: ' + inttostr(on_horizontal_button));
   additional_textbutton[length(additional_textbutton) - 1].Show;
 end;
 
@@ -394,8 +394,8 @@ begin
   width := lastLineInTable^.data[countColumn].x_pos + lastLineInTable^.data[countColumn].button_width - borderFreeSpace;
   line := lineList.getNode(getFirstLineNumber(pageNumber) + (on_vertical_button-1));
   InputField := createInputField(x_, y_, width);
-  InputField.text := line^.data[on_horizontal_button].text;
-  line^.data[on_horizontal_button].text := enterTextFormat(InputField);
+  InputField.setText(line^.data[on_horizontal_button].getText);
+  line^.data[on_horizontal_button].setText(enterTextFormat(InputField));
   line^.data[on_horizontal_button].show;
   gotoxy(line^.data[on_horizontal_button].x_pos, line^.data[on_horizontal_button].y_pos);
 end;
@@ -517,24 +517,27 @@ end;
 
 function InheritedTableCls.enterTextFormat(InputField: TextButton): string;
 begin
-  write(InputField.text);
+  write(InputField.getText);
 end;
 
 procedure InheritedTableCls.SortTable(column: byte);
 var
   j, i: integer;
   line: PLine;
+  currentText, previousText: string;
 begin
   for j := 0 to lineList.nodeCount - 1 do
   begin
     line := lineList.getNode(1);
+    currentText := line^.data[column].getText;
+    previousText := line^.previous^.data[column].getText;
     for i := 2 to lineList.nodeCount - j do
     begin
       line := line^.next;
-      if ((line^.data[column].text[1] < line^.previous^.data[column].text[1])
-          and (isString(line^.previous^.data[column].text[1]))
-          and not (line^.data[column].text[1] = ' '))
-          or (line^.previous^.data[column].text[1] = ' ') then
+      if ((currentText[1] < previousText[1])
+          and (isString(previousText[1]))
+          and not (currentText[1] = ' '))
+          or (currentText[1] = ' ') then
       begin
         lineList.insert(line, line^.previous);
         line := line^.next;
@@ -606,24 +609,23 @@ end;
 procedure InheritedTableCls.enterSavePath(field: TextButton);
 var
   flag: boolean;
+  fieldText: string;
 begin
-  flag := false;
-  while not flag do
+  flag := true;
+  while flag do
   begin
-    field.text := readkey;
-    if (field.text[1] in ['C'..'z']) and not (field.text[1] in ['a', 'b']) then
+    field.setText(readkey);
+    fieldText := field.getText;
+    if (fieldText[1] in ['C'..'z']) and not (fieldText[1] in ['a', 'b']) then
     begin
       //if field.text[1] in ['a'..'z'] then
       //  field.text := chr(ord(field.text[1]) - 32);
-      field.text := UpCase(field.text[1]);
-      write(field.text + ':\');
-      field.text := field.text + ':\';
-      flag := true;
+      write(UpCase(fieldText) + ':\');
+      field.setText(fieldText + ':\');
+      flag := false;
     end
-    else
-      field.text := '';
   end;
-  field.text := enterText(field.text, trunc(field.button_width - (field.button_width/3)));
+  field.setText(enterText(field.getText, trunc(field.button_width - (field.button_width/3))));
 end;
 
 procedure InheritedTableCls.Save(fName: string);
