@@ -5,7 +5,7 @@ unit db_representation;
 interface
 
 uses
-  Classes, SysUtils, Crt, Storage, base_graphic;
+  Classes, SysUtils, Crt, GeneralTypes, Storage, base_graphic;
 
 type
     { Menu }
@@ -47,10 +47,11 @@ type
   { ViewTable }
 
   generic ViewTable<T> = class
-      table: T;
-  private
+  strict private
+    table: T;
     procedure Load;
     procedure Save;
+    procedure Search;
     procedure SortMode;
     procedure ShowHeadMod;
     procedure DeleteMode;
@@ -140,8 +141,7 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
   procedure Menu.Key_UP;
   begin
     //buttons[on_button].background := 0;
-    buttons[on_button].text_color := 15;
-    buttons[on_button].show();
+    buttons[on_button].ChangeColor(15);
     if on_button = 1 then
       on_button := countButtons
     else
@@ -151,8 +151,7 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
 
   procedure Menu.Key_DOWN;
   begin
-    buttons[on_button].text_color := 15;
-    buttons[on_button].show();
+    buttons[on_button].ChangeColor(15);
     if on_button = countButtons then
       on_button := 1
     else
@@ -171,33 +170,24 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
       end
   end;
 
-  {Достойно рефакторинга}
   procedure Menu.Main();
   var
-    run: boolean;
     key: char;
   begin
-    buttons[on_button].text_color := 15;
-    //SetBackground;
     cursoroff;
     showMenu;
+    buttons[on_button].ChangeColor(15);
     window(x, y, x_border, y_border);
-    run := true;
+
+    key := #0;
     on_button := 1;
-    while run do
+    while ((key <> #27) and (key <> #13))do
     begin
-      //buttons[on_button].background := 2;
-      buttons[on_button].text_color := 2;
-      buttons[on_button].show();
+      buttons[on_button].ChangeColor(2);
       key := readkey;
       eventKeyDown(key);
-      if key = #13 then
-        run := false
-      else if key = #27 then
-      begin
-        run := false;
+      if key = #27 then
         on_button := 0;
-      end;
     end;
     clearMenu;
     cursoron;
@@ -288,16 +278,17 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
   procedure ViewTable.Main(var menu: Menu);
 var
   key: char;
-  line: PLine;
+  currentCellCoords: Coords;
 begin
   table := T.Init(2, 2, 36, 8, 1);
   //достойно экстерминатуса
-  menu.changePos(table.head_buttons[table.countColumn-1].x_pos + table.head_width + (menu.menu_border.XborderFreeSpace + 3), table.additional_textbutton[3].y_pos + (menu.menu_border.XborderFreeSpace + 3));
+  menu.changePos(table.head_buttons[table.countColumn-1].x_pos + table.head_width + (menu.menu_border.XborderFreeSpace + 3),
+                 table.additional_textbutton[3].y_pos + (menu.menu_border.XborderFreeSpace + 3));
   menu.showMenu;
   table.showPage;
   key := ' ';
-  line := table.lineList.getNode(table.getFirstLineNumber(table.pageNumber) + (table.on_vertical_button-1));
-  gotoxy(line^.data[1].x_pos, line^.data[1].y_pos);
+  currentCellCoords := table.getCellCoords(table.on_vertical_button, 1);
+  gotoxy(currentCellCoords[1], currentCellCoords[2]);
   repeat
     key := readkey;
     case key of
@@ -315,13 +306,15 @@ end;
 procedure ViewTable.WriteMode; { Временно main}
 var
   key: char;
-  line: PLine;
+  currentCellCoords: Coords;
 begin
-  table.showPositionHint;
-  window(table.x, table.y, table.x_border, table.y_border);
-  line := table.lineList.getNode(table.getFirstLineNumber(table.pageNumber) + (table.on_vertical_button-1));
-  gotoxy(line^.data[table.on_horizontal_button].x_pos, line^.data[table.on_horizontal_button].y_pos);
   repeat
+    table.showPositionHint;
+    window(table.x, table.y, table.x_border, table.y_border);
+
+    currentCellCoords := table.getCellCoords(table.on_vertical_button, table.on_horizontal_button);
+    gotoxy(currentCellCoords[1], currentCellCoords[2]);
+
     key := readkey;
     if key = #0 then
     begin
@@ -331,10 +324,6 @@ begin
         #75: table.Key_LEFT;
         #77: table.Key_RIGHT;
       end;
-      table.showPositionHint;
-      window(table.x, table.y, table.x_border, table.y_border);
-      line := table.lineList.getNode(table.getFirstLineNumber(table.pageNumber) + (table.on_vertical_button-1));
-      gotoxy(line^.data[table.on_horizontal_button].x_pos, line^.data[table.on_horizontal_button].y_pos);
     end
     else if key = #13 then
       table.writeInCell;
@@ -410,20 +399,47 @@ end;
 
 procedure ViewTable.Load;
 var
-  lastLineInTable: PLine;
+  coordsOfTheLastLine: Coords;
   field: TextButton;
   x_, y_, width: integer;
 begin
-  lastLineInTable := table.lineList.getNode(table.lineCount);
-  x_ := lastLineInTable^.data[1].x_pos;
-  y_ := lastLineInTable^.data[table.countColumn].y_pos + (table.borderFreeSpace * 2);
-  width := lastLineInTable^.data[table.countColumn].x_pos + lastLineInTable^.data[table.countColumn].button_width - table.borderFreeSpace;
+  coordsOfTheLastLine := table.getCellCoords(table.lineCount, 1);
+  x_ := coordsOfTheLastLine[1];
+  y_ := coordsOfTheLastLine[2] + (table.borderFreeSpace * 2);
+  width := x_ + table.head_width - table.borderFreeSpace;  // СРОЧНО ИСПРАВИТЬ!!!
   field := table.createInputField(x_, y_, width);
   table.enterSavePath(field);
   table.Load(field.getText);
   field.border.destroy;
   field.destroy;
   table.showpage;
+end;
+
+procedure ViewTable.Search;
+const
+  preliminaryTextLen = 9;
+var
+  coordsOfTheLastLine: Coords;
+  selectionDescription, field: TextButton;
+  selectionMenu: SwitchMenu;
+  head_name: byte;
+begin
+  table.additional_textbutton[length(table.additional_textbutton) - 1].clearButton;
+
+  selectionMenu := table.createSelectionMenu;
+  selectionMenu.x := selectionMenu.x + preliminaryTextLen;
+
+  selectionDescription := TextButton.Init(preliminaryTextLen, 1, selectionMenu.x, selectionMenu.y, 0, 'Search in: ');
+  selectionDescription.show;
+
+  for head_name := 0 to table.countColumn - 1 do
+    selectionMenu.addButton(table.head_buttons[head_name].getText);
+  selectionMenu.Main;
+  selectionDescription.Destroy;
+
+  coordsOfTheLastLine := table.getCellCoords(table.lineCount, 1);
+  field := table.createInputField(coordsOfTheLastLine[1], coordsOfTheLastLine[2] + (table.borderFreeSpace * 2), table.head_width);
+  //field.setText(enterTextFormat())
 end;
 
 procedure ViewTable.ShowHeadMod;

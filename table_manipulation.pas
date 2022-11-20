@@ -65,12 +65,13 @@ type
     function createInputField(x_, y_, last_y: word): TextButton;
     function createSelectionMenu: SwitchMenu;
     function getFirstLineNumber(page: word): word;
+    function getCellCoords(lineNumber, cellNumber: byte): Coords;
+    function getHeadCellCoords(cellNumber: byte): Coords;
     function deleteText(text: string; delCount: byte): string;
     function enterText(text: string; symbolsCount: byte): string;
     function enterNumber(digitsCount: byte): string;
     function calculationLineCount: byte;
     function setHeadOfColumns(): Header; virtual;
-    function getLineYPosition(lineNum: word): word;
     function enterTextFormat(InputField: TextButton): string; virtual;
   end;
 
@@ -154,13 +155,26 @@ begin
   end;
 end;
 
-function InheritedTableCls.getCoordsOfTheLastLineOffset: Coords;
+function InheritedTableCls.getCellCoords(lineNumber, cellNumber: byte): Coords;
 var
-  last_line: PLine;
+  lineNode: PLine;
 begin
-  last_line := lineList.getNode(lineCount);
-  result[1] := abs(last_line^.data[countColumn].x_pos + last_line^.data[countColumn].button_width + borderFreeSpace);
-  result[2] := last_line^.data[countColumn].y_pos + borderFreeSpace;
+  lineNode := lineList.getNode(lineNumber);
+  result[1] := lineNode^.data[cellNumber].x_pos;
+  result[2] := lineNode^.data[cellNumber].y_pos;
+end;
+
+function InheritedTableCls.getHeadCellCoords(cellNumber: byte): Coords;
+begin
+  result[1] := head_buttons[cellNumber].x_pos;
+  result[2] := head_buttons[cellNumber].y_pos;
+end;
+
+function InheritedTableCls.getCoordsOfTheLastLineOffset: Coords;
+begin
+  result := getCellCoords(lineCount, countColumn);
+  result[1] := result[1] + head_width + borderFreeSpace;
+  result[2] := result[2] + borderFreeSpace;
 end;
 
 procedure InheritedTableCls.createPositionHint;
@@ -207,11 +221,6 @@ begin
   x_border := head_buttons[countColumn-1].x_pos + head_buttons[countColumn-1].button_width + head_buttons[countColumn-1].border.XborderFreeSpace;
 end;
 
-function InheritedTableCls.getLineYPosition(lineNum: word): word;
-begin
-  result := (head_buttons[1].y_pos + (borderFreeSpace+1)) + ((lineNum-1) mod lineCount) * borderFreeSpace;
-end;
-
 function InheritedTableCls.getFirstLineNumber(page: word): word;
 begin
     result := (lineCount * (page-1)) + 1;
@@ -224,17 +233,18 @@ end;
 
 procedure InheritedTableCls.createNewPage();
 var
-  i, j: integer;
-  lineNum, y_line_pos: integer;
+  i: word;
+  j: byte;
+  headCoords: Coords;
+  y_line_pos: byte;
   Cells: array of Cell;
 begin
-  lineNum := 1;
   pageCount := pageCount + 1;
+  headCoords := getHeadCellCoords(1);
   setlength(Cells, countColumn);
-  for i := 1 to lineCount do
+  for i := 0 to lineCount-1 do
   begin
-    y_line_pos := getLineYPosition(lineNum);
-    lineNum := lineNum + 1;
+    y_line_pos := headCoords[2] + (borderFreeSpace + 1) + (i * borderFreeSpace);
     for j := 0 to countColumn-1 do
     begin
       Cells[j] := Cell.Init(head_width, head_height, head_buttons[j].x_pos, y_line_pos, background, '');
@@ -529,19 +539,20 @@ begin
   for j := 0 to lineList.nodeCount - 1 do
   begin
     line := lineList.getNode(1);
-    currentText := line^.data[column].getText;
-    previousText := line^.previous^.data[column].getText;
     for i := 2 to lineList.nodeCount - j do
     begin
       line := line^.next;
-      if ((currentText[1] < previousText[1])
-          and (isString(previousText[1]))
-          and not (currentText[1] = ' '))
-          or (currentText[1] = ' ') then
-      begin
-        lineList.insert(line, line^.previous);
-        line := line^.next;
-      end;
+      currentText := line^.data[column].getText;
+      previousText := line^.previous^.data[column].getText;
+      if ((currentText <> '') and (previousText <> '')) then
+        if ((currentText[1] < previousText[1])
+                                          and (isString(previousText[1]))
+                                          and not (currentText[1] = ' '))
+                                          or (currentText[1] = ' ') then
+        begin
+          lineList.insert(line, line^.previous);
+          line := line^.next;
+        end;
     end;
   end;
 end;
@@ -595,14 +606,14 @@ end;
 
 function InheritedTableCls.createSelectionMenu: SwitchMenu;
 const
-  MAX_TEXT_SIZE = 45;
+  MAX_TEXT_SIZE = 24;
 var
   offSetCoords: Coords;
   x_pos, y_pos: byte;
 begin
-  offSetCoords := getCoordsOfTheLastLineOffset;
+  offSetCoords := getCellCoords(lineCount, countColumn);
   x_pos := abs(offSetCoords[1] - MAX_TEXT_SIZE);
-  y_pos := offSetCoords[2];
+  y_pos := offSetCoords[2] + + borderFreeSpace;
   result := SwitchMenu.Init(x_pos, y_pos, x_pos + MAX_TEXT_SIZE, y_pos, 0);
 end;
 

@@ -434,7 +434,7 @@ begin
       1: enterTextFormat := enterNumberOfSpeciality;
       2: enterTextFormat := enterName;
       3: enterTextFormat := enterDurationOfLearning;
-    end;
+  end;
   InputField.border.Destroy;
   InputField.Destroy;
 end;
