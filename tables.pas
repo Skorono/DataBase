@@ -18,25 +18,25 @@ type
     function enterTownName: string;
     function enterTypeOfSubordination: string;
     function enterYear: string;
-    public
-      constructor Init(start_x, start_y, border_y, width, height: integer);
-      procedure showPage;
-      procedure showLine(lineNumber: word);
-      procedure showHead;
-      function enterStreetName: string;
-      function enterTextFormat(InputField: TextButton): string; override;
-      function setHeadOfColumns(): Header; override;
-      {function enterDateForm: string;}
-      function checkDayFormat(day: string): boolean;
-      function checkMonthFormat(month: string): boolean;
-      function checkYearFormat(year: string): boolean;
-      function checkOrganizationName(text: string): boolean;
-      function enterOrganizationName(text: string): string;
-      function enterAddress: string;
-      function enterHomeNumber: string;
-      {procedure enterSubmissionForm;
-      procedure enterNumberForm;
-      procedure enterAddressForm;}
+  public
+    constructor Init(start_x, start_y, border_y, width, height: integer);
+    procedure showPage;
+    procedure showLine(lineNumber: word);
+    procedure showHead;
+    function enterStreetName: string;
+    function enterTextFormat(InputField: TextButton): string; override;
+    function setHeadOfColumns(): Header; override;
+    {function enterDateForm: string;}
+    function checkDayFormat(day: string): boolean;
+    function checkMonthFormat(month: string): boolean;
+    function checkYearFormat(year: string): boolean;
+    function checkOrganizationName(text: string): boolean;
+    function enterOrganizationName(text: string): string;
+    function enterAddress: string;
+    function enterHomeNumber: string;
+    {procedure enterSubmissionForm;
+    procedure enterNumberForm;
+    procedure enterAddressForm;}
   end;
 
   { Table2 }
@@ -44,8 +44,7 @@ type
   Table2 = class sealed (InheritedTableCls)
   private
     function enterNameOfTheInstitution: string;
-    function enterNumberOfBudgetSeats: string;
-    function enterNumberOfCommercialSeats: string;
+    function enterNumberOfSeats: string;
     function enterSpecialtyCode: string;
     public
       constructor Init(start_x, start_y, border_y, width, height: integer);
@@ -99,26 +98,18 @@ end;
 function Table1.enterTextFormat(InputField: TextButton): string;
 begin
   inherited enterTextFormat(InputField);
-  if on_horizontal_button <> 3 then
-  begin
-    case on_horizontal_button of
-      1: enterTextFormat := enterOrganizationName(InputField.getText);
-      2: enterTextFormat := enterAddress;
-      4: enterTextFormat := enterYear;
-      5: enterTextFormat := enterLicence;
-      6: enterTextFormat := enterAccreditation;
-      7: enterTextFormat := enterDateForm;
-    end;
-    InputField.border.Destroy;
-    InputField.Destroy;
-  end
-  else
-  begin
-    InputField.Border.Destroy;
-    InputField.Destroy;
-    enterTextFormat := enterTypeOfSubordination;
+  case on_horizontal_button of
+    1: enterTextFormat := enterOrganizationName(InputField.getText);
+    2: enterTextFormat := enterAddress;
+    4: enterTextFormat := enterYear;
+    5: enterTextFormat := enterLicence;
+    6: enterTextFormat := enterAccreditation;
+    7: enterTextFormat := enterDateForm;
   end;
-    {enterTextFormat := ;}
+  InputField.border.Destroy;
+  InputField.Destroy;
+  if on_horizontal_button = 3 then
+    enterTextFormat := enterTypeOfSubordination;
 end;
 
 function Table1.setHeadOfColumns(): Header;
@@ -134,13 +125,16 @@ begin
 end;
 
 function Table1.checkDayFormat(day: string): boolean;
+const
+  lowerBoundOfTheDay = 0;
+  highestBoundOfTheDay = 13;
 var
   int_day: integer;
 begin
   if isInteger(day) then
   begin
     int_day := strtoint(day);
-    if ((int_day < 32) and (int_day > 0)) then
+    if ((int_day < highestBoundOfTheDay) and (int_day > lowerBoundOfTheDay)) then
       result := true
     else
       result := false;
@@ -150,13 +144,16 @@ begin
 end;
 
 function Table1.checkMonthFormat(month: string): boolean;
+const
+  lowerBoundOfTheMonth = 0;
+  highestBoundOfTheMonth = 13;
 var
   int_month: integer;
 begin
   if isInteger(month) then
   begin
     int_month := strtoint(month);
-    if ((int_month < 13) and (int_month > 0)) then
+    if ((int_month < highestBoundOfTheMonth) and (int_month > lowerBoundOfTheMonth)) then
       result := true
     else
       result := false;
@@ -166,19 +163,19 @@ begin
 end;
 
 function Table1.checkYearFormat(year: string): boolean;
+const
+  lowerBoundOfTheYear = 1723;
+  highestBoundOfTheYear = 2023;
 var
   int_year: integer;
 begin
-  if isinteger(year) then
+  result := false;
+  if isInteger(year) then
   begin
     int_year := strtoint(year);
-    if ((int_year > 1990) and (int_year < 2023)) then
+    if ((int_year > lowerBoundOfTheYear) and (int_year < highestBoundOfTheYear)) then
       result := true
-    else
-      result := false;
   end
-  else
-    result := false;
 end;
 
 function Table1.checkOrganizationName(text: string): boolean;
@@ -228,27 +225,35 @@ begin
 end;
 
 function Table1.enterStreetName: string;
+const
+  theLongestStreetName = 34;
 begin
   write('ул.');
-  enterStreetName := 'ул.' + enterText(result, 34);
+  enterStreetName := 'ул.' + enterText(result, theLongestStreetName);
 end;
 
 function Table1.enterHomeNumber: string;
+const
+  homeNumberLength = 4;
 begin
   write('д.');
-  enterHomeNumber := 'д.' + enterNumber(4);
+  enterHomeNumber := 'д.' + enterNumber(homeNumberLength);
 end;
 
 function Table1.enterTownName: string;
+const
+  theLongestTownName = 25;
 begin
   write('г.');
-  enterTownName := enterText(result, 25);
+  enterTownName := enterText(result, theLongestTownName);
 end;
 
 function Table1.enterFlatNumber: string;
+const
+  flatNumber = 2;
 begin
   write('к.');
-  enterFlatNumber := 'к.' + enterNumber(2);
+  enterFlatNumber := 'к.' + enterNumber(flatNumber);
 end;
 
 function Table1.enterAddress: string;
@@ -267,15 +272,16 @@ function Table1.enterOrganizationName(text: string): string;
 const
   MaxOrgNameSize = 80;
 begin
-  enterOrganizationName := text;
-  enterOrganizationName := enterText(result, MaxOrgNameSize);
+  enterOrganizationName := enterText(text, MaxOrgNameSize);
 end;
 
 function Table1.enterYear: string;
+const
+  countNumberInYear = 4;
 begin
   repeat
-    enterYear := enterNumber(4);
-    if (strtoint(enterYear) < 1400) or (strtoint(enterYear) > 2022) then
+    enterYear := enterNumber(countNumberInYear);
+    if not checkYearFormat(enterYear) then
       enterYear := deleteText(enterYear, length(enterYear));
   until length(enterYear) > 0;
   enterYear := enterYear + ' г.';
@@ -328,11 +334,13 @@ begin
 end;
 
 function Table2.enterNameOfTheInstitution: string;
+const
+  theLongestInstitutionName = 80;
 begin
   result := '';
   while result = '' do
   begin
-    result := enterText(result, 80);
+    result := enterText(result, theLongestInstitutionName);
     if isString(result) and isInteger(result) then
       result := deleteText(result, length(result));
   end;
@@ -341,37 +349,38 @@ end;
 function Table2.enterSpecialtyCode: string;
 const
   numberCount = 3;
+  numbersLength = 2;
 var
   i: byte = 0;
   intermediateText: string = '';
 begin
+  result := '';
   while i < numberCount do
   begin
-    intermediateText := enterText(intermediateText, 2);
+    intermediateText := enterText(intermediateText, numbersLength);
     if isInteger(intermediateText) then
-      result := result + intermediateText
-    else
-      intermediateText := deleteText(intermediateText, 2);
-    if i < numberCount - 1 then
     begin
-      result := result + '.';
-      write('.');
-    end;
-    i := i + 1;
-    intermediateText := '';
+      result := result + intermediateText;
+      if i < numberCount - 1 then
+      begin
+        result := result + '.';
+        write('.');
+      end;
+      i := i + 1;
+      intermediateText := '';
+    end
+    else
+      intermediateText := deleteText(intermediateText, numbersLength);
   end;
 end;
 
-function Table2.enterNumberOfBudgetSeats: string;
+function Table2.enterNumberOfSeats: string;
+const
+  postscript = ' мест(о/a)';
+  digitsCountInNumber = 3;
 begin
-  result := enterNumber(3) + ' мест';
-  write('мест');
-end;
-
-function Table2.enterNumberOfCommercialSeats: string;
-begin
-  result := enterNumber(3) + ' мест';
-  write('мест');
+  result := enterNumber(digitsCountInNumber) + postscript;
+  write(postscript);
 end;
 
 function Table2.enterTextFormat(InputField: TextButton): string;
@@ -381,8 +390,8 @@ begin
   case on_horizontal_button of
       1: enterTextFormat := enterNameOfTheInstitution;
       2: enterTextFormat := enterSpecialtyCode;
-      3: enterTextFormat := enterNumberOfBudgetSeats;
-      4: enterTextFormat := enterNumberOfCommercialSeats;
+      3: enterTextFormat := enterNumberOfSeats;
+      4: enterTextFormat := enterNumberOfSeats;
     end;
   InputField.border.Destroy;
   InputField.Destroy;
@@ -403,17 +412,21 @@ begin
 end;
 
 function Table3.enterNumberOfSpeciality: string;
+const
+  digitsInNumber = 4;
 begin
   write('№');
-  result := '№' + enterNumber(4);
+  result := '№' + enterNumber(digitsInNumber);
 end;
 
 function Table3.enterName: string;
+const
+  nameLength = 80;
 begin
   result := '';
   while result = '' do
   begin
-    result := enterText(result, 80);
+    result := enterText(result, nameLength);
     if isString(result) and isInteger(result) then
       result := deleteText(result, length(result));
   end;

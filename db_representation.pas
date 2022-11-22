@@ -297,6 +297,7 @@ begin
       #16: SortMode;
       #19: Save;
       #12: Load;
+      #6: Search;
       #8: ShowHeadMod;
     end;
     table.switchPage(key);
@@ -355,6 +356,7 @@ begin
   end;
   until (key = #27);
   table.turnOffDeleteLight;
+  table.showpage;
 end;
 
 procedure ViewTable.SortMode;
@@ -417,7 +419,7 @@ end;
 
 procedure ViewTable.Search;
 const
-  preliminaryTextLen = 9;
+  preliminaryTextLen = 11;
 var
   coordsOfTheLastLine: Coords;
   selectionDescription, field: TextButton;
@@ -430,6 +432,7 @@ begin
   selectionMenu.x := selectionMenu.x + preliminaryTextLen;
 
   selectionDescription := TextButton.Init(preliminaryTextLen, 1, selectionMenu.x, selectionMenu.y, 0, 'Search in: ');
+  selectionMenu.x := selectionMenu.x + preliminaryTextLen;
   selectionDescription.show;
 
   for head_name := 0 to table.countColumn - 1 do
@@ -438,8 +441,10 @@ begin
   selectionDescription.Destroy;
 
   coordsOfTheLastLine := table.getCellCoords(table.lineCount, 1);
-  field := table.createInputField(coordsOfTheLastLine[1], coordsOfTheLastLine[2] + (table.borderFreeSpace * 2), table.head_width);
-  //field.setText(enterTextFormat())
+  field := table.createInputField(coordsOfTheLastLine[1], coordsOfTheLastLine[2] + (table.borderFreeSpace * 2),
+            coordsOfTheLastLine[1] + table.head_width - table.borderFreeSpace);
+  field.setText(table.enterTextFormat(field));
+  table.search(field.getText(), selectionMenu.on_button);
 end;
 
 procedure ViewTable.ShowHeadMod;

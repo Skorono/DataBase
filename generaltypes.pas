@@ -44,11 +44,14 @@ implementation
 
   function isInteger(text: string): boolean;
   var
-    i: integer;
+    i: integer = 0;
   begin
     result := true;
-    for i := 1 to length(text) do
+    if text = '' then
+      result := false;
+    while ((result) and (i < length(text))) do
     begin
+      i := i + 1;
       if not (text[i] in ['0'..'9']) then
         result := false;
     end;

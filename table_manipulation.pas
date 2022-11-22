@@ -61,6 +61,7 @@ type
     procedure SortTable(column: byte);
     procedure Save(fName: string);
     procedure Load(fName: string);
+    procedure Search(text: string; column: byte);
     procedure enterSavePath(field: TextButton);
     function createInputField(x_, y_, last_y: word): TextButton;
     function createSelectionMenu: SwitchMenu;
@@ -99,7 +100,6 @@ begin
   else
     head_width := width;
   showHead;
-  //SetBackground(background);
   createNewPage;
   positional_hint;
   createPositionHint;
@@ -311,25 +311,27 @@ end;
 
 function InheritedTableCls.enterText(text: string; symbolsCount: byte): string;
 var
-  key: char;
+  key: char = ' ';
 begin
-  key := ' ';
   result := '';
   while key <> #13 do
   begin
     key := readkey;
-    if (isString(key) or (key in ['-', '/', '\'])) and (symbolsCount > length(text)) then
+    if (symbolsCount > length(text)) then
     begin
-      text := text + key;
-      write(key);
-    end
-    else if (key = #8) and (text <> '')then
-      text := deleteText(text, 1)
-    else if key = #32 then
-    begin
-      text := text + ' ';
-      write(' ');
+      if isString(key) or (key in ['-', '/', '\']) then
+      begin
+        text := text + key;
+        write(key);
+      end
+      else if key = #32 then
+      begin
+        text := text + ' ';
+        write(' ');
+      end;
     end;
+    if (key = #8) and (text <> '') then
+      text := deleteText(text, 1)
   end;
   result := text;
 end;
@@ -343,22 +345,18 @@ begin
   while key <> #13 do
   begin
     key := readkey;
-    if isInteger(key) and (digitsCount > length(result)) then
+    if digitsCount > length(result) then
     begin
-      result := result + key;
-      write(key);
-    end
-    else if (key = #8) and (result <> '') then
-      result := deleteText(result, 1)
-    else if key = #32 then
-    begin
-      result := result + ' ';
-      write(' ');
+      if isInteger(key) then
+      begin
+        result := result + key;
+        write(key);
+      end
     end;
+    if key = #8 then
+      result := deleteText(result, 1);
   end;
-  if result = '' then
-    result := ' ';
-  while (result[1] = '0') and (result <> '') and (length(result) > 1) do
+  while (result <> '') and (result[1] = '0') and (length(result) > 1) do
     result := result[2..length(result)];
 end;
 
@@ -368,17 +366,20 @@ const
 var
   x_, y_, count: integer;
 begin
-  x_ := whereX;
-  y_ := whereY;
-  count := delCount;
-  repeat
-    x_ := x_ - stepDel;
+  if text <> '' then
+  begin
+    x_ := whereX;
+    y_ := whereY;
+    count := delCount;
+    repeat
+      x_ := x_ - stepDel;
+      gotoxy(x_, y_);
+      write(' ');
+      count := count - 1;
+    until count = 0;
     gotoxy(x_, y_);
-    write(' ');
-    count := count - 1;
-  until count = 0;
-  gotoxy(x_, y_);
-  deleteText := copy(text, 1, length(text) - delCount);
+    deleteText := copy(text, 1, length(text) - delCount);
+  end;
 end;
 
 function InheritedTableCls.createInputField(x_, y_, last_y: word): TextButton;
@@ -422,12 +423,14 @@ end;
 
 procedure InheritedTableCls.turnOffDeleteLight();
 var
-  line: PLine;
+  line: Coords;
+  lineNumber: byte;
 begin
-  line := lineList.getNode(getFirstLineNumber(pageNumber) + (on_vertical_button-1));
-  LineLighting(getFirstLineNumber(pageNumber) + (on_vertical_button-1), 0);
+  lineNumber := getFirstLineNumber(pageNumber) + (on_vertical_button-1);
+  line := getCellCoords(lineNumber, 1);
+  LineLighting(lineNumber, 0);
   window(x, y, x_border, y_border);
-  gotoxy(line^.data[1].x_pos, line^.data[1].y_pos);
+  gotoxy(line[1], line[2]);
 end;
 
 procedure InheritedTableCls.deleteLine(lineNumber: byte);
@@ -647,6 +650,22 @@ end;
 procedure InheritedTableCls.Load(fName: string);
 begin
   lineList.Load(fName);
+end;
+
+procedure InheritedTableCls.Search(text: string; column: byte);
+var
+  node: integer;
+  line: PLine;
+begin
+  for node := 1 to lineList.nodeCount do
+  begin
+    line := lineList.getNode(node);
+    if line^.data[column].getText() = text then
+    begin
+      pageNumber := node mod lineCount;
+      showpage();
+    end;
+  end;
 end;
 
 destructor InheritedTableCls.Destroy;

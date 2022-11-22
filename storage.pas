@@ -169,7 +169,8 @@ implementation
        while not EOF(f) do
        begin
          readLineFromFile(f, line_copy);
-         line_copy := line_copy^.next;
+         if line_copy^.next <> nil then
+           line_copy := line_copy^.next;
        end;
        close(f);
      except
@@ -214,7 +215,10 @@ implementation
     _propetiesTransmission(elm, newEmptyElm);
 
     _pullOffElmFromList(elm);
+    _renumberList;
+
     _insert(newEmptyElm, newEmptyElm^.number);
+    _renumberList;
   end;
 
   procedure Cls_List.insert(var elm: PLine; var replaceableNode: PLine);
