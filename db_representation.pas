@@ -283,7 +283,7 @@ begin
   table := T.Init(2, 2, 36, 8, 1);
   //достойно экстерминатуса
   menu.changePos(table.head_buttons[table.countColumn-1].x_pos + table.head_width + (menu.menu_border.XborderFreeSpace + 3),
-                 table.additional_textbutton[3].y_pos + (menu.menu_border.XborderFreeSpace + 3));
+                 table.additional_textbutton[7].y_pos + (menu.menu_border.XborderFreeSpace + 3));
   menu.showMenu;
   table.showPage;
   key := ' ';

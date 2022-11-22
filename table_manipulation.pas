@@ -134,11 +134,13 @@ end;
 procedure InheritedTableCls.positional_hint;
 const
   height = 1;
-  hintCount = 4;
+  hintCount = 8;
 var
   hint: TextButton;
   text: array[1..hintCount] of string = ('ESC - выход из режима/выход из программы', 'Ctrl + A - EditMode',
-                                          'Ctrl + D - DeleteMode', 'Ctrl + <- / -> - Переключение между страницами');
+                                          'Ctrl + P - SortMode', 'Ctrl + F - Search',
+                                          'Ctrl + D - DeleteMode', 'Ctrl + S - Save',
+                                          'Ctrl + L - Load', 'Ctrl + <- / -> - Переключение между страницами');
   line: PLine;
   i, pos_x, pos_y: integer;
 begin

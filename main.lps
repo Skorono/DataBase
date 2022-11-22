@@ -9,7 +9,7 @@
         <Filename Value="main.lpr"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Main"/>
-        <TopLine Value="30"/>
+        <TopLine Value="34"/>
         <CursorPos X="13" Y="42"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
@@ -26,8 +26,8 @@
         <Filename Value="table_manipulation.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="625"/>
-        <CursorPos X="38" Y="642"/>
+        <TopLine Value="122"/>
+        <CursorPos X="52" Y="156"/>
         <UsageCount Value="134"/>
         <Loaded Value="True"/>
       </Unit>
@@ -41,7 +41,6 @@
       <Unit>
         <Filename Value="tables.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="5"/>
         <TopLine Value="19"/>
         <CursorPos X="23" Y="63"/>
@@ -69,9 +68,10 @@
       <Unit>
         <Filename Value="db_representation.pas"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="435"/>
-        <CursorPos Y="492"/>
+        <TopLine Value="267"/>
+        <CursorPos X="47" Y="286"/>
         <UsageCount Value="205"/>
         <Loaded Value="True"/>
       </Unit>
@@ -80,8 +80,7 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="GeneralTypes"/>
         <EditorIndex Value="6"/>
-        <TopLine Value="44"/>
-        <CursorPos X="53" Y="47"/>
+        <CursorPos X="73" Y="33"/>
         <UsageCount Value="201"/>
         <Loaded Value="True"/>
       </Unit>
@@ -134,7 +133,7 @@
         <UsageCount Value="3"/>
       </Unit>
     </Units>
-    <JumpHistory HistoryIndex="29">
+    <JumpHistory HistoryIndex="27">
       <Position>
         <Filename Value="storage.pas"/>
         <Caret Line="231" Column="80" TopLine="203"/>
@@ -162,10 +161,6 @@
       <Position>
         <Filename Value="storage.pas"/>
         <Caret Line="218" TopLine="210"/>
-      </Position>
-      <Position>
-        <Filename Value="storage.pas"/>
-        <Caret Line="220" TopLine="237"/>
       </Position>
       <Position>
         <Filename Value="storage.pas"/>
@@ -240,20 +235,16 @@
         <Caret Line="76" Column="22" TopLine="26"/>
       </Position>
       <Position>
-        <Filename Value="db_representation.pas"/>
-        <Caret Line="80" Column="16" TopLine="438"/>
-      </Position>
-      <Position>
         <Filename Value="base_graphic.pas"/>
         <Caret Line="40" Column="48" TopLine="30"/>
       </Position>
       <Position>
-        <Filename Value="tables.pas"/>
-        <Caret Line="12" Column="26" TopLine="403"/>
-      </Position>
-      <Position>
         <Filename Value="generaltypes.pas"/>
         <Caret Line="68" Column="60" TopLine="47"/>
+      </Position>
+      <Position>
+        <Filename Value="table_manipulation.pas"/>
+        <Caret Line="141" Column="86" TopLine="95"/>
       </Position>
     </JumpHistory>
     <RunParams>
@@ -279,7 +270,7 @@
         <WatchScope Value="wpsLocal"/>
         <WatchKind Value="wpkWrite"/>
         <Source Value="table_manipulation.pas"/>
-        <Line Value="438"/>
+        <Line Value="440"/>
       </Item>
     </BreakPoints>
     <Watches>
