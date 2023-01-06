@@ -26,6 +26,7 @@ type
   function split(symbol: char; str: string): ArrOfString;
   function join(symbol: char; arr_str: ArrOfString): string;
 implementation
+
   function isString(text: string): boolean;
   var
     i: integer;

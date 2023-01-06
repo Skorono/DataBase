@@ -368,19 +368,20 @@ const
 var
   x_, y_, count: integer;
 begin
+  deleteText := '';
   if text <> '' then
   begin
     x_ := whereX;
     y_ := whereY;
-    count := delCount;
+    count := 0;
     repeat
       x_ := x_ - stepDel;
+      count := count + 1;
       gotoxy(x_, y_);
       write(' ');
-      count := count - 1;
-    until count = 0;
-    gotoxy(x_, y_);
-    deleteText := copy(text, 1, length(text) - delCount);
+      gotoxy(x_, y_);
+      deleteText := copy(text, 1, length(text) - count);
+    until ((count = delCount) or (deleteText = ''));
   end;
 end;
 
@@ -664,7 +665,7 @@ begin
     line := lineList.getNode(node);
     if line^.data[column].getText() = text then
     begin
-      pageNumber := node mod lineCount;
+      pageNumber := (node div lineCount) + 1;
       showpage();
     end;
   end;

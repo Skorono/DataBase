@@ -442,9 +442,12 @@ begin
 
   coordsOfTheLastLine := table.getCellCoords(table.lineCount, 1);
   field := table.createInputField(coordsOfTheLastLine[1], coordsOfTheLastLine[2] + (table.borderFreeSpace * 2),
-            coordsOfTheLastLine[1] + table.head_width - table.borderFreeSpace);
-  field.setText(table.enterTextFormat(field));
+            coordsOfTheLastLine[1] + ((table.head_width + (table.borderFreeSpace-1)) * table.countColumn));
+  gotoxy(field.Border.start_x + field.border.XborderFreeSpace, field.Border.top_y + field.border.YborderFreeSpace);
+  field.setText(table.enterText('', field.button_width - field.border.XborderFreeSpace));
   table.search(field.getText(), selectionMenu.on_button);
+  field.border.Destroy;
+  field.Destroy();
 end;
 
 procedure ViewTable.ShowHeadMod;

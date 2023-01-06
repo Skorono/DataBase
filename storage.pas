@@ -209,10 +209,15 @@ implementation
     newEmptyElm^.number := elm^.number;
     for i := 1 to countOfColumns do
     begin
-      newEmptyElm^.data[i] := Cell.Create;
-      newEmptyElm^.data[i].border := Border.Create;
+      newEmptyElm^.data[i] := Cell.Init(elm^.data[i].button_width, elm^.data[i].button_height,
+                                        elm^.data[i].x_pos, elm^.data[i].y_pos, elm^.data[i].background, '');
+      newEmptyElm^.data[i].border := Border.Init(elm^.data[i].border.symbol,
+                                      elm^.data[i].border.XborderFreeSpace, elm^.data[i].border.YborderFreeSpace,
+                                      elm^.data[i].border.start_x, elm^.data[i].border.top_y, elm^.data[i].border.top_y,
+                                      elm^.data[i].border.text_size);
+      elm^.data[i].border.Destroy;
+      elm^.data[i].Destroy;
     end;
-    _propetiesTransmission(elm, newEmptyElm);
 
     _pullOffElmFromList(elm);
     _renumberList;
@@ -296,7 +301,10 @@ implementation
       node^.next^.previous := node;
     end
     else if elm = Line then
+    begin
       Line := Line^.next;
+      Line^.previous := nil;
+    end;
     dispose(elm);
     elm := newN;
   end;
@@ -334,6 +342,8 @@ implementation
         recipient^.data[cell].border.last_x := sender^.data[cell].border.last_x;
         recipient^.data[cell].border.top_y := sender^.data[cell].border.top_y;
         recipient^.data[cell].border.bottom_y := sender^.data[cell].border.bottom_y;
+        recipient^.data[cell].button_width := sender^.data[cell].button_width;
+        recipient^.data[cell].button_height := sender^.data[cell].button_height;
       end;
     end;
   end;

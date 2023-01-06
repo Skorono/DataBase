@@ -13,20 +13,14 @@ type
   private
     function enterAccreditation: string;
     function enterDateForm: string;
+    function enterDayInDate: string;
     function enterFlatNumber: string;
     function enterLicence: string;
+    function enterMonthInDate: string;
     function enterTownName: string;
     function enterTypeOfSubordination: string;
     function enterYear: string;
-  public
-    constructor Init(start_x, start_y, border_y, width, height: integer);
-    procedure showPage;
-    procedure showLine(lineNumber: word);
-    procedure showHead;
-    function enterStreetName: string;
-    function enterTextFormat(InputField: TextButton): string; override;
-    function setHeadOfColumns(): Header; override;
-    {function enterDateForm: string;}
+    function enterYearInDate: string;
     function checkDayFormat(day: string): boolean;
     function checkMonthFormat(month: string): boolean;
     function checkYearFormat(year: string): boolean;
@@ -34,6 +28,14 @@ type
     function enterOrganizationName(text: string): string;
     function enterAddress: string;
     function enterHomeNumber: string;
+    function enterStreetName: string;
+  public
+    constructor Init(start_x, start_y, border_y, width, height: integer);
+    procedure showPage;
+    procedure showLine(lineNumber: word);
+    procedure showHead;
+    function enterTextFormat(InputField: TextButton): string; override;
+    function setHeadOfColumns(): Header; override;
     {procedure enterSubmissionForm;
     procedure enterNumberForm;
     procedure enterAddressForm;}
@@ -56,6 +58,7 @@ type
 
   Table3 = class sealed (InheritedTableCls)
   private
+    function enterDatePart: string;
     function enterDurationOfLearning: string;
     function enterName: string;
     function enterNumberOfSpeciality: string;
@@ -98,18 +101,30 @@ end;
 function Table1.enterTextFormat(InputField: TextButton): string;
 begin
   inherited enterTextFormat(InputField);
-  case on_horizontal_button of
-    1: enterTextFormat := enterOrganizationName(InputField.getText);
-    2: enterTextFormat := enterAddress;
-    4: enterTextFormat := enterYear;
-    5: enterTextFormat := enterLicence;
-    6: enterTextFormat := enterAccreditation;
-    7: enterTextFormat := enterDateForm;
-  end;
-  InputField.border.Destroy;
-  InputField.Destroy;
-  if on_horizontal_button = 3 then
+  if (on_horizontal_button <> 3) then
+  begin
+    if on_horizontal_button = 1 then
+      enterTextFormat := enterOrganizationName(InputField.getText)
+    else if (InputField.getText() = '') or (readkey <> #13) then
+    begin
+      InputField.setText(deleteText(InputField.getText(), length(InputField.getText())));
+      case on_horizontal_button of
+        2: enterTextFormat := enterAddress;
+        4: enterTextFormat := enterYear;
+        5: enterTextFormat := enterLicence;
+        6: enterTextFormat := enterAccreditation;
+        7: enterTextFormat := enterDateForm;
+      end;
+    end;
+    InputField.border.Destroy;
+    InputField.Destroy;
+  end
+  else
+  begin
+    InputField.border.Destroy;
+    InputField.Destroy;
     enterTextFormat := enterTypeOfSubordination;
+  end;
 end;
 
 function Table1.setHeadOfColumns(): Header;
@@ -127,7 +142,7 @@ end;
 function Table1.checkDayFormat(day: string): boolean;
 const
   lowerBoundOfTheDay = 0;
-  highestBoundOfTheDay = 13;
+  highestBoundOfTheDay = 32;
 var
   int_day: integer;
 begin
@@ -190,38 +205,51 @@ begin
   end;
 end;
 
-function Table1.enterDateForm: string;
+function Table1.enterDayInDate: string;
 const
-  otherLen = 2; { переименовать }
-  yearLen = 4;
-var
-  x_, y_: integer;
-  text: string;
+  countNumbersBeforeDot = 2;
 begin
- { x_ := 1;
-  y_ := 1;
+  enterDayInDate := enterNumber(countNumbersBeforeDot);
+  while not checkDayFormat(enterDayInDate) do
+  begin
+    enterDayInDate := deleteText(enterDayInDate, countNumbersBeforeDot);
+    enterDayInDate := enterNumber(countNumbersBeforeDot);
+  end;
+  enterDayInDate := enterDayInDate + '.';
+  write('.');
+end;
 
-  write('  .  .');
-  gotoxy(x_ + otherLen, y_);
-  repeat
-    deleteText(otherLen);
-    enterText(otherLen);
-  until (checkDayFormat(text));
+function Table1.enterMonthInDate: string;
+const
+  countNumbersBeforeDot = 2;
+begin
+  enterMonthInDate := enterNumber(countNumbersBeforeDot);
+  while not checkMonthFormat(enterMonthInDate) do
+  begin
+    enterMonthInDate := deleteText(enterMonthInDate, countNumbersBeforeDot);
+    enterMonthInDate := enterNumber(countNumbersBeforeDot);
+  end;
+  enterMonthInDate := enterMonthInDate + '.';
+  write('.');
+end;
 
-  x_ := x_ + otherLen;
-  gotoxy(x_ + otherLen, y_);
-  repeat
-    deleteText(otherLen);
-    enterText(otherLen);
-    write(text);
-  until (checkMonthFormat(text));
+function Table1.enterYearInDate: string;
+const
+  countDigitsInYear = 4;
+begin
+  enterYearInDate := enterNumber(countDigitsInYear);
+  while not checkYearFormat(enterYearInDate) do
+  begin
+    enterYearInDate := deleteText(enterYearInDate, countDigitsInYear);
+    enterYearInDate := enterNumber(countDigitsInYear);
+  end;
+end;
 
-  x_ := x_ + otherLen;
-  gotoxy(x_ + yearLen, y_);
-  repeat
-    deleteText(yearLen);
-    enterText(yearLen);
-  until (checkYearFormat(text)); }
+function Table1.enterDateForm: string;
+begin
+  result := result + enterDayInDate;
+  result := result + enterMonthInDate;
+  result := result + enterYearInDate;
 end;
 
 function Table1.enterStreetName: string;
@@ -352,26 +380,18 @@ const
   numbersLength = 2;
 var
   i: byte = 0;
-  intermediateText: string = '';
 begin
   result := '';
   while i < numberCount do
   begin
-    intermediateText := enterText(intermediateText, numbersLength);
-    if isInteger(intermediateText) then
+    result := result + enterNumber(numbersLength);
+    if i < numberCount - 1 then
     begin
-      result := result + intermediateText;
-      if i < numberCount - 1 then
-      begin
-        result := result + '.';
-        write('.');
-      end;
-      i := i + 1;
-      intermediateText := '';
-    end
-    else
-      intermediateText := deleteText(intermediateText, numbersLength);
-  end;
+      result := result + '.';
+      write('.');
+    end;
+    i := i + 1;
+  end
 end;
 
 function Table2.enterNumberOfSeats: string;
@@ -386,13 +406,18 @@ end;
 function Table2.enterTextFormat(InputField: TextButton): string;
 begin
   inherited enterTextFormat(InputField);
-
-  case on_horizontal_button of
-      1: enterTextFormat := enterNameOfTheInstitution;
-      2: enterTextFormat := enterSpecialtyCode;
-      3: enterTextFormat := enterNumberOfSeats;
-      4: enterTextFormat := enterNumberOfSeats;
-    end;
+  if on_horizontal_button = 1 then
+    enterTextFormat := enterNameOfTheInstitution
+  else if (InputField.getText() = '') or (readkey <> #13) then
+  begin
+    deleteText(InputField.getText(), length(InputField.getText()));
+    InputField.setText('');
+    case on_horizontal_button of
+        2: enterTextFormat := enterSpecialtyCode;
+        3: enterTextFormat := enterNumberOfSeats;
+        4: enterTextFormat := enterNumberOfSeats;
+      end;
+  end;
   InputField.border.Destroy;
   InputField.Destroy;
 end;
@@ -432,24 +457,54 @@ begin
   end;
 end;
 
-function Table3.enterDurationOfLearning: string;
-const
-  postScriptum = 'a';
+function Table3.enterDatePart(): string;
 begin
+  result := '';
+  while (result = '') do
+  begin
+    deleteText(result, 2);
+    result := enterNumber(2);
+  end;
+end;
 
+function Table3.enterDurationOfLearning: string;
+var
+  monthNumber: integer;
+begin
+  result := '';
+  result := result + enterDatePart;
+  write(' год(а)/лет ');
+  result := result + ' год(а)/лет ';
+
+  monthNumber := strToInt(enterDatePart);
+  while (monthNumber > 11) do
+  begin
+    result := result + intToStr(monthNumber);
+    result := deleteText(result, 2);
+    monthNumber := strToInt(enterDatePart);
+  end;
+
+  result := result + intToStr(monthNumber);
+  write(' мес€ц(а/ев)');
+  result := result + ' мес€ц(а/ев)';
 end;
 
 function Table3.enterTextFormat(InputField: TextButton): string;
 begin
   inherited enterTextFormat(InputField);
-
-  case on_horizontal_button of
+  if on_horizontal_button = 2 then
+    enterTextFormat := enterName
+  else if (InputField.getText() = '') or (readkey <> #13) then
+  begin
+    InputField.setText(deleteText(InputField.getText(), length(InputField.getText())));
+    case on_horizontal_button of
       1: enterTextFormat := enterNumberOfSpeciality;
-      2: enterTextFormat := enterName;
       3: enterTextFormat := enterDurationOfLearning;
+    end;
   end;
   InputField.border.Destroy;
   InputField.Destroy;
 end;
-end.
 
+begin
+end.
