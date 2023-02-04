@@ -59,21 +59,21 @@ var
    table1: _table1 = nil;
    table2: _table2 = nil;
    table3: _table3 = nil;
-   //backdrop: WindowManager;
+   backdrop: WindowManager;
 begin
-  //backdrop := WindowManager.Init;
+  backdrop := WindowManager.Init;
   main_menu := Menu.Init(110, 22, 240, 40, 0); // инициализируем меню по координатам
   main_menu.addButton('Учреждения');
   main_menu.addButton('Контрольные цифры приема');
   main_menu.addButton('Специальности');
-  //backdrop.createNewWindow(110, 22, 240, 40, 7);
-  //backdrop.showWindow(1);
+  backdrop.createNewWindow(110, 22, 240, 40, 7);
+  backdrop.showWindow(1);
   main_menu.Main;
   createTable(table1, table2, table3, main_menu);
   while main_menu <> nil do
   begin
     main_menu.Main;
-    //backdrop.showWindow(1);
+    backdrop.showWindow(1);
     destroyPreviousTable(table1, table2, table3);  // удаление таблицы при перезаписи несохраненной таблицы
     createTable(table1, table2, table3, main_menu);
   end;

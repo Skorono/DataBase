@@ -87,16 +87,15 @@ implementation
     end;
   end;
 
-  //  Соединяет массив строк символом.
   function join(symbol: char; arr_str: ArrOfString): string;
   var
     i: integer;
     new_str: string;
   begin
-    new_str := ''; // динамически изменяемая строка
+    new_str := '';
     result := '';
     for i := 0 to length(arr_str)-1 do
-      new_str := new_str + arr_str[i] + symbol; // изменяем строку
+      new_str := new_str + arr_str[i] + symbol;
     //result := new_str + arr_str[length(arr_str)-1];
     result := new_str;
   end;

@@ -194,7 +194,7 @@ implementation
     last_x := start_x + t_size + XborderFreeSpace;
     top_y := start_y;
     bottom_y := last_y + YborderFreeSpace;
-    text_size := (t_size + (XborderFreespace * 2)) - 2;      // граница не касается текста
+    text_size := (t_size + (XborderFreespace * 2)) - 2;
     symbol := fsymbol;
     border_color := 3;
     background := 0;
@@ -217,9 +217,9 @@ implementation
     horizontal_text: string;
     _start_x, _top_y, _last_x, _bottom_y, char, pos: byte;
   begin
-    _start_x := start_x - XborderFreeSpace;     // start_x - координата текста _start_x - координата обрамления
-    _top_y := top_y - YborderFreeSpace;         // top_y - координата текста _top_y - координата обрамления
-    Window(_start_x, _top_y, last_x, bottom_y); // При создании окна координатой (1, 1) становиться  (_start_x, _top_y)
+    _start_x := start_x - XborderFreeSpace;
+    _top_y := top_y - YborderFreeSpace;
+    Window(_start_x, _top_y, last_x, bottom_y);
 
     _last_x := last_x - _start_x;
     _start_x := 1;

@@ -491,7 +491,7 @@ begin
   begin
     gotoxy(1, y);
     //delline;
-    clreol;  // стирает строку
+    clreol;
     sleep(17);
   end;
   cursoron;

@@ -80,7 +80,7 @@ begin
   //win.createNewWindow(120, 1, 220, 50, 7);
   //for i := 1 to win.activeWindows do
   //  win.showWindow(i);
-  inherited Init(start_x, start_y, border_y, width, height, countColumn, 0, false);
+  inherited Init(start_x, start_y, border_y, width, height, countColumn, 0, true);
 end;
 
 procedure Table1.showPage;

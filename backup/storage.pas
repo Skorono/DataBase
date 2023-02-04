@@ -131,6 +131,7 @@ implementation
        end;
        close(f);
      except
+        writeln('hello');
      end;
    end;
 

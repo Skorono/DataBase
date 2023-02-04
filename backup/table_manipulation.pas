@@ -312,9 +312,9 @@ end;
 
 procedure InheritedTableCls.switchPage(key: char);
 begin
-  if key = #116 then // Ñtrl + ->
+  if key = #116 then
     nextPage()
-  else if key = #115 then // Ñtrl + <-
+  else if key = #115 then
     previousPage();
 end;
 
