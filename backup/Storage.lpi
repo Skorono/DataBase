@@ -10,7 +10,7 @@
         <MainUnitHasScaledStatement Value="False"/>
       </Flags>
       <SessionStorage Value="InProjectDir"/>
-      <Title Value="main"/>
+      <Title Value="Storage"/>
       <UseAppBundle Value="False"/>
       <ResourceType Value="res"/>
     </General>
@@ -23,48 +23,15 @@
     </PublishOptions>
     <RunParams>
       <FormatVersion Value="2"/>
-      <Modes>
-        <Mode Name="default"/>
-      </Modes>
     </RunParams>
     <Units>
       <Unit>
-        <Filename Value="main.lpr"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="Main"/>
-      </Unit>
-      <Unit>
-        <Filename Value="delete.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="table_manipulation.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="menu.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="tables.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="base_graphic.pas"/>
+        <Filename Value="Storage.lpr"/>
         <IsPartOfProject Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="storage.pas"/>
         <IsPartOfProject Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="db_representation.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="generaltypes.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="GeneralTypes"/>
       </Unit>
     </Units>
   </ProjectOptions>
@@ -72,37 +39,17 @@
     <Version Value="11"/>
     <PathDelim Value="\"/>
     <Target>
-      <Filename Value="main"/>
+      <Filename Value="Storage"/>
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
-    <Parsing>
-      <SyntaxOptions>
-        <IncludeAssertionCode Value="True"/>
-      </SyntaxOptions>
-    </Parsing>
-    <CodeGeneration>
-      <Checks>
-        <IOChecks Value="True"/>
-        <RangeChecks Value="True"/>
-        <OverflowChecks Value="True"/>
-        <StackChecks Value="True"/>
-      </Checks>
-      <VerifyObjMethodCallValidity Value="True"/>
-    </CodeGeneration>
     <Linking>
       <Debugging>
         <DebugInfoType Value="dsDwarf2"/>
-        <UseHeaptrc Value="True"/>
       </Debugging>
     </Linking>
-    <Other>
-      <Verbosity>
-        <ShowAll Value="True"/>
-      </Verbosity>
-    </Other>
   </CompilerOptions>
   <Debugging>
     <Exceptions>

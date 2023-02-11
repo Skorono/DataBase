@@ -74,7 +74,7 @@ constructor Table1.Init(start_x, start_y, border_y, width, height: integer);
 //  i: byte;
 //  win: WindowManager;
 begin
-  countColumn := 7;
+  countColumn := 4;
   //win := WindowManager.Init;
   //win.createNewWindow(1, 1, 170, 5, 7);
   //win.createNewWindow(120, 1, 220, 50, 7);
@@ -131,12 +131,9 @@ function Table1.setHeadOfColumns(): Header;
 begin
   setlength(result, countColumn);
   Result[0] := 'мюгбюмхе';
-  Result[1] := 'юдпея';
-  Result[2] := 'рхо ондвхмемхъ';
-  Result[3] := 'цнд нямнбюмхъ';
-  Result[4] := 'мнлеп кхжемгхх';
-  Result[5] := 'мнлеп юййпедхрюжхх';
-  Result[6] := 'дюрю нйнмвюмхъ деиярбхъ юййпедхрюжхх';
+  Result[1] := 'дебекноеп';
+  Result[2] := 'окныюдэ';
+  Result[3] := 'йнкхвеярбн фхрекеи';
 end;
 
 function Table1.checkDayFormat(day: string): boolean;
@@ -348,17 +345,18 @@ end;
 
 constructor Table2.Init(start_x, start_y, border_y, width, height: integer);
 begin
-  countColumn := 4;
+  countColumn := 5;
   inherited Init(start_x, start_y, border_y, width, height, countColumn);
 end;
 
 function Table2.setHeadOfColumns(): Header;
 begin
   setlength(result, countColumn);
-  Result[0] := 'свпефдемхе';
-  Result[1] := 'яоежхюкэмнярэ';
-  Result[2] := 'йнкхвеярбн ачдфермшу леяр';
-  Result[3] := 'йнкхвеярбн йнллепвеяйху леяр';
+  Result[0] := 'оняекнй';
+  Result[1] := 'мнлеп днлю';
+  Result[2] := 'окныюдэ днлю';
+  Result[3] := 'йнкхвеярбн щрюфеи';
+  Result[4] := 'рхо днлю';
 end;
 
 function Table2.enterNameOfTheInstitution: string;
@@ -431,9 +429,9 @@ end;
 function Table3.setHeadOfColumns(): Header;
 begin
   setlength(result, countColumn);
-  Result[0] := 'мНЛЕП';
-  Result[1] := 'мЮГБЮМХЕ';
-  Result[2] := 'дКХРЕКЭМНЯРЭ НАСВЕМХЪ';
+  Result[0] := 'мюгбюмхе дебекноепю';
+  Result[1] := 'цнднбни днунд';
+  Result[2] := 'юдпея';
 end;
 
 function Table3.enterNumberOfSpeciality: string;

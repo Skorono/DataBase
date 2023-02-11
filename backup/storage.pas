@@ -131,7 +131,6 @@ implementation
        end;
        close(f);
      except
-        writeln('hello');
      end;
    end;
 
@@ -197,6 +196,7 @@ implementation
        end;
      end;
   end;
+
   // удаляет элемент списка
   procedure Cls_List.delete(lineNumber: word);
   var
@@ -210,11 +210,11 @@ implementation
     newEmptyElm^.number := elm^.number;
     for i := 1 to countOfColumns do
     begin
-      newEmptyElm^.data[i] := Cell.Init(elm^.data[i].button_width, elm^.data[i].button_height,              // создается новая пустая строка при удалении
-                                        elm^.data[i].x_pos, elm^.data[i].y_pos, elm^.data[i].background, '');
+      newEmptyElm^.data[i] := Cell.Init(elm^.data[i].GetWidth, elm^.data[i].GetHeight,              // создается новая пустая строка при удалении
+                                        elm^.data[i].GetStartX, elm^.data[i].GetTopY, elm^.data[i].GetBackgroundColor, '');
       newEmptyElm^.data[i].border := Border.Init(elm^.data[i].border.symbol,                                // создается новая граница
-                                      elm^.data[i].border.XborderFreeSpace, elm^.data[i].border.YborderFreeSpace,
-                                      elm^.data[i].border.start_x, elm^.data[i].border.top_y, elm^.data[i].border.top_y,
+                                      elm^.data[i].border.GetXOffsetFromText, elm^.data[i].border.GetYOffsetFromText,
+                                      elm^.data[i].border.GetStartX, elm^.data[i].border.GetTopY, elm^.data[i].border.GetBottomY,
                                       elm^.data[i].border.text_size);
       elm^.data[i].border.Destroy; // удаляется старая граница
       elm^.data[i].Destroy;
@@ -337,14 +337,13 @@ implementation
     begin
       if (sender^.data[cell] <> nil) and (recipient^.data[cell] <> nil) then
       begin
-        recipient^.data[cell].x_pos := sender^.data[cell].x_pos;
-        recipient^.data[cell].y_pos := sender^.data[cell].y_pos;
-        recipient^.data[cell].border.start_x := sender^.data[cell].border.start_x;
-        recipient^.data[cell].border.last_x := sender^.data[cell].border.last_x;
-        recipient^.data[cell].border.top_y := sender^.data[cell].border.top_y;
-        recipient^.data[cell].border.bottom_y := sender^.data[cell].border.bottom_y;
-        recipient^.data[cell].button_width := sender^.data[cell].button_width;
-        recipient^.data[cell].button_height := sender^.data[cell].button_height;
+        recipient^.data[cell].ChangePos(sender^.data[cell].GetStartX, sender^.data[cell].GetTopY,
+                                          sender^.data[cell].GetLastX, sender^.data[cell].GetBottomY);
+
+        recipient^.data[cell].border.ChangePos(sender^.data[cell].border.GetStartX, sender^.data[cell].border.GetTopY, sender^.data[cell].border.GetBottomY);
+
+        recipient^.data[cell].ChangeSize(sender^.data[cell].GetWidth, sender^.data[cell].GetHeight);
+        recipient^.data[cell].ChangeColor(sender^.data[cell].GetTextColor);
       end;
     end;
   end;

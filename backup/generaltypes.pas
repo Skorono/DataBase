@@ -25,6 +25,7 @@ type
   function isInteger(text: string): boolean;
   function split(symbol: char; str: string): ArrOfString;
   function join(symbol: char; arr_str: ArrOfString): string;
+  procedure max(arr: array of string);
 implementation
 
   function isString(text: string): boolean;
@@ -87,18 +88,34 @@ implementation
     end;
   end;
 
+  //  Соединяет массив строк символом.
   function join(symbol: char; arr_str: ArrOfString): string;
   var
     i: integer;
     new_str: string;
   begin
-    new_str := '';
+    new_str := ''; // динамически изменяемая строка
     result := '';
     for i := 0 to length(arr_str)-1 do
-      new_str := new_str + arr_str[i] + symbol;
+      new_str := new_str + arr_str[i] + symbol; // изменяем строку
     //result := new_str + arr_str[length(arr_str)-1];
     result := new_str;
   end;
+
+  function max(arr: array of string): integer;
+  var
+    strI, maxL: integer;
+  begin
+    maxL := 0;
+    for strI := 0 to Length(arr) - 1 do
+    begin
+      if length(arr[strI]) > maxL then
+        maxL := length(arr[strI]);
+    end;
+    result := maxL;
+  end;
+
 end.
+
 
 

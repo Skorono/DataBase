@@ -20,10 +20,10 @@ type
       procedure Key_Left;
       procedure DelKey_UP;
       procedure DelKey_DOWN;
-      procedure SwitchHeadButton_Left(var on_headButton: byte);
-      procedure SwitchHeadButton_Right(var on_headButton: byte);
-      procedure PutButtonOnEachOther(number: byte);
-      procedure PutButtonsOnEachOther(fromButton, toButton: byte);
+      //procedure SwitchHeadButton_Left(var on_headButton: byte);
+      //procedure SwitchHeadButton_Right(var on_headButton: byte);
+      //procedure PutButtonOnEachOther(number: byte);
+      //procedure PutButtonsOnEachOther(fromButton, toButton: byte);
   private
     procedure additionalTextDelete;
     procedure cellsDelete;
@@ -100,7 +100,7 @@ begin
   lineList := Cls_List.Init(countColumn);   // инициализация списка с определенным количеством столбцов
   setlength(head_buttons, countColumn);     // устанавливаем размер динамическому массиву
   if addaptive then                         // адаптирует размер таблицы под экран устройства
-    addaptiveToSize(75)
+    addaptiveToSize(35)
   else
     head_width := width;
   showHead;
@@ -115,7 +115,7 @@ var
   button: byte;
 begin
   for button := 0 to countColumn - 1 do
-    head_buttons[button].border.clearBorder;
+    head_buttons[button].border.clear;
 end;
 
 procedure InheritedTableCls.SetBackground(abs_background: byte);
@@ -150,8 +150,8 @@ var
   i, pos_x, pos_y: integer;
 begin
   line := lineList.getNode(1);
-  pos_x := line^.data[countColumn].x_pos + line^.data[countColumn].button_width + (borderFreeSpace * 2);
-  pos_y := line^.data[countColumn].y_pos;
+  pos_x := line^.data[countColumn].GetStartX + line^.data[countColumn].GetWidth + (borderFreeSpace * 2);
+  pos_y := line^.data[countColumn].GetTopY;
   for i := 1 to hintCount do
   begin
     setlength(additional_textbutton, length(additional_textbutton) + 1);
@@ -168,14 +168,14 @@ var
   lineNode: PLine;
 begin
   lineNode := lineList.getNode(lineNumber); // получаем строку по её номеру из списка
-  result[1] := lineNode^.data[cellNumber].x_pos; // получаем координаты ячейки из строки по её номеру.
-  result[2] := lineNode^.data[cellNumber].y_pos;
+  result[1] := lineNode^.data[cellNumber].GetStartX; // получаем координаты ячейки из строки по её номеру.
+  result[2] := lineNode^.data[cellNumber].GetTopY;
 end;
 
 function InheritedTableCls.getHeadCellCoords(cellNumber: byte): Coords; // возвращает координаты заголовочного столбца
 begin
-  result[1] := head_buttons[cellNumber].x_pos;
-  result[2] := head_buttons[cellNumber].y_pos;
+  result[1] := head_buttons[cellNumber].GetStartX;
+  result[2] := head_buttons[cellNumber].GetTopY;
 end;
 
 function InheritedTableCls.getCoordsOfTheLastLineOffset: Coords; // возвращает координаты последней строки со сдвигом от неё
@@ -226,7 +226,7 @@ begin
     head_buttons[i].Show;
     x_pos := x_pos + head_width + borderFreeSpace;
   end;
-  x_border := head_buttons[countColumn-1].x_pos + head_buttons[countColumn-1].button_width + head_buttons[countColumn-1].border.XborderFreeSpace;
+  x_border := head_buttons[countColumn-1].GetStartX + head_buttons[countColumn-1].GetWidth + head_buttons[countColumn-1].border.GetXOffsetFromText;
 end;
 
 function InheritedTableCls.getFirstLineNumber(page: word): word;    // Номер первой строки на странице в списке
@@ -255,8 +255,8 @@ begin
     y_line_pos := headCoords[2] + (borderFreeSpace + 1) + (i * borderFreeSpace);
     for j := 0 to countColumn-1 do
     begin
-      Cells[j] := Cell.Init(head_width, head_height, head_buttons[j].x_pos, y_line_pos, background, '');
-      Cells[j].Border := Border.Init('-', borderFreeSpace-1, borderFreeSpace-1, head_buttons[j].x_pos, y_line_pos, y_line_pos, head_width); // инициализируем обрамление
+      Cells[j] := Cell.Init(head_width, head_height, head_buttons[j].GetStartX, y_line_pos, background, '');
+      Cells[j].Border := Border.Init('-', borderFreeSpace-1, borderFreeSpace-1, head_buttons[j].GetStartX, y_line_pos, y_line_pos, head_width); // инициализируем обрамление
     end;
     lineList.add_line(Cells);
   end;
@@ -415,15 +415,15 @@ var
   InputField: TextButton;
 begin
   lastLineInTable := lineList.getNode(lineCount); // получаем узел списка с последней линией в таблице
-  x_ := lastLineInTable^.data[1].x_pos;           // получаем координату по x последней линии
-  y_ := lastLineInTable^.data[countColumn].y_pos + (borderFreeSpace * 2); // получаем координату по y последней ячейки, последней линии со сдвигом
-  width := lastLineInTable^.data[countColumn].x_pos + lastLineInTable^.data[countColumn].button_width - borderFreeSpace; // считаем ширину поля ввода из координаты последней ячейки последний строки
+  x_ := lastLineInTable^.data[1].GetStartX;           // получаем координату по x последней линии
+  y_ := lastLineInTable^.data[countColumn].GetTopY + (borderFreeSpace * 2); // получаем координату по y последней ячейки, последней линии со сдвигом
+  width := lastLineInTable^.data[countColumn].GetStartX + lastLineInTable^.data[countColumn].GetWidth - borderFreeSpace; // считаем ширину поля ввода из координаты последней ячейки последний строки
   line := lineList.getNode(getFirstLineNumber(pageNumber) + (on_vertical_button-1)); // получаем строку в которую мы вводим текст
   InputField := createInputField(x_, y_, width);                                     // создаем поле для ввода
   InputField.setText(line^.data[on_horizontal_button].getText);                      // устанавливаем текст который сейчас находится в ячейке полю для ввода
   line^.data[on_horizontal_button].setText(enterTextFormat(InputField));             // после ввода текста устанавливаем введенный текст ячейке (получаем из enterTextFormat)
   line^.data[on_horizontal_button].show;                                             // отрисовываем ячейки
-  gotoxy(line^.data[on_horizontal_button].x_pos, line^.data[on_horizontal_button].y_pos); // переводим курсор к ячейке
+  gotoxy(line^.data[on_horizontal_button].GetStartX, line^.data[on_horizontal_button].GetStartX); // переводим курсор к ячейке
 end;
 
 // включает подсветку линии
@@ -584,51 +584,54 @@ begin
 end;
 
 // -----------------------------ТЕХНИЧЕСКИЕ РАБОТЫ!-----------------------------
-procedure InheritedTableCls.PutButtonOnEachOther(number: byte);
-begin
-  if (number <> 0) and (number < countColumn) then
-  begin
-    head_buttons[number].x_pos := (head_buttons[number-1].x_pos + head_buttons[number-1].button_width) div 2;
-    head_buttons[number].border.start_x := head_buttons[number].x_pos - 1;
-  end;
-end;
-
-procedure InheritedTableCls.PutButtonsOnEachOther(fromButton, toButton: byte);
-var
-  button: byte;
-begin
-  if (fromButton >= 0) and (fromButton < countColumn) then
-  begin
-    for button := fromButton to toButton do
-      PutButtonOnEachOther(button);
-  end;
-end;
-
-procedure InheritedTableCls.SwitchHeadButton_Right(var on_headButton: byte);
-begin
-  clearHeadButtons;
-  if on_headButton <> countColumn-1 then
-  begin
-    on_headButton := on_headButton + 1;
-    PutButtonOnEachOther(on_headButton);
-    head_buttons[on_headButton].show;
-    head_buttons[on_headButton].border.show;
-    PutButtonsOnEachOther(on_headButton+2, countColumn);
-  end;
-end;
-
-procedure InheritedTableCls.SwitchHeadButton_Left(var on_headButton: byte);
-begin
-  clearHeadButtons;
-  if on_headButton <> 0 then
-  begin
-    PutButtonsOnEachOther(on_headButton + 1, countColumn);
-    on_headButton := on_headButton - 1;
-    head_buttons[on_headButton].show;
-    head_buttons[on_headButton].border.show;
-    //PutButtonOnEachOther(on_headButton+1);
-  end;
-end;
+//procedure InheritedTableCls.PutButtonOnEachOther(number: byte);
+//var
+//  newButtonXPos, newBorderXPos: byte;
+//begin
+//  if (number <> 0) and (number < countColumn) then
+//  begin
+//    newButtonXPos := (head_buttons[number-1].GetStartX + head_buttons[number-1].GetWidth) div 2;
+//    //head_buttons[number].GetStartX := ;
+//    //head_buttons[number].border.GetStartX := head_buttons[number].GetStartX - 1;
+//  end;
+//end;
+//
+//procedure InheritedTableCls.PutButtonsOnEachOther(fromButton, toButton: byte);
+//var
+//  button: byte;
+//begin
+//  if (fromButton >= 0) and (fromButton < countColumn) then
+//  begin
+//    for button := fromButton to toButton do
+//      PutButtonOnEachOther(button);
+//  end;
+//end;
+//
+//procedure InheritedTableCls.SwitchHeadButton_Right(var on_headButton: byte);
+//begin
+//  clearHeadButtons;
+//  if on_headButton <> countColumn-1 then
+//  begin
+//    on_headButton := on_headButton + 1;
+//    PutButtonOnEachOther(on_headButton);
+//    head_buttons[on_headButton].show;
+//    head_buttons[on_headButton].border.show;
+//    PutButtonsOnEachOther(on_headButton+2, countColumn);
+//  end;
+//end;
+//
+//procedure InheritedTableCls.SwitchHeadButton_Left(var on_headButton: byte);
+//begin
+//  clearHeadButtons;
+//  if on_headButton <> 0 then
+//  begin
+//    PutButtonsOnEachOther(on_headButton + 1, countColumn);
+//    on_headButton := on_headButton - 1;
+//    head_buttons[on_headButton].show;
+//    head_buttons[on_headButton].border.show;
+//    //PutButtonOnEachOther(on_headButton+1);
+//  end;
+//end;
 //------------------------------------------------------------------------------
 
 // создает меню выбора
@@ -664,7 +667,7 @@ begin
       flag := false;
     end
   end;
-  field.setText(enterText(field.getText, trunc(field.button_width - (field.button_width/3)))); // вызываем процедуру для ввода текста 2/3 строки
+  field.setText(enterText(field.getText, trunc(field.GetWidth * 0.66))); // вызываем процедуру для ввода текста 2/3 строки
 end;
 
 procedure InheritedTableCls.Save(fName: string);
@@ -682,15 +685,16 @@ var
   node: integer;
   line: PLine;
 begin
-  for node := 1 to lineList.nodeCount do
-  begin
-    line := lineList.getNode(node); // получаем узел
-    if line^.data[column].getText() = text then // поиск текста по столбцу в таблице
+  if column <> 0 then
+    for node := 1 to lineList.nodeCount do
     begin
-      pageNumber := (node div lineCount) + 1; // номер страницы на которой мы сейчас находимся
-      showpage();                             // показываем страницу
+      line := lineList.getNode(node); // получаем узел
+      if line^.data[column].getText() = text then // поиск текста по столбцу в таблице
+      begin
+        pageNumber := (node div lineCount) + 1; // номер страницы на которой мы сейчас находимся
+        showpage();                             // показываем страницу
+      end;
     end;
-  end;
 end;
 
 destructor InheritedTableCls.Destroy;

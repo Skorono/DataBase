@@ -63,9 +63,9 @@ var
 begin
   //backdrop := WindowManager.Init;
   main_menu := Menu.Init(110, 22, 240, 40, 0); // инициализируем меню по координатам
-  main_menu.addButton('Учреждения');
-  main_menu.addButton('Контрольные цифры приема');
-  main_menu.addButton('Специальности');
+  main_menu.addButton('Посёлки');
+  main_menu.addButton('Дома');
+  main_menu.addButton('Девелоперы');
   //backdrop.createNewWindow(110, 22, 240, 40, 7);
   //backdrop.showWindow(1);
   main_menu.Main;

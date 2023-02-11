@@ -12,16 +12,18 @@ type
     Menu = class
       x, y, x_border, y_border, on_button, background: byte;
       buttons: array[1..10] of TextButton;
+    private
       menu_border: Border;
       countButtons: byte;
-    private
+      widthOfOffset, heightOfOffset: byte;
       // существование границы
       borderExistence: boolean;
       procedure changePos(x_pos, y_pos: byte);
+      procedure changeSize(new_width_offset, new_height_offset: byte);
       procedure clearMenu;
       procedure eventKeyDown(var key: char); virtual;
       procedure SetBackground;
-      procedure showMenu; virtual;
+      procedure Show; virtual;
       procedure Key_UP; virtual;
       procedure Key_DOWN; virtual;
     public
@@ -39,7 +41,7 @@ type
       procedure Key_LEFT;
       procedure Key_RIGHT;
       procedure eventKeyDown(var key: char); override;
-      procedure showMenu; override;
+      procedure Show; override;
     public
       constructor Init(start_x, start_y, border_x , border_y, abs_background: integer);
       procedure addButton(text: string); override;
@@ -54,7 +56,7 @@ type
     procedure Save;
     procedure Search;
     procedure SortMode;
-    procedure ShowHeadMod;
+    //procedure ShowHeadMod;
     procedure DeleteMode;
     procedure WriteMode;
   public
@@ -84,7 +86,7 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
     window.showWindow(1);
   end;
 
-  procedure Menu.showMenu();
+  procedure Menu.Show();
   const
     text_size = 24;
   var
@@ -101,26 +103,46 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
 
     if borderExistence then // если параметр true
     begin
-      menu_border := border.Init('~', 5, 6, buttons[1].x_pos, buttons[1].y_pos, buttons[countButtons].y_pos, text_size);
+      if menu_border = nil then
+        menu_border := border.Init('~', 5, 6, buttons[1].GetStartX, buttons[1].GetTopY, buttons[countButtons].GetBottomY, text_size);
+      // BUG
       menu_border.show;
     end;
   end;
 
+  { Передвигает меню по новым координатам}
   procedure Menu.changePos(x_pos, y_pos: byte);
   const
     spaceBetweenButtons = 2;
   var
-    i: integer;
+    new_button_y, i: integer;
   begin
     x := x_pos;
     y := y_pos;
     for i := 1 to countButtons do
     begin
-      buttons[i].x_pos := x;
       if i = 1 then
-        buttons[i].y_pos := y
+        new_button_y := y
       else
-        buttons[i].y_pos := buttons[i-1].y_pos + spaceBetweenButtons; // сдвигаем по отношению к предыдущему
+        new_button_y := buttons[i-1].GetTopY + spaceBetweenButtons; // сдвигаем по отношению к предыдущему
+      buttons[i].ChangePos(x, new_button_y,
+                            x + buttons[i].GetWidth, buttons[i].GetBottomY + spaceBetweenButtons);
+    end;
+
+    if menu_border <> nil then
+      menu_border.ChangePos(buttons[1].GetStartX, buttons[1].GetTopY, buttons[countButtons].GetBottomY);
+  end;
+
+  {Изменяет размер меню посредством передвижения границы относительно текста
+  Размер меню изменится при следующей отрисовке
+  }
+  procedure Menu.changeSize(new_width_offset, new_height_offset: byte);
+  begin
+    if borderExistence then
+    begin
+      widthOfOffset  := new_width_offset;
+      heightOfOffset := new_height_offset;
+      menu_border.changeSize(widthOfOffset, heightOfOffset);
     end;
   end;
 
@@ -129,15 +151,15 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
   const
     spaceBetweenButtons = 2;
   var
-    cord_x, cord_y: integer;
+    cord_y: integer;
   begin
-    cord_x := x;
+    // меняется только координата по Y
     if countButtons > 0 then  // если это не первая кнопка
-      cord_y := buttons[countButtons].y_pos + spaceBetweenButtons // следующая кнопка ниже предыдущей
+      cord_y := buttons[countButtons].GetTopY + spaceBetweenButtons // следующая кнопка ниже предыдущей
     else
       cord_y := y; // если первая кнопка
     countButtons := countButtons + 1;
-    buttons[countButtons] := TextButton.Init(length(text), spaceBetweenButtons, cord_x, cord_y, background, text);
+    buttons[countButtons] := TextButton.Init(length(text), spaceBetweenButtons, x, cord_y, background, text);
   end;
 
   procedure Menu.Key_UP;
@@ -178,7 +200,7 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
     key: char;
   begin
     cursoroff;
-    showMenu;  // отрисовывает меню
+    Show;  // отрисовывает меню
     buttons[on_button].ChangeColor(15); // меняем цвет у кнопки на которой находится курсор
     window(x, y, x_border, y_border);
 
@@ -214,9 +236,9 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
     i: integer;
   begin
     for i := 1 to countButtons do
-      buttons[i].clearButton;
+      buttons[i].clear;
     if borderExistence then
-      menu_border.clearBorder;
+      menu_border.clear;
   end;
 
   destructor Menu.Destroy;
@@ -237,10 +259,10 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
     //menu_border := nil;
   end;
 
-  procedure SwitchMenu.showMenu;
+  procedure SwitchMenu.Show;
   begin
-    inherited showMenu;
-    buttons[countButtons].clearButton;
+    inherited Show;
+    buttons[countButtons].clear;
   end;
 
   // LEFT
@@ -249,9 +271,9 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
     inherited Key_UP;
 
     if on_button <> countButtons then
-      buttons[on_button+1].clearButton
+      buttons[on_button+1].clear
     else
-      buttons[1].clearButton;
+      buttons[1].clear;
   end;
 
   // RIGHT
@@ -259,9 +281,9 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
   begin
     inherited Key_DOWN;
     if on_button <> 1 then
-      buttons[on_button-1].clearButton // on_button-1 стирает предыдущий элемент
+      buttons[on_button-1].clear // on_button-1 стирает предыдущий элемент
     else
-      buttons[countButtons].clearButton;
+      buttons[countButtons].clear;
   end;
 
   procedure SwitchMenu.eventKeyDown(var key: char);
@@ -278,7 +300,8 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
   procedure SwitchMenu.addButton(text: string);
   begin
     inherited addButton(text);
-    buttons[countButtons].y_pos := y; // поскольку элементы меню находятся в одной точке Y устанавливаем у всех одинаковый
+    buttons[countButtons].ChangePos(buttons[countButtons].GetStartX, y,                                 // поскольку элементы меню находятся в одной точке Y устанавливаем у всех одинаковый
+                                      buttons[countButtons].GetLastX, buttons[countButtons].GetBottomY);
   end;
 
   procedure ViewTable.Main(var menu: Menu);
@@ -287,9 +310,9 @@ var
   currentCellCoords: Coords;
 begin
   table := T.Init(2, 2, 36, 8, 1); // (2, 2, 36, 8, 1)
-  menu.changePos(table.head_buttons[table.countColumn-1].x_pos + table.head_width + (menu.menu_border.XborderFreeSpace + 3),
-                 table.additional_textbutton[7].y_pos + (menu.menu_border.XborderFreeSpace + 3)); .// получаем позицию последней подсказки, прибавляем размер границы, чтобы она не мешала подсказке
-  menu.showMenu; // отрисовываем меню
+  menu.changePos(table.head_buttons[table.countColumn-1].GetStartX + table.head_width + (menu.menu_border.GetXOffsetFromText + 3),
+                 table.additional_textbutton[7].GetTopY + (menu.menu_border.GetXOffsetFromText + 3)); // получаем позицию последней подсказки, прибавляем размер границы, чтобы она не мешала подсказке
+  menu.Show; // отрисовываем меню
   table.showPage; // отрисовываем страницу таблицы
   key := ' ';
   currentCellCoords := table.getCellCoords(table.on_vertical_button, 1); // получаем координаты курсора по позиции на странице
@@ -303,7 +326,7 @@ begin
       #19: Save;
       #12: Load;
       #6: Search;
-      #8: ShowHeadMod;
+      //#8: ShowHeadMod;
     end;
     table.switchPage(key); // если нажато сочетание клавиш для переключения страницы, то она будет переключена, в противном случае ничего не произойдёт
   until (key = #27); // ESC
@@ -361,7 +384,7 @@ begin
     table.deleteLine(table.getFirstLineNumber(table.pageNumber) + (table.on_vertical_button-1));
   end;
   until (key = #27); // ESC
-  table.turnOffDeleteLight;   // отключается подсветка у строки
+  table.turnOffDeleteLight;   // отключается подсветку у строки
   table.showpage;
 end;
 
@@ -373,7 +396,7 @@ var
   selectionMenu: SwitchMenu;
   head_name: byte;
 begin
-  table.additional_textbutton[length(table.additional_textbutton) - 1].clearButton; // стирает подсказку о позиции.
+  table.additional_textbutton[length(table.additional_textbutton) - 1].clear; // стирает подсказку о позиции.
   selectionMenu := table.createSelectionMenu; // создаем переключающеес мееню
   selectionDescription := TextButton.Init(preliminaryTextLen, 1, selectionMenu.x, selectionMenu.y, 0, 'Sort by: '); // создаем текст перед меню
   selectionMenu.x := selectionMenu.x + preliminaryTextLen;  // сдвигаем меню от selectionDescription
@@ -395,9 +418,9 @@ var
   x_, y_, width: integer;
 begin
   lastLineInTable := table.lineList.getNode(table.lineCount);
-  x_ := lastLineInTable^.data[1].x_pos;
-  y_ := lastLineInTable^.data[table.countColumn].y_pos + (table.borderFreeSpace * 2);
-  width := lastLineInTable^.data[table.countColumn].x_pos + lastLineInTable^.data[table.countColumn].button_width - table.borderFreeSpace; // (переписать writeInCell)
+  x_ := lastLineInTable^.data[1].GetStartX;
+  y_ := lastLineInTable^.data[table.countColumn].GetTopY + (table.borderFreeSpace * 2);
+  width := lastLineInTable^.data[table.countColumn].GetStartX + lastLineInTable^.data[table.countColumn].GetWidth - table.borderFreeSpace; // (переписать writeInCell)
   field := table.createInputField(x_, y_, width);
   table.enterSavePath(field);
   table.Save(field.getText);
@@ -426,14 +449,14 @@ end;
 
 procedure ViewTable.Search;
 const
-  preliminaryTextLen = 11; // максимальный размер текста в меню выбора
+  preliminaryTextLen = 11; // размер подписи к меню выбора
 var
   coordsOfTheLastLine: Coords;
   selectionDescription, field: TextButton;
   selectionMenu: SwitchMenu;
   head_name: byte;
 begin
-  table.additional_textbutton[length(table.additional_textbutton) - 1].clearButton;  // стираем подсказку о позиции
+  table.additional_textbutton[length(table.additional_textbutton) - 1].clear;  // стираем подсказку о позиции
 
   selectionMenu := table.createSelectionMenu;  // создание меню выбора
   selectionMenu.x := selectionMenu.x + preliminaryTextLen;
@@ -450,35 +473,35 @@ begin
   coordsOfTheLastLine := table.getCellCoords(table.lineCount, 1);
   field := table.createInputField(coordsOfTheLastLine[1], coordsOfTheLastLine[2] + (table.borderFreeSpace * 2),
             coordsOfTheLastLine[1] + ((table.head_width + (table.borderFreeSpace-1)) * table.countColumn)); // ширина поля ввода
-  gotoxy(field.Border.start_x + field.border.XborderFreeSpace, field.Border.top_y + field.border.YborderFreeSpace); // перемещаем курсор к полю для ввода
-  field.setText(table.enterText('', field.button_width - field.border.XborderFreeSpace)); // enterText - ввод и проверка формата текста. setText - передача введенного текста полю
+  gotoxy(field.Border.GetStartX + field.border.GetXOffsetFromText, field.Border.GetTopY + field.border.GetYOffsetFromText); // перемещаем курсор к полю для ввода
+  field.setText(table.enterText('', field.GetWidth - field.border.GetXOffsetFromText)); // enterText - ввод и проверка формата текста. setText - передача введенного текста полю
   table.search(field.getText(), selectionMenu.on_button); // поиск в таблице по тексту и номеру столбца
   field.border.Destroy;
   field.Destroy();
 end;
 
 // не используется
-procedure ViewTable.ShowHeadMod;
-var
-  key: char;
-  on_button: byte = 0;
-  button: byte;
-begin
-  table.clearHeadButtons;
-  table.PutButtonsOnEachOther(on_button+1, table.countColumn);
-  for button := 0 to table.countColumn - 1 do
-  begin
-    table.head_buttons[button].show;
-    table.head_buttons[button].border.show;
-  end;
-  repeat
-    key := readkey;
-    case key of
-      #75: table.SwitchHeadButton_Left(on_button);
-      #77: table.SwitchHeadButton_Right(on_button);
-    end;
-  until key = #27;
-end;
+//procedure ViewTable.ShowHeadMod;
+//var
+//  key: char;
+//  on_button: byte = 0;
+//  button: byte;
+//begin
+//  table.clearHeadButtons;
+//  table.PutButtonsOnEachOther(on_button+1, table.countColumn);
+//  for button := 0 to table.countColumn - 1 do
+//  begin
+//    table.head_buttons[button].show;
+//    table.head_buttons[button].border.show;
+//  end;
+//  repeat
+//    key := readkey;
+//    case key of
+//      #75: table.SwitchHeadButton_Left(on_button);
+//      #77: table.SwitchHeadButton_Right(on_button);
+//    end;
+//  until key = #27;
+//end;
 
 destructor ViewTable.Destroy;
 var
@@ -491,7 +514,7 @@ begin
   begin
     gotoxy(1, y);
     //delline;
-    clreol;
+    clreol;  // стирает строку
     sleep(17);
   end;
   cursoron;

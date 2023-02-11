@@ -25,6 +25,7 @@ type
   function isInteger(text: string): boolean;
   function split(symbol: char; str: string): ArrOfString;
   function join(symbol: char; arr_str: ArrOfString): string;
+  function max(arr: array of string): integer;
 implementation
 
   function isString(text: string): boolean;
@@ -100,6 +101,21 @@ implementation
     //result := new_str + arr_str[length(arr_str)-1];
     result := new_str;
   end;
+
+  function max(arr: array of string): integer;
+  var
+    strI, maxL: integer;
+  begin
+    maxL := 0;
+    for strI := 0 to Length(arr) - 1 do
+    begin
+      if length(arr[strI]) > maxL then
+        maxL := length(arr[strI]);
+    end;
+    result := maxL;
+  end;
+
 end.
+
 
 
