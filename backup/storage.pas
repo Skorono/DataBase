@@ -24,7 +24,6 @@ type
          procedure readLineFromFile(var f: file; Cline: PLine);
          procedure writingLineInAFile(var f: file; Cline: PLine);
          procedure _pullOffElmFromList(var elm: PLine);
-         procedure _insert(var elm: PLine; i: integer);
          procedure _renumberList;
          procedure _propetiesTransmission(sender: PLine; var recipient: PLine);
        public
@@ -33,8 +32,8 @@ type
          destructor Destroy; override;
          function getNode(n: integer): PLine;
          procedure add_line(cells: array of Cell);
-         procedure rewrite_cell;
-         procedure insert(var elm: PLine; var replaceableNode: PLine);
+         procedure insert(var elm: PLine; i: integer);
+         procedure swap(var elm: PLine; var replaceableNode: PLine);
          procedure delete(lineNumber: word);
          procedure save(name: string);
          procedure load(name: string);
@@ -47,10 +46,6 @@ implementation
     nodeCount := 0;
     countOfColumns := countColumns;
     Line:=nil;
-  end;
-
-  procedure Cls_List.rewrite_cell;
-  begin
   end;
 
   {Добавляет линию таблицы в список.
@@ -124,7 +119,7 @@ implementation
      try
        assign(f, name);
        rewrite(f, sizeof(writeableRecord));
-       while line_copy^.next <> nil do
+       while line_copy <> nil do
        begin
          writingLineInAFile(f, line_copy);
          line_copy := line_copy^.next;
@@ -169,7 +164,7 @@ implementation
        while not EOF(f) do
        begin
          readLineFromFile(f, line_copy);
-         if line_copy^.next <> nil then
+         if line_copy <> nil then
            line_copy := line_copy^.next;
        end;
        close(f);
@@ -210,24 +205,22 @@ implementation
     newEmptyElm^.number := elm^.number;
     for i := 1 to countOfColumns do
     begin
-      newEmptyElm^.data[i] := Cell.Init(elm^.data[i].GetWidth, elm^.data[i].GetHeight,              // создается новая пустая строка при удалении
-                                        elm^.data[i].GetStartX, elm^.data[i].GetTopY, elm^.data[i].GetBackgroundColor, '');
-      newEmptyElm^.data[i].border := Border.Init(elm^.data[i].border.symbol,                                // создается новая граница
+      newEmptyElm^.data[i] := Cell.Init(elm^.data[i].GetWidth, elm^.data[i].GetHeight,
+                                      elm^.data[i].GetStartX, elm^.data[i].GetTopY,
+                                      elm^.data[i].GetBackgroundColor, '');
+      newEmptyElm^.data[i].border := Border.Init(elm^.data[i].border.symbol,
                                       elm^.data[i].border.GetXOffsetFromText, elm^.data[i].border.GetYOffsetFromText,
-                                      elm^.data[i].border.GetStartX, elm^.data[i].border.GetTopY, elm^.data[i].border.GetBottomY,
-                                      elm^.data[i].border.text_size);
+                                      elm^.data[i].GetStartX, elm^.data[i].GetTopY,
+                                      elm^.data[i].GetBottomY, elm^.data[i].border.GetWidth);
       elm^.data[i].border.Destroy; // удаляется старая граница
       elm^.data[i].Destroy;
     end;
-
     _pullOffElmFromList(elm); // вытаскивает элемент из списка
     _renumberList; // пересчитывает список без этого элемента
-
-    _insert(newEmptyElm, newEmptyElm^.number);  // вставляет элемент в список
-    _renumberList;
+    insert(newEmptyElm, newEmptyElm^.number);  // вставляет элемент в список
   end;
 
-  procedure Cls_List.insert(var elm: PLine; var replaceableNode: PLine);
+  procedure Cls_List.swap(var elm: PLine; var replaceableNode: PLine);
   var
     i: word;
     elmDataCopy: PLine;
@@ -243,12 +236,13 @@ implementation
     i := replaceableNode^.number;
     _pullOffElmFromList(elm);
     _renumberList;
-    _insert(elm, i);
-    _renumberList;
+    insert(elm, i);
 
     replaceableNode := getNode(i+1);
     _propetiesTransmission(replaceableNode, elm);
     _propetiesTransmission(elmDataCopy, replaceableNode);
+    replaceableNode.setText(elm.getText);
+    elm.setText(elmDataCopy.getText);
     for i := 1 to countOfColumns do
     begin
       elmDataCopy^.data[i].border.Destroy;
@@ -256,7 +250,7 @@ implementation
     end;
   end;
 
-  procedure Cls_List._insert(var elm: PLine; i: integer);
+  procedure Cls_List.insert(var elm: PLine; i: integer);
   var
     node: PLine;
   begin
@@ -282,6 +276,7 @@ implementation
       Line := elm;
     end;
     elm^.number := i;
+    _renumberList;
   end;
 
   procedure Cls_List._pullOffElmFromList(var elm: PLine);
@@ -337,13 +332,17 @@ implementation
     begin
       if (sender^.data[cell] <> nil) and (recipient^.data[cell] <> nil) then
       begin
+        recipient^.data[cell].setText(sender^.data[cell].getText);
         recipient^.data[cell].ChangePos(sender^.data[cell].GetStartX, sender^.data[cell].GetTopY,
                                           sender^.data[cell].GetLastX, sender^.data[cell].GetBottomY);
-
-        recipient^.data[cell].border.ChangePos(sender^.data[cell].border.GetStartX, sender^.data[cell].border.GetTopY, sender^.data[cell].border.GetBottomY);
-
         recipient^.data[cell].ChangeSize(sender^.data[cell].GetWidth, sender^.data[cell].GetHeight);
         recipient^.data[cell].ChangeColor(sender^.data[cell].GetTextColor);
+
+        recipient^.data[cell].border.ChangeWidth(sender^.data[cell].GetWidth);
+        recipient^.data[cell].border.ChangeOffset(sender^.data[cell].Border.GetXOffsetFromText,
+                                                  sender^.data[cell].Border.GetYOffsetFromText);
+        recipient^.data[cell].border.ChangePos(sender^.data[cell].GetStartX, sender^.data[cell].GetTopY, sender^.data[cell].GetBottomY);
+        recipient^.data[cell].border.symbol := sender^.data[cell].border.symbol;
       end;
     end;
   end;
@@ -356,13 +355,12 @@ implementation
     line_copy: PLine;
   begin
     line_copy := Line;
-    while Line^.number < nodeCount do
+    while line_copy <> nil do
     begin
       Line := Line^.next;
       Dispose(line_copy);
       line_copy := Line;
     end;
-    Line := nil;
   end;
 end.
 

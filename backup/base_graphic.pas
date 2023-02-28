@@ -39,15 +39,16 @@ type
     XborderFreeSpace, // расстояние от обрамления до текста по x
     YborderFreeSpace: byte; // расстояние от обрамления до текста по y
   public
-    text_size: byte;
     symbol: char;
 
     // конструктор нужен для инициализации и передачи параметров в объект
-    constructor Init(fsymbol: char; XfreeSpace, YfreeSpace, std_x, start_y, last_y, t_size: integer);  // инициализация обрамления
+    constructor Init(fsymbol: char; XfreeSpace, YfreeSpace, std_x, start_y, last_y,
+      new_width: byte);  // инициализация обрамления
     // метод удаляющий объект из памяти
     destructor Destroy; override; // меняет логику выполнения destroy: стирает объект с экрана
     procedure Show; override;
-    procedure ChangeSize(new_width_offset, new_height_offset: byte); override;
+    procedure ChangeWidth(new_width: byte);
+    procedure ChangeOffset(new_width_offset, new_height_offset: byte);
     procedure ChangePos(new_start_x, new_top_y, new_bottom_y: byte); reintroduce;
     function GetXOffsetFromText: byte;
     function GetYOffsetFromText: byte;
@@ -170,7 +171,6 @@ implementation
   begin
     if (new_color >= 0) then
       background := new_color;
-    show;
   end;
 
   constructor TextButton.Init(button_width, button_height, x_cord, y_cord, abs_background: byte; abs_text: string);
@@ -202,7 +202,6 @@ implementation
         width := new_width;
         height := new_height;
     end;
-    show;
   end;
 
   // стирает кнопку с экрана
@@ -282,11 +281,10 @@ implementation
       result := text;
   end;
 
-  constructor Border.Init(fsymbol: char; XfreeSpace, YfreeSpace, std_x, start_y, last_y, t_size: integer);
+  constructor Border.Init(fsymbol: char; XfreeSpace, YfreeSpace, std_x, start_y, last_y, new_width: byte);
   begin
-    XborderFreeSpace := XfreeSpace;
-    YborderFreeSpace := YfreeSpace;
-    text_size := t_size; // граница не касается текста
+    ChangeOffset(XfreeSpace, YfreeSpace);
+    ChangeWidth(new_width);
     ChangePos(std_x, start_y, last_y);
     symbol := fsymbol;
     color := 3;
@@ -294,22 +292,22 @@ implementation
   end;
 
   // изменяет расстояние границы от текста
-  procedure Border.ChangeSize(new_width_offset, new_height_offset: byte);
+  procedure Border.ChangeOffset(new_width_offset, new_height_offset: byte);
   begin
     if (new_width_offset > 0) and (new_height_offset > 0) then
     begin
       XborderFreeSpace := new_width_offset;
       YborderFreeSpace := new_height_offset;
     end;
-    show;
   end;
 
 procedure Border.ChangePos(new_start_x, new_top_y, new_bottom_y: byte);
 begin
-  start_x := new_start_x - XfreeSpace;
-  last_x := start_x + text_size + (XfreeSpace * 2);
+  start_x := new_start_x - XborderFreeSpace;
+  last_x := start_x + width + (XborderFreeSpace * 2);
+  height := abs(new_top_y - new_bottom_y) + 1;
   top_y := new_top_y - YborderFreeSpace;
-  bottom_y := new_bottom_y + YborderFreeSpace;
+  bottom_y := new_top_y + height + YborderFreeSpace;
 end;
 
   function Border.GetXOffsetFromText: byte;
@@ -348,14 +346,20 @@ end;
       gotoxy(_last_x, pos);
       write('|');
     end;
-    gotoxy(_start_x, _bottom_y+1);
+    gotoxy(_start_x, _bottom_y);
     write(' ' + horizontal_text + ' ');
+  end;
+
+    procedure Border.ChangeWidth(new_width: byte);
+  begin
+    if (new_width > 0) then
+      width := new_width;
   end;
 
   // BUG
   procedure Border.Clear;
   begin
-    window(start_x, top_y, last_x, bottom_y);
+    window(start_x, top_y, last_x, bottom_y-1);
     TextBackground(0);
     ClrScr;
   end;

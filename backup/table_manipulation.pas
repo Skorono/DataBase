@@ -14,22 +14,31 @@ type
 
   // класс описывает логику работы таблицы
   InheritedTableCls = class
-      procedure Key_UP;
-      procedure Key_DOWN;
-      procedure Key_RIGHT;
-      procedure Key_Left;
-      procedure DelKey_UP;
-      procedure DelKey_DOWN;
       //procedure SwitchHeadButton_Left(var on_headButton: byte);
       //procedure SwitchHeadButton_Right(var on_headButton: byte);
       //procedure PutButtonOnEachOther(number: byte);
       //procedure PutButtonsOnEachOther(fromButton, toButton: byte);
-  private
+  strict private
+    procedure Key_UP;
+    procedure Key_DOWN;
+    procedure Key_RIGHT;
+    procedure Key_Left;
     procedure additionalTextDelete;
     procedure cellsDelete;
     procedure createPositionHint;
+    procedure createTable;
     function getCoordsOfTheLastLineOffset: Coords;
     procedure headerDelete;
+    procedure showControlHint;
+    procedure showPositionHint;
+    procedure showHead;
+    procedure showLine(lineNumber: word);
+    procedure show();
+    procedure createHead;
+    procedure createNewPage;
+    procedure createControlHint;
+    procedure clearHeadButtons;
+    function calculationLineCount: byte;
   public
     countColumn: byte; { вернуть в strict protected }
     on_vertical_button, on_horizontal_button,
@@ -44,20 +53,13 @@ type
       abs_background: byte=0; addaptive: boolean=false);
     destructor Destroy; override;
     procedure showPage;
-    procedure showPositionHint;
-    procedure showLine(lineNumber: word);
-    procedure showHead;
-    procedure createNewPage;
-    procedure clearHeadButtons;
     {procedure createPage;}
     procedure writeInCell;
     procedure switchPage(key: char);
     procedure deleteLine(lineNumber: word);
     procedure LineLighting(lineNumber, color: word);
-    procedure turnOffDeleteLight;
     procedure nextPage;
     procedure previousPage;
-    procedure positional_hint;
     procedure addaptiveToSize(Xborder: byte);
     procedure SetBackground(abs_background: byte);
     procedure SortTable(column: byte);
@@ -65,6 +67,11 @@ type
     procedure Load(fName: string);
     procedure Search(text: string; column: byte);
     procedure enterSavePath(field: TextButton);
+    procedure DelKey_UP;
+    procedure DelKey_DOWN;
+    procedure turnOffDeleteLight;
+    procedure onKeyDown(key: char);
+    procedure onDelKeyDown(key: char);
     function createInputField(x_, y_, width: word): TextButton;
     function createSelectionMenu: SwitchMenu;
     function getFirstLineNumber(page: word): word;
@@ -73,7 +80,6 @@ type
     function deleteText(text: string; delCount: byte): string;
     function enterText(text: string; symbolsCount: byte): string;
     function enterNumber(digitsCount: byte): string;
-    function calculationLineCount: byte;
     // устанавливает названия столбцов
     function setHeadOfColumns(): Header; virtual;
     // определяет формат ввода по столбцу
@@ -93,21 +99,18 @@ begin
   y := start_y;
   background := abs_background;
   y_border := border_y;
-  elementsNumber := 100;
+  //elementsNumber := 100;
   pageNumber := 1;
   pageCount := 0;
   lineCount := calculationLineCount;
   lineList := Cls_List.Init(countColumn);   // инициализация списка с определенным количеством столбцов
   setlength(head_buttons, countColumn);     // устанавливаем размер динамическому массиву
   if addaptive then                         // адаптирует размер таблицы под экран устройства
-    addaptiveToSize(50)
+    addaptiveToSize(35)
   else
     head_width := width;
-  showHead;
-  createNewPage;
-  positional_hint;                          // создает подсказки по управлению БД
-  createPositionHint;                       // создает подсказку о позиции на странице
-  showPositionHint;                         // отрисовываем подсказку
+  CreateTable;
+  Show;
 end;
 
 procedure InheritedTableCls.clearHeadButtons;
@@ -136,7 +139,7 @@ begin
   result := (y_border - headSize - (x-1)) div lineSize;  // отнимаем от количества символов высоту шапки и x (координата положения таблицы) и делим на высоту одной линии
 end;
 
-procedure InheritedTableCls.positional_hint;
+procedure InheritedTableCls.createControlHint;
 const
   height = 1;
   hintCount = 8;
@@ -156,10 +159,17 @@ begin
   begin
     setlength(additional_textbutton, length(additional_textbutton) + 1);
     hint := TextButton.Init(length(text[i]), height, pos_x, pos_y, background, text[i]);
-    hint.show;
     additional_textbutton[length(additional_textbutton)-1] := hint;
     inc(pos_y);
   end;
+end;
+
+procedure InheritedTableCls.showControlHint;
+var
+  button: byte;
+begin
+  for button := 0 to length(additional_textbutton) - 1 do
+    additional_textbutton[button].show;
 end;
 
 // получение координат клетки
@@ -201,6 +211,14 @@ begin
   additional_textbutton[length(additional_textbutton) - 1] := inf_button;
 end;
 
+procedure InheritedTableCls.createTable;
+begin
+  createHead;
+  createNewPage;
+  createControlHint;
+  createPositionHint;                       // создает подсказку о позиции на странице
+end;
+
 procedure InheritedTableCls.showPositionHint;
 begin
   additional_textbutton[length(additional_textbutton) - 1].setText('страница: ' + inttostr(pageNumber) + ' строка: ' + inttostr(on_vertical_button) + ' ячейка: ' + inttostr(on_horizontal_button));
@@ -208,6 +226,17 @@ begin
 end;
 
 procedure InheritedTableCls.showHead;
+var
+  i: byte;
+begin
+  for i := 0 to countColumn-1 do
+  begin
+    head_buttons[i].Show;
+    head_buttons[i].Border.Show;
+  end;
+end;
+
+procedure InheritedTableCls.createHead;
 var
   i: integer;
   columnHeader: Header;
@@ -223,7 +252,6 @@ begin
     head_buttons[i].Border := border.Init('-', borderFreeSpace, borderFreeSpace, x_pos, y_pos, y_pos, head_width);
     head_buttons[i].Border.ChangeColor(1);
     head_buttons[i].Border.ChangeBackground(background);
-    head_buttons[i].Show;
     x_pos := x_pos + head_width + borderFreeSpace;
   end;
   x_border := head_buttons[countColumn-1].GetStartX + head_buttons[countColumn-1].GetWidth + head_buttons[countColumn-1].border.GetXOffsetFromText;
@@ -272,6 +300,7 @@ begin
   begin
       line^.data[i].Border.ChangeColor(1);
       line^.data[i].Border.ChangeBackground(background);
+      line^.data[i].border.show;
       line^.data[i].show;
   end;
 end;
@@ -288,6 +317,7 @@ begin
     showLine(pageHeadNumber + (lineNumber - 1));
     lineNumber := lineNumber + 1;
   end;
+  showPositionHint;
   cursoron;
 end;
 
@@ -321,15 +351,17 @@ end;
 // ввод текста с клавиатуры
 function InheritedTableCls.enterText(text: string; symbolsCount: byte): string;
 var
-  key: char = ' ';
+  key: string = '';
 begin
   result := '';
   while key <> #13 do
   begin
+    if key = #0 then
+      key := readkey;
     key := readkey;
     if (symbolsCount > length(text)) then
     begin
-      if isString(key) or (key in ['-', '/', '\']) then // проверка символа на принадлежность к букве или числу или к ['-', '/', '\']
+      if isString(key) or (key[1] in ['-', '/', '\']) then // проверка символа на принадлежность к букве или числу или к ['-', '/', '\']
       begin
         text := text + key;
         write(key);
@@ -404,6 +436,7 @@ begin
   createInputField.Border := Border.Init('-', borderFreeSpace-1, borderFreeSpace-1, x_, y_, y_, width); // создаем границу для текстового поля
   createInputField.show; // отрисовываем текстовое поле
   createInputField.Border.ChangeColor(15);  // меняем цвет границы
+  createInputField.Border.show;
   gotoxy(1 + borderFreeSpace, 1 + (borderFreeSpace-1)); // переводим курсор к вводу.
 end;
 
@@ -434,7 +467,10 @@ var
 begin
   line := lineList.getNode(lineNumber);
   for i := 1 to countColumn do
+  begin
     line^.data[i].border.ChangeBackground(color);
+    line^.data[i].border.show;
+  end
 end;
 
 // отключает подсветку
@@ -448,6 +484,26 @@ begin
   LineLighting(lineNumber, 0);
   window(x, y, x_border, y_border);
   gotoxy(line[1], line[2]);
+end;
+
+procedure InheritedTableCls.onDelKeyDown(key: char);
+begin
+  case readkey of
+    #72: DelKey_UP;
+    #80: DelKey_DOWN;
+  end;
+  showPositionHint;
+end;
+
+procedure InheritedTableCls.onKeyDown(key: char);
+begin
+  case readkey of
+    #72: Key_UP;
+    #80: Key_DOWN;
+    #75: Key_LEFT;
+    #77: Key_RIGHT;
+  end;
+  showPositionHint;
 end;
 
 // удаление и создание новой линии
@@ -571,14 +627,12 @@ begin
       line := line^.next;
       currentText := line^.data[column].getText;  // получает текст из текущей ячейки
       previousText := line^.previous^.data[column].getText;
-      if ((currentText <> '') and (previousText <> '')) then
-        if ((currentText[1] < previousText[1])             // если номер элемента в сортировке выше предыдущего то он идёт в вверх в таблице (например: a < b, то a будет выше)
-                                          and (isString(previousText[1]))
-                                          and (isString(currentText[1]))) then
-        begin
-          lineList.insert(line, line^.previous);
-          line := line^.next;
-        end;
+
+      if  (isMore(previousText, currentText)) then   // если номер элемента в сортировке выше предыдущего то он идёт в вверх в таблице (например: a < b, то a будет выше)
+      begin
+        lineList.swap(line, line^.previous);
+        line := line^.next;
+      end;
     end;
   end;
 end;
@@ -703,6 +757,14 @@ begin
   cellsDelete;
   additionalTextDelete;
   lineList.Destroy;
+end;
+
+procedure InheritedTableCls.show;
+begin
+  showHead;
+  showPage;
+  //showPositionHint;                       // отрисовываем подсказку
+  showControlHint;                          // создает подсказки по управлению БД
 end;
 
 begin

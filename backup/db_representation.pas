@@ -166,6 +166,7 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
   begin
     //buttons[on_button].background := 0;
     buttons[on_button].ChangeColor(15);
+    buttons[on_button].show;
     if on_button = 1 then
       on_button := countButtons
     else
@@ -176,6 +177,7 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
   procedure Menu.Key_DOWN;
   begin
     buttons[on_button].ChangeColor(15);
+    buttons[on_button].show;
     if on_button = countButtons then
       on_button := 1
     else
@@ -202,6 +204,7 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
     cursoroff;
     Show;  // отрисовывает меню
     buttons[on_button].ChangeColor(15); // меняем цвет у кнопки на которой находится курсор
+    buttons[on_button].show;
     window(x, y, x_border, y_border);
 
     key := #0;
@@ -209,6 +212,7 @@ constructor Menu.Init(start_x, start_y, border_x , border_y, abs_background: int
     while ((key <> #27) and (key <> #13)) do
     begin
       buttons[on_button].ChangeColor(2);
+      buttons[on_button].show;
       key := readkey;
       eventKeyDown(key);
       if key = #27 then // ESC выход из программы
@@ -313,7 +317,7 @@ begin
   menu.changePos(table.head_buttons[table.countColumn-1].GetStartX + table.head_width + (menu.menu_border.GetXOffsetFromText + 3),
                  table.additional_textbutton[7].GetTopY + (menu.menu_border.GetXOffsetFromText + 3)); // получаем позицию последней подсказки, прибавляем размер границы, чтобы она не мешала подсказке
   menu.Show; // отрисовываем меню
-  table.showPage; // отрисовываем страницу таблицы
+  //table.showPage; // отрисовываем страницу таблицы
   key := ' ';
   currentCellCoords := table.getCellCoords(table.on_vertical_button, 1); // получаем координаты курсора по позиции на странице
   gotoxy(currentCellCoords[1], currentCellCoords[2]); // перемещаем курсор по координатам
@@ -339,7 +343,6 @@ var
   currentCellCoords: Coords;
 begin
   repeat
-    table.showPositionHint;                                   // показываем подсказку о позиции курсора
     window(table.x, table.y, table.x_border, table.y_border); // создаем окно по координатам таблицы
 
     currentCellCoords := table.getCellCoords(table.on_vertical_button, table.on_horizontal_button);  // получаем координаты ячейки на которой находится курсоп
@@ -348,12 +351,7 @@ begin
     key := readkey;
     if key = #0 then
     begin
-      case readkey of
-        #72: table.Key_UP;
-        #80: table.Key_DOWN;
-        #75: table.Key_LEFT;
-        #77: table.Key_RIGHT;
-      end;
+      table.onKeyDown(key);
     end
     else if key = #13 then
       table.writeInCell;
@@ -364,7 +362,7 @@ procedure ViewTable.DeleteMode;
 var
   key: char;
 begin
-  table.showPositionHint;
+  //table.showPositionHint;
   key := ' ';
   table.on_horizontal_button := 1;
   table.on_vertical_button := 1;
@@ -373,11 +371,7 @@ begin
   key := readkey;
   if key = #0 then
   begin
-    case readkey of
-      #72: table.DelKey_UP;
-      #80: table.DelKey_DOWN;
-    end;
-    table.showPositionHint;
+    table.onDelKeyDown(key);
   end
   else if key = #4 then // Сtrl + D
   begin

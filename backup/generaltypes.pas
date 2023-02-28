@@ -23,9 +23,10 @@ type
 
   function isString(text: string): boolean;
   function isInteger(text: string): boolean;
+  function isMore(str1, str2: string): boolean;
   function split(symbol: char; str: string): ArrOfString;
   function join(symbol: char; arr_str: ArrOfString): string;
-  procedure max(arr: array of string);
+  function max(arr: array of string): integer;
 implementation
 
   function isString(text: string): boolean;
@@ -33,6 +34,8 @@ implementation
     i: integer;
   begin
     result := true;
+    if text = '' then
+      result := false;
     for i := 1 to length(text) do
     begin
       if not (((text[i] in ['A'..'Z'])
@@ -57,6 +60,17 @@ implementation
       if not (text[i] in ['0'..'9']) then
         result := false;
     end;
+  end;
+
+  function isMore(str1, str2: string): boolean;
+  begin
+    result := false;
+    if (isInteger(str1) and isInteger(str2)) then
+      if strToInt(str1) > strToInt(str2) then
+        result := true;
+    if (isString(str1) and isString(str2)) then
+      if str1[1] < str2[1] then
+        result := true;
   end;
 
   // возвращает массив "слов" разделенных опеределенным символом (symbol) -> split(): ["возвращает", "массив", "\"слов\"", "разделенных", "опеределенным", "символом", "(symbol)"]
