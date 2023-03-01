@@ -196,17 +196,24 @@ begin
 end;
 
 function Table2.enterHouseType: string;
+const
+  preliminaryTextLen = 6;
 var
+  selectionDescription: TextButton;
   selectionMenu: SwitchMenu;
 begin
-  selectionMenu := SwitchMenu.Init(additional_textbutton[length(additional_textbutton)-1].GetStartX, additional_textbutton[length(additional_textbutton)-1].GetTopY,
-                                  0, 0, 0);
+  selectionMenu := createSelectionMenu;
   selectionMenu.addButton('Каменный');
   selectionMenu.addButton('Деревянный');
   selectionMenu.addButton('Каркасный');
   additional_textbutton[length(additional_textbutton)-1].clear;
+
+  selectionDescription := TextButton.Init(preliminaryTextLen, 1, selectionMenu.x - preliminaryTextLen, selectionMenu.y, 0, 'Type: '); // создаем текст перед меню
+  selectionDescription.show;
+
   selectionMenu.Main;
   result := selectionMenu.buttons[selectionMenu.on_button].getText;
+  selectionDescription.Destroy;
   selectionMenu.Destroy;
   //showPositionHint;
 end;

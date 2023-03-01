@@ -31,8 +31,6 @@ type
     procedure createTable;
     function getCoordsOfTheLastLineOffset: Coords;
     procedure headerDelete;
-    procedure showControlHint;
-    procedure showPositionHint;
     procedure showHead;
     procedure showLine(lineNumber: word);
     procedure show();
@@ -80,6 +78,8 @@ type
     function deleteText(text: string; delCount: byte): string;
     function enterText(text: string; symbolsCount: byte): string;
     function enterNumber(digitsCount: byte): string;
+    procedure showControlHint;
+    procedure showPositionHint;
     // устанавливает названия столбцов
     function setHeadOfColumns(): Header; virtual;
     // определяет формат ввода по столбцу

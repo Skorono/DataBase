@@ -228,10 +228,11 @@ implementation
     new(elmDataCopy);
     for i := 1 to countOfColumns do
     begin
-      elmDataCopy^.data[i] := Cell.Create;
-      elmDataCopy^.data[i].border := Border.Create;
+      elmDataCopy^.data[i] := Cell.Init(elm^.data[i].GetWidth, elm^.data[i].GetHeight,
+                                      elm^.data[i].GetStartX, elm^.data[i].GetTopY, elm^.data[i].GetBackGroundColor, elm^.data[i].GetText);
+      elmDataCopy^.data[i].border := Border.Init(elm^.data[i].border.char, elm^.data[i].border.GetXOffsetFromText, elm^.data[i].border.GetYOffsetFromText,
+                                            elm^.data[i].GetStartX, elm^.data[i].GetTopY, elm^.data[i].GetBottomY, elm^.data[i].GetWidth);
     end;
-    _propetiesTransmission(elm, elmDataCopy);
 
     i := replaceableNode^.number;
     _pullOffElmFromList(elm);
@@ -241,8 +242,6 @@ implementation
     replaceableNode := getNode(i+1);
     _propetiesTransmission(replaceableNode, elm);
     _propetiesTransmission(elmDataCopy, replaceableNode);
-    replaceableNode.setText(elm.getText);
-    elm.setText(elmDataCopy.getText);
     for i := 1 to countOfColumns do
     begin
       elmDataCopy^.data[i].border.Destroy;
@@ -332,7 +331,7 @@ implementation
     begin
       if (sender^.data[cell] <> nil) and (recipient^.data[cell] <> nil) then
       begin
-        recipient^.data[cell].setText(sender^.data[cell].getText);
+        //recipient^.data[cell].setText(sender^.data[cell].getText);
         recipient^.data[cell].ChangePos(sender^.data[cell].GetStartX, sender^.data[cell].GetTopY,
                                           sender^.data[cell].GetLastX, sender^.data[cell].GetBottomY);
         recipient^.data[cell].ChangeSize(sender^.data[cell].GetWidth, sender^.data[cell].GetHeight);

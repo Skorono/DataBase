@@ -18,7 +18,7 @@ type
       //procedure SwitchHeadButton_Right(var on_headButton: byte);
       //procedure PutButtonOnEachOther(number: byte);
       //procedure PutButtonsOnEachOther(fromButton, toButton: byte);
-  private // не strict потому что доступно и наследникам
+  strict private
     procedure Key_UP;
     procedure Key_DOWN;
     procedure Key_RIGHT;
