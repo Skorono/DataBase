@@ -18,7 +18,7 @@ type
       //procedure SwitchHeadButton_Right(var on_headButton: byte);
       //procedure PutButtonOnEachOther(number: byte);
       //procedure PutButtonsOnEachOther(fromButton, toButton: byte);
-  strict private
+  private // не strict потому что доступно и наследникам
     procedure Key_UP;
     procedure Key_DOWN;
     procedure Key_RIGHT;
@@ -31,8 +31,6 @@ type
     procedure createTable;
     function getCoordsOfTheLastLineOffset: Coords;
     procedure headerDelete;
-    procedure showControlHint;
-    procedure showPositionHint;
     procedure showHead;
     procedure showLine(lineNumber: word);
     procedure show();
@@ -80,6 +78,8 @@ type
     function deleteText(text: string; delCount: byte): string;
     function enterText(text: string; symbolsCount: byte): string;
     function enterNumber(digitsCount: byte): string;
+    procedure showControlHint;
+    procedure showPositionHint;
     // устанавливает названия столбцов
     function setHeadOfColumns(): Header; virtual;
     // определяет формат ввода по столбцу
@@ -422,7 +422,7 @@ begin
       gotoxy(x_, y_);
       write(' ');
       gotoxy(x_, y_);                         // 'abc' 4 => ''
-      deleteText := copy(text, 1, length(text) - count); // удаляет count символов из строки
+      deleteText := copy(text, 0, length(text) - count); // удаляет count символов из строки
     until ((count = delCount) or (deleteText = '')); // пока не удалится нужное количество символов или пока не закончится строка.
   end;
 end;

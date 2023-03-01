@@ -18,11 +18,13 @@ type
       //procedure SwitchHeadButton_Right(var on_headButton: byte);
       //procedure PutButtonOnEachOther(number: byte);
       //procedure PutButtonsOnEachOther(fromButton, toButton: byte);
-  strict private
+  private // не strict потому что доступно и наследникам
     procedure Key_UP;
     procedure Key_DOWN;
     procedure Key_RIGHT;
     procedure Key_Left;
+    procedure DelKey_UP;
+    procedure DelKey_DOWN;
     procedure additionalTextDelete;
     procedure cellsDelete;
     procedure createPositionHint;
@@ -67,8 +69,6 @@ type
     procedure Load(fName: string);
     procedure Search(text: string; column: byte);
     procedure enterSavePath(field: TextButton);
-    procedure DelKey_UP;
-    procedure DelKey_DOWN;
     procedure turnOffDeleteLight;
     procedure onKeyDown(key: char);
     procedure onDelKeyDown(key: char);
@@ -422,7 +422,7 @@ begin
       gotoxy(x_, y_);
       write(' ');
       gotoxy(x_, y_);                         // 'abc' 4 => ''
-      deleteText := copy(text, 1, length(text) - count); // удаляет count символов из строки
+      deleteText := copy(text, 0, length(text) - count); // удаляет count символов из строки
     until ((count = delCount) or (deleteText = '')); // пока не удалится нужное количество символов или пока не закончится строка.
   end;
 end;
