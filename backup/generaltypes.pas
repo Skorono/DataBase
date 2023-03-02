@@ -42,7 +42,8 @@ implementation
               or (text[i] in ['a'..'z'])
               or (text[i] in ['À'..'ß'])
               or (text[i] in ['à'..'ÿ'])
-              or (text[i] in ['0'..'9'])))  then
+              or (text[i] in ['0'..'9'])
+              or (text[i] = ' '))  then
         result := false;
     end;
   end;
@@ -69,7 +70,7 @@ implementation
       if strToInt(str1) > strToInt(str2) then
         result := true;
     if (isString(str1) and isString(str2)) then
-      if str1[1] < str2[1] then
+      if str1[1] > str2[1] then
         result := true;
   end;
 

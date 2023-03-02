@@ -18,7 +18,7 @@ type
       //procedure SwitchHeadButton_Right(var on_headButton: byte);
       //procedure PutButtonOnEachOther(number: byte);
       //procedure PutButtonsOnEachOther(fromButton, toButton: byte);
-  private // не strict потому что доступно и наследникам
+  strict private
     procedure Key_UP;
     procedure Key_DOWN;
     procedure Key_RIGHT;
@@ -628,7 +628,7 @@ begin
       currentText := line^.data[column].getText;  // получает текст из текущей €чейки
       previousText := line^.previous^.data[column].getText;
 
-      if  (isMore(previousText, currentText)) then   // если номер элемента в сортировке выше предыдущего то он идЄт в вверх в таблице (например: a < b, то a будет выше)
+      if  ((isMore(previousText, currentText) and not (previousText[1] = ' ')) then   // если номер элемента в сортировке выше предыдущего то он идЄт в вверх в таблице (например: a < b, то a будет выше)
       begin
         lineList.swap(line, line^.previous);
         line := line^.next;

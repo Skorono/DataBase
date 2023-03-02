@@ -313,7 +313,7 @@ var
   key: char;
   currentCellCoords: Coords;
 begin
-  table := T.Init(2, 2, 36, 8, 1); // (2, 2, 36, 8, 1)
+  table := T.Init(2, 2, 36, 10, 1); // (2, 2, 36, 8, 1)
   menu.changePos(table.head_buttons[table.countColumn-1].GetStartX + table.head_width + (menu.menu_border.GetXOffsetFromText + 3),
                  table.additional_textbutton[7].GetTopY + (menu.menu_border.GetXOffsetFromText + 3)); // получаем позицию последней подсказки, прибавляем размер границы, чтобы она не мешала подсказке
   menu.Show; // отрисовываем меню

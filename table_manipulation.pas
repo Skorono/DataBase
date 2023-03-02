@@ -628,7 +628,7 @@ begin
       currentText := line^.data[column].getText;  // получает текст из текущей €чейки
       previousText := line^.previous^.data[column].getText;
 
-      if  (isMore(previousText, currentText)) then   // если номер элемента в сортировке выше предыдущего то он идЄт в вверх в таблице (например: a < b, то a будет выше)
+      if  ((isMore(previousText, currentText)) and not (previousText[1] = ' ')) then   // если номер элемента в сортировке выше предыдущего то он идЄт в вверх в таблице (например: a < b, то a будет выше)
       begin
         lineList.swap(line, line^.previous);
         line := line^.next;

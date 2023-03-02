@@ -42,7 +42,8 @@ implementation
               or (text[i] in ['a'..'z'])
               or (text[i] in ['À'..'ß'])
               or (text[i] in ['à'..'ÿ'])
-              or (text[i] in ['0'..'9'])))  then
+              or (text[i] in ['0'..'9'])
+              or (text[i] = ' ')))  then
         result := false;
     end;
   end;

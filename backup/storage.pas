@@ -7,12 +7,12 @@ uses
 const
   MAX_COUNT_OF_COLUMNS = 7;
 type
-     PLine = ^Line_Node; // СѓРєР°Р·Р°С‚РµР»СЊ РЅР° СЌР»РµРјРµРЅС‚ СЃРїРёСЃРєР°
+     PLine = ^Line_Node; // указатель на элемент списка
      Line_Node = record
-       data: array[1..MAX_COUNT_OF_COLUMNS] of Cell; // СЃС‚СЂРѕРєР° РёР· СЏС‡РµРµРє
-       number: word;                                 // РЅРѕРјРµСЂ СѓР·Р»Р°
-       next: PLine;                                  // СѓРєР°Р·Р°С‚РµР»СЊ РЅР° СЃР»РµРґСѓСЋС‰РёР№ СѓР·РµР»
-       previous: PLine;                              // СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РїСЂРµРґС‹РґСѓС‰РёР№ СѓР·РµР»
+       data: array[1..MAX_COUNT_OF_COLUMNS] of Cell; // строка из ячеек
+       number: word;                                 // номер узла
+       next: PLine;                                  // указатель на следующий узел
+       previous: PLine;                              // указатель на предыдущий узел
      end;
 
      { Cls_List }
@@ -27,7 +27,7 @@ type
          procedure _renumberList;
          procedure _propetiesTransmission(sender: PLine; var recipient: PLine);
        public
-         nodeCount: integer; // РєРѕР»РёС‡РµСЃС‚РІРѕ СѓР·Р»РѕРІ РІ СЃРїРёСЃРєРµ
+         nodeCount: integer; // количество узлов в списке
          constructor Init(countColumns: byte);
          destructor Destroy; override;
          function getNode(n: integer): PLine;
@@ -48,12 +48,12 @@ implementation
     Line:=nil;
   end;
 
-  {Р”РѕР±Р°РІР»СЏРµС‚ Р»РёРЅРёСЋ С‚Р°Р±Р»РёС†С‹ РІ СЃРїРёСЃРѕРє.
-  Р’ РїСЂРѕС†РµСЃСЃРµ СЃРѕР·РґР°РµС‚СЃСЏ РєРѕРїРёСЏ(list_copy) СЃРІРѕР№СЃС‚РІР° РєР»Р°СЃСЃР° Line,
-  Р·Р°С‚РµРј РєРѕРїРёРё РїСЂРёСЃРІР°РёРІР°РµС‚СЃСЏ Р°РґСЂРµСЃ РїР°СЂР°РјРµС‚СЂР° Р·Р°РїРёСЃРё "next" РґРѕ РјРѕРјРµРЅС‚Р°,
-  РїРѕРєР° РЅРµ Р±СѓРґРµС‚ РЅР°Р№РґРµРЅ РїРѕСЃР»РµРґРЅРёР№ СЌР»РµРјРµРЅС‚ СЃРїРёСЃРєР°.
-  РџРѕСЃР»Рµ РЅР°С…РѕР¶РґРµРЅРёСЏ РІ РєРѕРЅРµС† СЃС‚Р°РЅРѕРІРёС‚СЃСЏ
-  СѓРєР°Р·Р°С‚РµР»СЊ РЅР° Р·Р°РїРёСЃСЊ, СЃРѕРґРµСЂР¶Р°С‰СѓСЋ Р»РёРЅРёСЋ}
+  {Добавляет линию таблицы в список.
+  В процессе создается копия(list_copy) свойства класса Line,
+  затем копии присваивается адрес параметра записи "next" до момента,
+  пока не будет найден последний элемент списка.
+  После нахождения в конец становится
+  указатель на запись, содержащую линию}
   procedure Cls_List.add_line(cells: array of Cell);
   var
     new_node, list_copy: PLine;
@@ -126,6 +126,7 @@ implementation
        end;
        close(f);
      except
+       close(f);
      end;
    end;
 
@@ -145,7 +146,7 @@ implementation
          STR_ID: text := join(' ', split('$', intermediateText.text));
          INT_ID: text := intToStr(intermediateText.number);
        end;
-       Cline^.data[i].setText(text);
+       Cline^.data[i].setText(UTF8ToAnsi(text));
      end;
    end;
 
@@ -164,17 +165,19 @@ implementation
        while not EOF(f) do
        begin
          readLineFromFile(f, line_copy);
-         if line_copy <> nil then
-           line_copy := line_copy^.next;
+         if line_copy^.next <> nil then
+          line_copy := line_copy^.next;
+          //table.nextPage;
        end;
        close(f);
      except
+       close(f);
      end;
    end;
 
-  {Р’РѕР·РІСЂР°С‰Р°РµС‚ СЃС‚СЂРѕРєСѓ С‚Р°Р±Р»РёС†С‹ СЃ РѕРїСЂРµРґРµР»РµРЅРЅС‹Рј РЅРѕРјРµСЂРѕРј.
-  РЎРѕР·РґР°РµС‚СЃСЏ РєРѕРїРёСЏ (line_copy) СЃРІРѕР№СЃС‚РІР° РєР»Р°СЃСЃ Line РµР№ РїРµСЂРµРґР°РµС‚СЃСЏ СЃСЃС‹Р»РєР° РЅР° СЃР»РµРґСѓСЋС‰РёР№ СЌР»РµРјРµРЅС‚,
-  РїРѕРєР° РЅРµ Р±СѓРґРµС‚ РЅР°Р№РґРµРЅ СЌР»РµРјРµРЅС‚ СЃРїРёСЃРєР° СЃ РЅСѓР¶РЅС‹Рј РЅРѕРјРµСЂРѕРј.
+  {Возвращает строку таблицы с определенным номером.
+  Создается копия (line_copy) свойства класс Line ей передается ссылка на следующий элемент,
+  пока не будет найден элемент списка с нужным номером.
   }
   function Cls_List.getNode(n: integer): PLine;
   var
@@ -192,7 +195,7 @@ implementation
      end;
   end;
 
-  // СѓРґР°Р»СЏРµС‚ СЌР»РµРјРµРЅС‚ СЃРїРёСЃРєР°
+  // удаляет элемент списка
   procedure Cls_List.delete(lineNumber: word);
   var
     i: integer;
@@ -212,12 +215,12 @@ implementation
                                       elm^.data[i].border.GetXOffsetFromText, elm^.data[i].border.GetYOffsetFromText,
                                       elm^.data[i].GetStartX, elm^.data[i].GetTopY,
                                       elm^.data[i].GetBottomY, elm^.data[i].border.GetWidth);
-      elm^.data[i].border.Destroy; // СѓРґР°Р»СЏРµС‚СЃСЏ СЃС‚Р°СЂР°СЏ РіСЂР°РЅРёС†Р°
+      elm^.data[i].border.Destroy; // удаляется старая граница
       elm^.data[i].Destroy;
     end;
-    _pullOffElmFromList(elm); // РІС‹С‚Р°СЃРєРёРІР°РµС‚ СЌР»РµРјРµРЅС‚ РёР· СЃРїРёСЃРєР°
-    _renumberList; // РїРµСЂРµСЃС‡РёС‚С‹РІР°РµС‚ СЃРїРёСЃРѕРє Р±РµР· СЌС‚РѕРіРѕ СЌР»РµРјРµРЅС‚Р°
-    insert(newEmptyElm, newEmptyElm^.number);  // РІСЃС‚Р°РІР»СЏРµС‚ СЌР»РµРјРµРЅС‚ РІ СЃРїРёСЃРѕРє
+    _pullOffElmFromList(elm); // вытаскивает элемент из списка
+    _renumberList; // пересчитывает список без этого элемента
+    insert(newEmptyElm, newEmptyElm^.number);  // вставляет элемент в список
   end;
 
   procedure Cls_List.swap(var elm: PLine; var replaceableNode: PLine);
@@ -230,7 +233,7 @@ implementation
     begin
       elmDataCopy^.data[i] := Cell.Init(elm^.data[i].GetWidth, elm^.data[i].GetHeight,
                                       elm^.data[i].GetStartX, elm^.data[i].GetTopY, elm^.data[i].GetBackGroundColor, elm^.data[i].GetText);
-      elmDataCopy^.data[i].border := Border.Init(elm^.data[i].border.char, elm^.data[i].border.GetXOffsetFromText, elm^.data[i].border.GetYOffsetFromText,
+      elmDataCopy^.data[i].border := Border.Init(elm^.data[i].border.symbol, elm^.data[i].border.GetXOffsetFromText, elm^.data[i].border.GetYOffsetFromText,
                                             elm^.data[i].GetStartX, elm^.data[i].GetTopY, elm^.data[i].GetBottomY, elm^.data[i].GetWidth);
     end;
 
@@ -347,7 +350,7 @@ implementation
   end;
 
   {
-  РџРѕР»РЅРѕСЃС‚СЊ СѓРґР°Р»СЏРµС‚ СЃРїРёСЃРѕРє
+  Полность удаляет список
   }
   destructor Cls_List.Destroy;
   var
